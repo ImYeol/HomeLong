@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/Timer/bloc/timer_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
 
+import 'Timer/timer.dart';
 import 'home/home.dart';
 import 'simple_bloc_observer.dart';
 
@@ -20,6 +22,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<HomeBloc>(
           create: (_) => HomeBloc()..add(HomeStarted()),
         ),
+        BlocProvider<TimerBloc>(
+          create: (_) => TimerBloc(ticker: Ticker())..add(TimerReset()),
+        ),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -31,7 +36,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: AppTheme.backgroundColor, // background color
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: '/',
+        initialRoute: '/', // initial page
         routes: {
           '/': (context) => homePage(),
         },
