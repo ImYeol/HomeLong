@@ -1,0 +1,1 @@
+export 'settingPage.dart';
