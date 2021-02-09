@@ -34,6 +34,11 @@ dependencies:
   custom_navigation_bar: ^0.7.1
   fl_chart: ^0.12.2
   table_calendar: ^2.3.3
+  google_sign_in: ^4.5.9
+  firebase_auth: ^0.20.0+1
+  formz: ^0.3.2
+  firebase_core: ^0.7.0
+  font_awesome_flutter: ^8.11.0
 
 dev_dependencies:
   flutter_test:
