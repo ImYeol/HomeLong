@@ -5,13 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homg_long/Timer/bloc/timer_bloc.dart';
+import 'package:homg_long/timer/bloc/timer_bloc.dart';
 import 'package:homg_long/authentication/authentication.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:homg_long/splashPage.dart';
 
-import 'Timer/timer.dart';
+import 'timer/timer.dart';
 import 'home/home.dart';
 import 'login/loginPage.dart';
 import 'rank/rankPage.dart';
