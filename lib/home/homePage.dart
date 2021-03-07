@@ -1,7 +1,7 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:homg_long/authentication/model/userInfo.dart';
+import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/home/home.dart';
 import 'package:homg_long/rank/rank.dart';
