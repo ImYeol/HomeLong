@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/home/home.dart';
+import 'package:homg_long/wifi/bloc/wifi_setting_cubit.dart';
+import 'package:homg_long/wifi/model/wifi_connection_info.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key key}) : super(key: key);
@@ -21,41 +22,39 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: BlocBuilder<HomeBloc, HomeState>(
+        body: BlocBuilder<WifiSettingCubit, WifiConnectionInfo>(
           builder: (context, state) {
-            if (state is HomeLoading) {
-              return const CircularProgressIndicator();
-            } else if (state is HomeLoaded) {
-              return Container(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    TitleWidget(
-                      title: state.home.title,
-                    ),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    TimerDisplay(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    DateDisplay(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    DetailsSubTitle(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    AverageTimeDisplay()
-                  ],
-                ),
-              );
-            }
+            return Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TitleWidget(
+                    title: (state is WifiNotconnected)
+                        ? "Not Staying At Home"
+                        : "Staying At Home For",
+                  ),
+                  SizedBox(
+                    height: 50,
+                  ),
+                  TimerDisplay(hour: state.curHour, minute: state.curMinute),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  DateDisplay(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  DetailsSubTitle(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  AverageTimeDisplay()
+                ],
+              ),
+            );
           },
         ));
   }
@@ -82,13 +81,15 @@ class TitleWidget extends StatelessWidget {
 }
 
 class TimerDisplay extends StatelessWidget {
-  const TimerDisplay({Key key}) : super(key: key);
+  final int hour;
+  final int minute;
+  const TimerDisplay({Key key, this.hour, this.minute}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        "00 : 00",
+        minute.toString() + " : " + hour.toString(),
         style: TextStyle(
             fontSize: AppTheme.subtitle_font_size_big,
             color: AppTheme.font_color,

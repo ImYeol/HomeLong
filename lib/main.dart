@@ -2,12 +2,11 @@ import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homg_long/Timer/bloc/timer_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/setting/setting.dart';
-
-import 'Timer/timer.dart';
-import 'home/home.dart';
+import 'package:homg_long/home/homePage.dart';
+import 'package:homg_long/wifi/bloc/wifi_setting_cubit.dart';
+import 'package:homg_long/wifi/model/wifi_connection_info.dart';
+import 'package:homg_long/wifi/wifiSettingPage.dart';
 import 'rank/rankPage.dart';
 import 'simple_bloc_observer.dart';
 
@@ -22,11 +21,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(
-          create: (_) => HomeBloc()..add(HomeStarted()),
-        ),
-        BlocProvider<TimerBloc>(
-          create: (_) => TimerBloc(ticker: Ticker())..add(TimerReset()),
+        // BlocProvider<HomeBloc>(
+        //   create: (_) => HomeBloc()..add(HomeStarted()),
+        // ),
+        BlocProvider<WifiSettingCubit>(
+          create: (_) => WifiSettingCubit(WifiNotconnected(null, null, 0, 0)),
         ),
       ],
       child: MaterialApp(
@@ -43,9 +42,10 @@ class MyApp extends StatelessWidget {
           focusColor: AppTheme.focusColor,
           disabledColor: AppTheme.disabledColor,
         ),
-        initialRoute: '/', // initial page => set login page
+        initialRoute: '/wifi', // initial page => set login page
         routes: {
           '/': (context) => MyAppView(),
+          '/wifi': (context) => WifiSettingPage()
         },
       ),
     );
@@ -62,7 +62,12 @@ class MyAppView extends StatefulWidget {
 class _MyAppViewState extends State<MyAppView> {
   int _currentIndex = 0;
 
-  List<Widget> pages = <Widget>[HomePage(), RankPage(), SettingPage()];
+  List<Widget> pages = <Widget>[
+    HomePage(),
+    RankPage(),
+//    SettingPage(),
+    WifiSettingPage()
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
