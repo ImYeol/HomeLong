@@ -1,11 +1,14 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:homg_long/home/bloc/homeCubit.dart';
+import 'package:homg_long/home/model/homeState.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/home/home.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/setting/setting.dart';
+import 'package:homg_long/wifi/bloc/wifi_setting_cubit.dart';
+import 'package:homg_long/wifi/model/wifi_connection_info.dart';
 
 class MainApp extends StatefulWidget {
   final UserInfo userInfo;
@@ -23,20 +26,21 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
   List<Widget> pages = <Widget>[HomePage(), RankPage(), SettingPage()];
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
-          BlocProvider<HomeBloc>(
-            create: (BuildContext context) => HomeBloc()..add(HomeStarted()),
+          BlocProvider<HomeCubit>(
+            create: (BuildContext context) => HomeCubit(DataLoading()),
           ),
           BlocProvider<RankBloc>(
             create: (BuildContext context) => RankBloc(),
           ),
-          BlocProvider<SettingBloc>(
-            create: (BuildContext context) => SettingBloc(),
+          BlocProvider<WifiSettingCubit>(
+            create: (BuildContext context) =>
+                WifiSettingCubit(WifiNotconnected(null, null, 0, 0)),
           ),
         ],
         child: Scaffold(

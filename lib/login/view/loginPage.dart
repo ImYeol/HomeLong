@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/home/home.dart';
 import 'package:homg_long/login/cubit/kakaoCubit.dart';
 import 'package:homg_long/repository/%20authRepository.dart';
 
@@ -39,10 +38,7 @@ class LoginForm extends StatelessWidget {
         listener: (context, state) {
           if (state == LoginState.LOGIN) {
             print("LoginState=$state");
-            MainApp.route(context
-                .read<AuthenticationRepository>()
-                .user);
-            Navigator.pushNamed(context, '/');
+            Navigator.pushNamed(context, "/MainApp");
           }
           // } else if (state == LoginState.UNLOGIN) {
           //   print("LoginState=$state");
