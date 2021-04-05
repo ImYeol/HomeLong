@@ -18,4 +18,10 @@ class SimpleBlocObserver extends BlocObserver {
     print(transition);
     super.onTransition(bloc, transition);
   }
+
+  @override
+  void onChange(Cubit cubit, Change change) {
+    print(change);
+    super.onChange(cubit, change);
+  }
 }

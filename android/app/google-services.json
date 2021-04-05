@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "793336824639",
+    "project_id": "home-long",
+    "storage_bucket": "home-long.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:793336824639:android:3e8ed5f74b88b796c1898a",
+        "android_client_info": {
+          "package_name": "com.example.homg_long"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "793336824639-qg3j1ph2g2tr7u8en8dq1vatcqovribg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANG8Eo_Faa7jQ664q33vyDugplMfHNqv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "793336824639-qg3j1ph2g2tr7u8en8dq1vatcqovribg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

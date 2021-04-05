@@ -1,47 +1,42 @@
-import 'package:custom_navigation_bar/custom_navigation_bar.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/login/login.dart';
+import 'package:homg_long/repository/%20authRepository.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/setting/setting.dart';
-import 'home/home.dart';
-import 'rank/rankPage.dart';
+import 'package:homg_long/splashPage.dart';
+import 'home/homePage.dart';
+import 'login/view/loginPage.dart';
 import 'simple_bloc_observer.dart';
 
-void main() {
+//https://fkkmemi.github.io/ff/
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  EquatableConfig.stringify = kDebugMode;
+
+  // initalize custom bloc observer to print log.
   Bloc.observer = SimpleBlocObserver();
-  runApp(MyApp());
+
+  // run myapp with auth repository.
+  runApp(MyApp(
+    authenticationRepository: AuthenticationRepository(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // repository which can access user info.
+  final AuthenticationRepository authenticationRepository;
+
+  const MyApp({Key key, @required this.authenticationRepository});
+
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<HomeBloc>(
-          create: (_) => HomeBloc()..add(HomeStarted()),
-        ),
-      ],
-      child: MaterialApp(
-        theme: ThemeData(
-          // font : google popsins font
-          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
-          primarySwatch: AppTheme.primarySwatch,
-          primaryColor: AppTheme.primaryColor, // primary color
-          accentColor: AppTheme.accentColor,
-          backgroundColor: AppTheme.backgroundColor, // background color
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          bottomAppBarColor: AppTheme.bottomAppBarColor,
-          textSelectionColor: AppTheme.primaryColor,
-          focusColor: AppTheme.focusColor,
-          disabledColor: AppTheme.disabledColor,
-        ),
-        initialRoute: '/', // initial page => set login page
-        routes: {
-          '/': (context) => MyAppView(),
-        },
-      ),
+    // repository provider can access value by context.
+    return RepositoryProvider.value(
+      value: authenticationRepository,
+      child: MyAppView(),
     );
   }
 }
@@ -54,47 +49,36 @@ class MyAppView extends StatefulWidget {
 }
 
 class _MyAppViewState extends State<MyAppView> {
-  int _currentIndex = 0;
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  NavigatorState get _navigator => _navigatorKey.currentState;
 
-  List<Widget> pages = <Widget>[HomePage(), RankPage(), SettingPage()];
+  final routes = {
+    '/Login': (BuildContext context) => LoginPage(),
+    '/Main': (BuildContext context) => MainApp(),
+  };
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        extendBody: true,
-        backgroundColor: Theme.of(context).backgroundColor,
-        body: pages[_currentIndex],
-        bottomNavigationBar: _buildOriginDesign());
-  }
+    return MaterialApp(
+      theme: ThemeData(
+        // font : google popsins font
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+        primarySwatch: AppTheme.primarySwatch,
+        primaryColor: AppTheme.primaryColor, // primary color
+        accentColor: AppTheme.accentColor,
+        backgroundColor: AppTheme.backgroundColor, // background color
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        bottomAppBarColor: AppTheme.bottomAppBarColor,
+        textSelectionColor: AppTheme.primaryColor,
+        focusColor: AppTheme.focusColor,
+        disabledColor: AppTheme.disabledColor,
+      ),
+      initialRoute: '/Login',
+      routes: routes,
+      navigatorKey: _navigatorKey,
 
-  Widget _buildOriginDesign() {
-    return CustomNavigationBar(
-      iconSize: 30.0,
-      selectedColor: Theme.of(context).focusColor,
-      strokeColor: Colors.white,
-      unSelectedColor: Theme.of(context).disabledColor,
-      backgroundColor: Theme.of(context).bottomAppBarColor,
-      bubbleCurve: Curves.linear,
-      opacity: 1.0,
-      items: [
-        CustomNavigationBarItem(
-          icon: Icon(Icons.home),
-          selectedTitle: Text("Home"),
-        ),
-        CustomNavigationBarItem(
-          icon: Icon(Icons.people),
-          selectedTitle: Text("Rank"),
-        ),
-        CustomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          selectedTitle: Text("Setting"),
-        ),
-      ],
-      currentIndex: _currentIndex,
-      onTap: (index) {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
+      //The SplashPage is shown while the application determines the authentication state of the user
+      onGenerateRoute: (_) => SplashPage.route(),
     );
   }
 }
