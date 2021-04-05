@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:homg_long/Timer/ticker.dart';
+import 'package:homg_long/timer/ticker.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
