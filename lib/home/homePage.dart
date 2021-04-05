@@ -82,24 +82,22 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-      if (state is HomeLoading) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state is HomeLoaded) {
-        return Scaffold(
-            backgroundColor: Theme.of(context).backgroundColor,
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).backgroundColor,
-              elevation: 0,
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.share,
-                      color: AppTheme.icon_color, size: AppTheme.icon_size),
-                  onPressed: () {},
-                ),
-              ],
+    return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).backgroundColor,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.share,
+                  color: AppTheme.icon_color, size: AppTheme.icon_size),
+              onPressed: () {},
             ),
-            body: Container(
+          ],
+        ),
+        body: BlocBuilder<WifiSettingCubit, WifiConnectionInfo>(
+          builder: (context, state) {
+            return Container(
               padding: EdgeInsets.all(20),
               child: Column(
                 children: [
@@ -107,12 +105,14 @@ class HomePage extends StatelessWidget {
                     height: 20,
                   ),
                   TitleWidget(
-                    title: state.home.title,
+                    title: (state is WifiNotconnected)
+                        ? "Not Staying At Home"
+                        : "Staying At Home For",
                   ),
                   SizedBox(
                     height: 50,
                   ),
-                  TimerDisplay(),
+                  TimerDisplay(hour: state.curHour, minute: state.curMinute),
                   SizedBox(
                     height: 20,
                   ),
@@ -127,9 +127,9 @@ class HomePage extends StatelessWidget {
                   AverageTimeDisplay()
                 ],
               ),
-            ));
-      }
-    });
+            );
+          },
+        ));
   }
 }
 
@@ -154,13 +154,15 @@ class TitleWidget extends StatelessWidget {
 }
 
 class TimerDisplay extends StatelessWidget {
-  const TimerDisplay({Key key}) : super(key: key);
+  final int hour;
+  final int minute;
+  const TimerDisplay({Key key, this.hour, this.minute}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        "00 : 00",
+        minute.toString() + " : " + hour.toString(),
         style: TextStyle(
             fontSize: AppTheme.subtitle_font_size_big,
             color: AppTheme.font_color,
