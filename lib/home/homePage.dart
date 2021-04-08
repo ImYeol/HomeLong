@@ -1,11 +1,14 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:homg_long/home/bloc/homeCubit.dart';
+import 'package:homg_long/home/model/homeState.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/home/home.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/setting/setting.dart';
+import 'package:homg_long/wifi/bloc/wifi_setting_cubit.dart';
+import 'package:homg_long/wifi/model/wifi_connection_info.dart';
 
 class MainApp extends StatefulWidget {
   final UserInfo userInfo;
@@ -23,20 +26,21 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
   List<Widget> pages = <Widget>[HomePage(), RankPage(), SettingPage()];
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
-          BlocProvider<HomeBloc>(
-            create: (BuildContext context) => HomeBloc()..add(HomeStarted()),
+          BlocProvider<HomeCubit>(
+            create: (BuildContext context) => HomeCubit(DataLoading()),
           ),
           BlocProvider<RankBloc>(
             create: (BuildContext context) => RankBloc(),
           ),
-          BlocProvider<SettingBloc>(
-            create: (BuildContext context) => SettingBloc(),
+          BlocProvider<WifiSettingCubit>(
+            create: (BuildContext context) =>
+                WifiSettingCubit(WifiNotconnected(null, null, 0, 0)),
           ),
         ],
         child: Scaffold(
@@ -82,24 +86,22 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-      if (state is HomeLoading) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state is HomeLoaded) {
-        return Scaffold(
-            backgroundColor: Theme.of(context).backgroundColor,
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).backgroundColor,
-              elevation: 0,
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.share,
-                      color: AppTheme.icon_color, size: AppTheme.icon_size),
-                  onPressed: () {},
-                ),
-              ],
+    return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).backgroundColor,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.share,
+                  color: AppTheme.icon_color, size: AppTheme.icon_size),
+              onPressed: () {},
             ),
-            body: Container(
+          ],
+        ),
+        body: BlocBuilder<WifiSettingCubit, WifiConnectionInfo>(
+          builder: (context, state) {
+            return Container(
               padding: EdgeInsets.all(20),
               child: Column(
                 children: [
@@ -107,12 +109,14 @@ class HomePage extends StatelessWidget {
                     height: 20,
                   ),
                   TitleWidget(
-                    title: state.home.title,
+                    title: (state is WifiNotconnected)
+                        ? "Not Staying At Home"
+                        : "Staying At Home For",
                   ),
                   SizedBox(
                     height: 50,
                   ),
-                  TimerDisplay(),
+                  TimerDisplay(hour: state.curHour, minute: state.curMinute),
                   SizedBox(
                     height: 20,
                   ),
@@ -127,9 +131,9 @@ class HomePage extends StatelessWidget {
                   AverageTimeDisplay()
                 ],
               ),
-            ));
-      }
-    });
+            );
+          },
+        ));
   }
 }
 
@@ -154,13 +158,15 @@ class TitleWidget extends StatelessWidget {
 }
 
 class TimerDisplay extends StatelessWidget {
-  const TimerDisplay({Key key}) : super(key: key);
+  final int hour;
+  final int minute;
+  const TimerDisplay({Key key, this.hour, this.minute}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        "00 : 00",
+        minute.toString() + " : " + hour.toString(),
         style: TextStyle(
             fontSize: AppTheme.subtitle_font_size_big,
             color: AppTheme.font_color,
