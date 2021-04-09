@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/model/homeState.dart';
+import 'package:homg_long/repository/counterService.dart';
+import 'package:homg_long/repository/model/timeEvent.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/rank/rank.dart';
+import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:homg_long/wifi/bloc/wifi_setting_cubit.dart';
-import 'package:homg_long/wifi/model/wifi_connection_info.dart';
 
 class MainApp extends StatefulWidget {
   final UserInfo userInfo;
@@ -33,14 +35,13 @@ class _MainAppState extends State<MainApp> {
     return MultiBlocProvider(
         providers: [
           BlocProvider<HomeCubit>(
-            create: (BuildContext context) => HomeCubit(DataLoading()),
+            create: (BuildContext context) => HomeCubit(context.read<WifiConnectionService>(), context.read<CounterService>()),
           ),
           BlocProvider<RankBloc>(
             create: (BuildContext context) => RankBloc(),
           ),
-          BlocProvider<WifiSettingCubit>(
-            create: (BuildContext context) =>
-                WifiSettingCubit(WifiNotconnected(null, null, 0, 0)),
+          BlocProvider<SettingBloc>(
+            create: (BuildContext context) => SettingBloc(),
           ),
         ],
         child: Scaffold(
@@ -86,6 +87,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<HomeCubit>().init();
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
@@ -99,40 +101,34 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: BlocBuilder<WifiSettingCubit, WifiConnectionInfo>(
-          builder: (context, state) {
-            return Container(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TitleWidget(
-                    title: (state is WifiNotconnected)
-                        ? "Not Staying At Home"
-                        : "Staying At Home For",
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  TimerDisplay(hour: state.curHour, minute: state.curMinute),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  DateDisplay(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  DetailsSubTitle(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  AverageTimeDisplay()
-                ],
+        body: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 20,
               ),
-            );
-          },
+              TitleWidget(
+                title: "Staying At Home For",
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              TimerDisplay(),
+              SizedBox(
+                height: 20,
+              ),
+              DateDisplay(),
+              SizedBox(
+                height: 20,
+              ),
+              DetailsSubTitle(),
+              SizedBox(
+                height: 20,
+              ),
+              AverageTimeDisplay()
+            ],
+          ),
         ));
   }
 }
@@ -158,23 +154,55 @@ class TitleWidget extends StatelessWidget {
 }
 
 class TimerDisplay extends StatelessWidget {
-  final int hour;
-  final int minute;
-  const TimerDisplay({Key key, this.hour, this.minute}) : super(key: key);
+  int hour;
+  int minute;
+  TimerDisplay({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        minute.toString() + " : " + hour.toString(),
-        style: TextStyle(
-            fontSize: AppTheme.subtitle_font_size_big,
-            color: AppTheme.font_color,
-            fontWeight: FontWeight.bold),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
+    return BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, event) {
+            if(event is DayTimeChanged) {
+              hour = event.hour;
+              minute = event.minute;
+            }
+            return Center(
+              child: Text(
+                hour.toString()+ " : " + minute.toString(),
+                style: TextStyle(
+                    fontSize: AppTheme.subtitle_font_size_big,
+                    color: AppTheme.font_color,
+                    fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }
+        );
+  }
+}
+
+class CounterText extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeCubit, HomeState>(
+          buildWhen: (previousState, currentState) {
+            return (currentState is WeekTimeChanged) || (currentState is MonthTimeChanged);
+          },
+          builder: (context, event) {
+            return Center(
+              child: Text(
+                event.toString(),
+                style: TextStyle(
+                    fontSize: AppTheme.subtitle_font_size_small,
+                    color: AppTheme.font_color,
+                    fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }
+        );
   }
 }
 
@@ -183,9 +211,11 @@ class DateDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var now = DateTime.now();
+    var y2k = DateTime(now.year, now.month, now.day);
     return Center(
       child: Text(
-        "Monday 25 Jan 2021",
+        y2k.month.toString() + " " + y2k.day.toString() + ", " + y2k.year.toString(),
         style: TextStyle(
             fontSize: AppTheme.subtitle_font_size_middle,
             color: AppTheme.font_color,
@@ -242,7 +272,7 @@ class AverageTimeDisplay extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              getTimeView(3),
+              CounterText(),
             ],
           ),
           Column(
@@ -253,7 +283,7 @@ class AverageTimeDisplay extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              getTimeView(30)
+              CounterText()
             ],
           )
         ],
@@ -272,41 +302,6 @@ class AverageTimeDisplay extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-    );
-  }
-
-  Widget getTimeView(double time) {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-          color: AppTheme.primaryColor,
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          shape: BoxShape.rectangle),
-      child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              time.toString(),
-              style: TextStyle(
-                  fontSize: AppTheme.subtitle_font_size_big,
-                  color: AppTheme.reverse_font_color,
-                  fontWeight: FontWeight.bold),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              "Hour",
-              style: TextStyle(
-                  fontSize: AppTheme.subtitle_font_size_small,
-                  color: AppTheme.reverse_font_color,
-                  fontWeight: FontWeight.bold),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            )
-          ]),
     );
   }
 }
