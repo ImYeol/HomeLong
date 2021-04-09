@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/wifi/model/wifi_connection_info.dart';
-
+import 'package:homg_long/repository/model/wifiState.dart';
 import 'bloc/wifi_setting_cubit.dart';
 
 class WifiSettingPage extends StatelessWidget {
@@ -10,10 +9,10 @@ class WifiSettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<WifiSettingCubit>().subsribeWifiInfo();
+    context.read<WifiSettingCubit>().subscribeWifiEvent();
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        body: BlocBuilder<WifiSettingCubit, WifiConnectionInfo>(
+        body: BlocBuilder<WifiSettingCubit, WifiState>(
           builder: (context, state) {
             if (state is WifiConnected) {
               return HomeWifiSelector(state);
@@ -62,7 +61,7 @@ class WarningNoWifiConnection extends StatelessWidget {
 }
 
 class HomeWifiSelector extends StatelessWidget {
-  final WifiConnectionInfo connInfo;
+  final WifiState connInfo;
   final String title = "Select the Item for Home Wifi";
   HomeWifiSelector(this.connInfo);
 

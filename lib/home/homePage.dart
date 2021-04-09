@@ -8,7 +8,6 @@ import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:homg_long/wifi/bloc/wifi_setting_cubit.dart';
-import 'package:homg_long/wifi/model/wifi_connection_info.dart';
 
 class MainApp extends StatefulWidget {
   final UserInfo userInfo;
@@ -38,9 +37,8 @@ class _MainAppState extends State<MainApp> {
           BlocProvider<RankBloc>(
             create: (BuildContext context) => RankBloc(),
           ),
-          BlocProvider<WifiSettingCubit>(
-            create: (BuildContext context) =>
-                WifiSettingCubit(WifiNotconnected(null, null, 0, 0)),
+          BlocProvider<SettingBloc>(
+            create: (BuildContext context) => SettingBloc(),
           ),
         ],
         child: Scaffold(
@@ -99,40 +97,34 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: BlocBuilder<WifiSettingCubit, WifiConnectionInfo>(
-          builder: (context, state) {
-            return Container(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TitleWidget(
-                    title: (state is WifiNotconnected)
-                        ? "Not Staying At Home"
-                        : "Staying At Home For",
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  TimerDisplay(hour: state.curHour, minute: state.curMinute),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  DateDisplay(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  DetailsSubTitle(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  AverageTimeDisplay()
-                ],
+        body: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 20,
               ),
-            );
-          },
+              TitleWidget(
+                title: "Staying At Home For",
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              TimerDisplay(hour: 11, minute: 12),
+              SizedBox(
+                height: 20,
+              ),
+              DateDisplay(),
+              SizedBox(
+                height: 20,
+              ),
+              DetailsSubTitle(),
+              SizedBox(
+                height: 20,
+              ),
+              AverageTimeDisplay()
+            ],
+          ),
         ));
   }
 }
