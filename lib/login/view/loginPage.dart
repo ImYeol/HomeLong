@@ -38,7 +38,7 @@ class LoginForm extends StatelessWidget {
         listener: (context, state) {
           if (state == LoginState.LOGIN) {
             print("LoginState=$state");
-            Navigator.pushNamed(context, "/MainApp");
+            Navigator.pushNamed(context, "/Wifi");
           }
           // } else if (state == LoginState.UNLOGIN) {
           //   print("LoginState=$state");

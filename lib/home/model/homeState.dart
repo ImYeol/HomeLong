@@ -1,60 +1,33 @@
+import 'package:homg_long/home/model/timeData.dart';
+
 abstract class HomeState {
-  HomeState();
+  final TimeData day;
+  final TimeData week;
+  final TimeData month;
+
+  HomeState({this.day, this.week, this.month});
+
+  TimeData get _day => day;
+  TimeData get _week => week;
+  TimeData get _month => month;
 }
 
 class HomeInit extends HomeState {
-  HomeInit();
+  HomeInit()
+      : super(day: UnknownTime(), week: UnknownTime(), month: UnknownTime());
+}
+
+class UserInfoLoaded extends HomeState {
+  UserInfoLoaded()
+      : super(day: UnknownTime(), week: UnknownTime(), month: UnknownTime());
 }
 
 class DataLoading extends HomeState {
-  DataLoading();
+  DataLoading(TimeData day, TimeData week, TimeData month)
+      : super(day: day, week: week, month: month);
 }
 
 class DataLoaded extends HomeState {
-  DataLoaded();
-}
-
-class DayTimeChanged extends HomeState {
-  final int hour;
-  final int minute;
-
-  DayTimeChanged({this.hour, this.minute});
-
-  int get _hour => hour;
-  int get _minute => minute;
-
-  @override
-  String toString() {
-    return hour.toString() + " : " + minute.toString();
-  }
-}
-
-class WeekTimeChanged extends HomeState {
-  final int hour;
-  final int minute;
-
-  WeekTimeChanged({this.hour, this.minute});
-
-  int get _hour => hour;
-  int get _minute => minute;
-
-  @override
-  String toString() {
-    return hour.toString() + " : " + minute.toString();
-  }
-}
-
-class MonthTimeChanged extends HomeState {
-  final int hour;
-  final int minute;
-
-  MonthTimeChanged({this.hour, this.minute});
-
-  int get _hour => hour;
-  int get _minute => minute;
-
-  @override
-  String toString() {
-    return hour.toString() + " : " + minute.toString();
-  }
+  DataLoaded(TimeData day, TimeData week, TimeData month)
+      : super(day: day, week: week, month: month);
 }

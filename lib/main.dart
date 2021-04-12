@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/repository/%20authRepository.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/repository/counterService.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/splashPage.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
@@ -40,14 +39,9 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
         providers: [
           RepositoryProvider<AuthenticationRepository>(
-            create: (context) => AuthenticationRepository()
-          ),
+              create: (context) => AuthenticationRepository()),
           RepositoryProvider<WifiConnectionService>(
-            create: (context) => WifiConnectionService()
-          ),
-          RepositoryProvider<CounterService>(
-            create: (context) => CounterService()..init()
-          ),
+              create: (context) => WifiConnectionService()),
         ],
         child: MaterialApp(
           theme: ThemeData(
@@ -64,7 +58,7 @@ class MyApp extends StatelessWidget {
             focusColor: AppTheme.focusColor,
             disabledColor: AppTheme.disabledColor,
           ),
-          initialRoute: '/Main',
+          initialRoute: '/Login',
           routes: routes,
           navigatorKey: _navigatorKey,
 
