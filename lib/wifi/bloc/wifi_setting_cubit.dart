@@ -11,6 +11,7 @@ class WifiSettingCubit extends Cubit<WifiState> {
   WifiSettingCubit(WifiConnectionService connectionService)
       : super(WifiDisConnected(null, null)) {
     this.connectionService = connectionService;
+    this.subscribeWifiEvent();
   }
 
   void subscribeWifiEvent() {

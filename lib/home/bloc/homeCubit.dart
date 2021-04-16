@@ -18,6 +18,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   HomeCubit(WifiConnectionService connectionService) : super(HomeInit()) {
     this.connectionService = connectionService;
+    init();
   }
 
   void init() {

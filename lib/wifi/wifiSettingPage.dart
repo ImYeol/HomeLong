@@ -24,7 +24,7 @@ class WifiSettingPage extends StatelessWidget {
 class WifiSettingForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    context.read<WifiSettingCubit>().subscribeWifiEvent();
+    // context.read<WifiSettingCubit>().subscribeWifiEvent();
     return BlocBuilder<WifiSettingCubit, WifiState>(
           builder: (context, state) {
             if (state is WifiConnected) {

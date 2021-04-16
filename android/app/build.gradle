@@ -61,8 +61,7 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation platform('com.google.firebase:firebase-bom:26.4.0')
-    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.facebook.android:facebook-login:[8.1)' // facebook login
     // implementation "com.kakao.sdk:v2-user:2.4.0" // 카카오 로그인
     // implementation "com.kakao.sdk:v2-talk:2.4.0" // 친구, 메시지(카카오톡)
 }

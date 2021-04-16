@@ -28,15 +28,24 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao234991db49db0e7808bf5cea94beabff</string>
+                <string>fb1865521580263990</string>
 			</array>
 		</dict>
 	</array>
+    <key>FacebookAppID</key>
+    <string>1865521580263990</string>
+    <key>FacebookDisplayName</key>
+    <string>homglong</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakaokompassauth</string>
 		<string>kakaolink</string>
+        <string>fbapi</string>
+        <string>fb-messenger-share-api</string>
+        <string>fbauth2</string>
+        <string>fbshareextension</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -59,5 +68,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoads</key>
+          <true/>
+    </dict>
 </dict>
 </plist>
