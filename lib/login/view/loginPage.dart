@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/home/homePage.dart';
+import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
+import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/authRepository.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
-
-//https://bloclibrary.dev/#/flutterfirebaselogintutorial
-//https://github.com/bizz84/starter_architecture_flutter_firebase
-//https://medium.com/@SebastianEngel/easy-push-notifications-with-flutter-and-firebase-cloud-messaging-d96084f5954f
-//https://flutterawesome.com/smart-course-app-built-in-flutter/
 
 enum LoginState { LOGIN, UNLOGIN }
 
@@ -22,6 +18,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("build login page");
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Center(
@@ -39,15 +36,15 @@ class LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("build login form");
     return BlocListener<loginCubit, LoginState>(
       listener: (context, state) {
         if (state == LoginState.LOGIN) {
           print("LoginState=$state");
           Navigator.pushNamed(context, "/Wifi");
+        } else if (state == LoginState.UNLOGIN) {
+          print("LoginState=$state");
         }
-        // } else if (state == LoginState.UNLOGIN) {
-        //   print("LoginState=$state");
-        // }
       },
       child: Container(
         padding: EdgeInsets.all(10),
@@ -100,6 +97,18 @@ class LoginForm extends StatelessWidget {
                     );
                   },
                   child: Text('Temp button next'),
+                ),
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                RaisedButton(
+                  onPressed: () {
+                    context.read<loginCubit>().dbInfoLogOut();
+                  },
+                  child: Text('Log out'),
                 ),
               ],
             )

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/home/model/homeState.dart';
 import 'package:homg_long/home/model/timeData.dart';
-import 'package:homg_long/repository/model/userInfo.dart';
+import 'package:homg_long/repository/model/UserInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 

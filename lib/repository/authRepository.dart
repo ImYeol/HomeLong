@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'model/userInfo.dart';
+import 'package:homg_long/repository/db.dart';
+
+import 'model/InAppUser.dart';
+import 'model/UserInfo.dart';
 import 'package:homg_long/const/URL.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
@@ -36,8 +39,10 @@ class AuthenticationRepository {
   // login with kakao app.
   Future<bool> _loginWithKakao() async {
     try {
+      print("[kakao] loginWithKakao");
       // request authorization code.
       var code = await AuthCodeClient.instance.requestWithTalk();
+      print("[kakao] code=$code");
       return await _issueAccessToken(code);
     } catch (e) {
       print(e);
@@ -48,8 +53,10 @@ class AuthenticationRepository {
   // login with kakao web view.
   Future<bool> _loginWithKakaoWebview() async {
     try {
+      print("[kakao] loginWithKakaoWebview");
       // request authorization code.
       var code = await AuthCodeClient.instance.request();
+      print("[kakao] code=$code");
       return await _issueAccessToken(code);
     } catch (e) {
       print(e);
@@ -60,8 +67,10 @@ class AuthenticationRepository {
   // authorization with auth code.
   Future<bool> _issueAccessToken(String authCode) async {
     try {
+      print("[kakao] issueAccessToken");
       // request user token with authorization code.
       var token = await AuthApi.instance.issueAccessToken(authCode);
+      print("[kakao] token=$token");
       AccessTokenStore.instance.toStore(token);
 
       // request user info with kakao account.
@@ -75,16 +84,25 @@ class AuthenticationRepository {
   // get user info.
   // register user info when user is not registered before.
   Future<bool> _getKakaoInfo() async {
+    print("[kakao] getKakaoInfo");
     try {
       User user = await UserApi.instance.me();
-      print("user=$user");
 
       // login request body.
       var body = jsonEncode({
         'id': user.id.toString(),
         'image': user.properties["profile_image"],
       });
-      print("body:" + body.toString());
+      print("[kakao] put kakao info body:" + body.toString());
+
+      InAppUser _user = InAppUser();
+      _user.setUser({
+        'id': user.id.toString(),
+        'image': user.properties["profile_image"],
+      });
+
+      DBHelper().deleteUser();
+      DBHelper().setUser(_user);
 
       // post request.
       var url = URL.kakaoLoginURL;
@@ -92,10 +110,12 @@ class AuthenticationRepository {
         url,
         body: body,
       );
-      print("http response statusCode:$response.statusCode");
-      if(response.statusCode == statusCode.statusOK)
+      print("[kakao] http response statusCode:"+response.statusCode.toString());
+      if(response.statusCode == statusCode.statusOK) {
+        print("[kakao] success");
         return true;
-      else {
+      } else {
+        print("[kakao] fail");
         return false;
       }
     } catch (e) {
