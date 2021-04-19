@@ -73,10 +73,10 @@ class TimeData {
   void updateTime(int duration) {
     DateTime now = DateTime.now();
 
-    timeData[now.day] += duration;
     if (prevDate.day != now.day) {
       today = 0;
     } else {
+      timeData[now.day] += duration;
       today = timeData[now.day];
     }
 
@@ -125,11 +125,17 @@ class TimeData {
   }
 
   void setFromTimeString(String timeString) {
-    if (timeString == null) {
+    print("setFromTimeString : ${timeString}");
+    if (timeString == null || timeString.isEmpty) {
       print("Loaded timeString null");
       timeData = List.generate(31, (index) => 0);
       return;
     }
-    timeData = timeString.split(",").map((data) => int.parse(data)).toList();
+    List<String> times = timeString.split(",");
+    for (int i = 0; i < times.length; i++) {
+      print("time : ${times[i]}");
+      timeData[i] = int.parse(times[i]);
+    }
+    //timeData = timeString.split(",").map((data) => print("${data}"); int.parse(data)).toList();
   }
 }
