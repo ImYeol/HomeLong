@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/repository/%20authRepository.dart';
+import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'bloc/wifi_setting_cubit.dart';
@@ -14,10 +16,10 @@ class WifiSettingPage extends StatelessWidget {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: BlocProvider(
-          create: (_) => WifiSettingCubit(context.read<WifiConnectionService>()),
+          create: (_) =>
+              WifiSettingCubit(context.read<WifiConnectionService>()),
           child: WifiSettingForm(),
-        )
-    );
+        ));
   }
 }
 
@@ -26,14 +28,14 @@ class WifiSettingForm extends StatelessWidget {
   Widget build(BuildContext context) {
     // context.read<WifiSettingCubit>().subscribeWifiEvent();
     return BlocBuilder<WifiSettingCubit, WifiState>(
-          builder: (context, state) {
-            if (state is WifiConnected) {
-              return HomeWifiSelector(state);
-            } else {
-              return WarningNoWifiConnection();
-            }
-          },
-        );
+      builder: (context, state) {
+        if (state is WifiConnected) {
+          return HomeWifiSelector(state);
+        } else {
+          return WarningNoWifiConnection();
+        }
+      },
+    );
   }
 }
 
@@ -80,50 +82,61 @@ class HomeWifiSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-      SizedBox(
-        height: 100,
-      ),
-      Text(
-        title,
-        style: TextStyle(
-            fontSize: AppTheme.subtitle_font_size_small,
-            color: AppTheme.font_color,
-            fontWeight: FontWeight.bold),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      SizedBox(
-        height: 50,
-      ),
-      Text(
-        connInfo.bssid == null ? "unknonw" : connInfo.ssid,
-        style: TextStyle(
-            fontSize: AppTheme.header_font_size,
-            color: AppTheme.font_color,
-            fontWeight: FontWeight.bold),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      SizedBox(
-        height: 50,
-      ),
-      Text(
-        connInfo.bssid == null ? "unknonw" : connInfo.bssid,
-        style: TextStyle(
-            fontSize: AppTheme.header_font_size,
-            color: AppTheme.font_color,
-            fontWeight: FontWeight.bold),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      if (connInfo.bssid != null)
-        TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/Main');
-            },
-            child: Text("NEXT")),
-    ]));
+    return BlocListener<WifiSettingCubit, WifiState>(
+        listener: (context, state) {
+          if (state is WifiInfoSaved) {
+            Navigator.pushNamed(context, '/Main');
+          }
+        },
+        child: Center(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+              SizedBox(
+                height: 100,
+              ),
+              Text(
+                title,
+                style: TextStyle(
+                    fontSize: AppTheme.subtitle_font_size_small,
+                    color: AppTheme.font_color,
+                    fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              Text(
+                connInfo.bssid == null ? "unknonw" : connInfo.ssid,
+                style: TextStyle(
+                    fontSize: AppTheme.header_font_size,
+                    color: AppTheme.font_color,
+                    fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              Text(
+                connInfo.bssid == null ? "unknonw" : connInfo.bssid,
+                style: TextStyle(
+                    fontSize: AppTheme.header_font_size,
+                    color: AppTheme.font_color,
+                    fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (connInfo.bssid != null)
+                TextButton(
+                    onPressed: () {
+                      UserInfo userInfo =
+                          context.read<AuthenticationRepository>().user;
+                      context.read<WifiSettingCubit>().postWifiAPInfo(
+                          userInfo.id, connInfo.ssid, connInfo.bssid);
+                    },
+                    child: Text("NEXT")),
+            ])));
   }
 }

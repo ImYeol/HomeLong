@@ -15,3 +15,12 @@ class WifiConnected extends WifiState {
 class WifiDisConnected extends WifiState {
   WifiDisConnected(String ssid, String bssid) : super(ssid: ssid, bssid: bssid);
 }
+
+class WifiInfoSaved extends WifiState {
+  WifiInfoSaved(String ssid, String bssid) : super(ssid: ssid, bssid: bssid);
+}
+
+class WifiInfoSaveFailed extends WifiState {
+  WifiInfoSaveFailed(String ssid, String bssid)
+      : super(ssid: ssid, bssid: bssid);
+}

@@ -27,6 +27,17 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 0;
   List<Widget> pages = <Widget>[HomePage(), RankPage(), SettingPage()];
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (pages[_currentIndex] is HomePage) {
+      // TODO : loadData
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
