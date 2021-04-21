@@ -45,6 +45,9 @@ class DBHelper {
     final db = await database;
     var res = await db.query(_tableName);
     InAppUser _user = InAppUser();
+    if (res.first == null) {
+      return;
+    }
     _user.setUser(res.first);
     var id = _user.id;
     print("[database] get user(id:$id)");
