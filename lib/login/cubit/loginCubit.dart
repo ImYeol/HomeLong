@@ -52,18 +52,20 @@ class loginCubit extends Cubit<LoginState> {
   }
 
   dbInfoLogin() async{
+    print("[loginCubit] dbInfoLogin");
     await DBHelper().getUser();
     InAppUser _user = InAppUser();
-    print("user:$_user");
+    print("[loginCubit] user:"+_user.getUser().toString());
     if (_user.id != null){
       emit(LoginState.LOGIN);
     }
   }
 
   dbInfoLogOut() async{
+    print("[loginCubit] dbInfoLogOut");
     await DBHelper().deleteUser();
     InAppUser _user = InAppUser();
-    print("user:$_user");
+    print("[loginCubit] user:"+_user.getUser().toString());
     emit(LoginState.UNLOGIN);
   }
 }

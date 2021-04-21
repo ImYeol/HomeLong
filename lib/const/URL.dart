@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 class URL{
-  static String serverHost = "http://192.168.35.235";
+  static String serverHost = "http://192.168.35.36";
   static String serverPort = ":8080";
 
   // login

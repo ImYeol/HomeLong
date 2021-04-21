@@ -34,30 +34,33 @@ class DBHelper {
   }
 
   setUser(InAppUser user) async {
+    print("[database] set user");
     final db = await database;
     var res = await db.insert(_tableName, user.getUser());
     var id = user.id;
-    print("[database] set user($id):$res");
+    print("[database] set user result(id:$id):"+res.toString());
     return res;
   }
 
   getUser() async {
+    print("[database] get user");
     final db = await database;
     var res = await db.query(_tableName);
     InAppUser _user = InAppUser();
-    if (res.first == null) {
+    if (res.length == 0) {
       return;
     }
     _user.setUser(res.first);
     var id = _user.id;
-    print("[database] get user(id:$id)");
+    print("[database] get user result(id:$id):"+_user.toString());
     return res;
   }
 
   deleteUser() async {
+    print("[database] delete user");
     final db = await database;
     var res = db.delete(_tableName);
-    print("[database] delete user:"+res.toString());
+    print("[database] delete user result:"+res.toString());
     return res;
   }
 

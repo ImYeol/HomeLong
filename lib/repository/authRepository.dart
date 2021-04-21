@@ -25,7 +25,7 @@ class AuthenticationRepository {
 
     // check kakao app is installed in phone.
     final kakaoTalkInstalled = await isKakaoTalkInstalled();
-    print("kakaoTalkInstalled: $kakaoTalkInstalled");
+    print("[kakao] kakaoTalkInstalled: $kakaoTalkInstalled");
 
     if (kakaoTalkInstalled == true) {
       // login with kakao app.
@@ -76,7 +76,7 @@ class AuthenticationRepository {
       // request user info with kakao account.
       return await _getKakaoInfo();
     } catch (e) {
-      print("error on issuing access token: $e");
+      print("[kakao] error on issuing access token: $e");
       return false;
     }
   }
