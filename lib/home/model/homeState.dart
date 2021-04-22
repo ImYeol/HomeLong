@@ -1,33 +1,17 @@
-import 'package:homg_long/home/model/timeData.dart';
+import 'package:homg_long/proxy/model/timeData.dart';
 
 abstract class HomeState {
-  final TimeData day;
-  final TimeData week;
-  final TimeData month;
+  TimeData time;
 
-  HomeState({this.day, this.week, this.month});
+  HomeState({this.time});
 
-  TimeData get _day => day;
-  TimeData get _week => week;
-  TimeData get _month => month;
+  TimeData get _time => time;
 }
 
-class HomeInit extends HomeState {
-  HomeInit()
-      : super(day: UnknownTime(), week: UnknownTime(), month: UnknownTime());
+class TimeDataLoading extends HomeState {
+  TimeDataLoading(TimeData data) : super(time: data);
 }
 
-class UserInfoLoaded extends HomeState {
-  UserInfoLoaded()
-      : super(day: UnknownTime(), week: UnknownTime(), month: UnknownTime());
-}
-
-class DataLoading extends HomeState {
-  DataLoading(TimeData day, TimeData week, TimeData month)
-      : super(day: day, week: week, month: month);
-}
-
-class DataLoaded extends HomeState {
-  DataLoaded(TimeData day, TimeData week, TimeData month)
-      : super(day: day, week: week, month: month);
+class TimeDataLoaded extends HomeState {
+  TimeDataLoaded(TimeData data) : super(time: data);
 }

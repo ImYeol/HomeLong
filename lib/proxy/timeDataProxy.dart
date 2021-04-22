@@ -24,10 +24,9 @@ class TimeDataProxy {
     return (response.statusCode == 200);
   }
 
-  static Future<List<TimeData>> fetchAllTimeData(
-      String id, String dataType) async {
-    DateTime now = DateTime.now();
-    final response = await http.get(prefixUrl + dataType + "/get");
+  static Future<TimeData> fetchAllTimeData(String id, String dataType) async {
+    final response = await http
+        .get(prefixUrl + dataType + "/get" + "/" + id + "/" + getNowTime());
 
     if (response.statusCode == 200) {
       return compute(parseTimeData, response.body);
@@ -37,10 +36,16 @@ class TimeDataProxy {
     }
   }
 
-  // 응답 결과를 List<TimeData>로 변환하는 함수.
-  static List<TimeData> parseTimeData(String responseBody) {
-    final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+  static String getNowTime() {
+    var now = DateTime.now();
 
-    return parsed.map<TimeData>((json) => TimeData.fromJson(json)).toList();
+    return now.year.toString().substring(2, 4) +
+        now.month.toString() +
+        now.day.toString();
+  }
+
+  static TimeData parseTimeData(String responseBody) {
+    List<dynamic> parsed = json.decode(responseBody);
+    return TimeData.fromJson(parsed);
   }
 }

@@ -31,4 +31,11 @@ class WifiApDataProxy {
       throw Exception('Failed to load post');
     }
   }
+
+  // 응답 결과를 List<TimeData>로 변환하는 함수.
+  static List<APInfo> parseTimeData(String responseBody) {
+    final parsed = json.decode(responseBody).cast<Map<String, String>>();
+
+    return parsed.map<APInfo>((json) => APInfo.fromJson(json)).toList();
+  }
 }

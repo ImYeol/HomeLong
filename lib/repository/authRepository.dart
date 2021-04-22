@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:homg_long/repository/db.dart';
 
 import 'model/InAppUser.dart';
-import 'model/UserInfo.dart';
+import 'model/userInfo.dart';
 import 'package:homg_long/const/URL.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
@@ -110,8 +110,9 @@ class AuthenticationRepository {
         url,
         body: body,
       );
-      print("[kakao] http response statusCode:"+response.statusCode.toString());
-      if(response.statusCode == statusCode.statusOK) {
+      print(
+          "[kakao] http response statusCode:" + response.statusCode.toString());
+      if (response.statusCode == statusCode.statusOK) {
         print("[kakao] success");
         return true;
       } else {
@@ -162,7 +163,7 @@ class AuthenticationRepository {
         break;
     }
 
-    if(loginStatusCode == statusCode.statusOK)
+    if (loginStatusCode == statusCode.statusOK)
       return true;
     else {
       return false;

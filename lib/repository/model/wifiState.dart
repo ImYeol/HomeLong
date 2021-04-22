@@ -9,7 +9,9 @@ abstract class WifiState {
 }
 
 class WifiConnected extends WifiState {
-  WifiConnected(String ssid, String bssid) : super(ssid: ssid, bssid: bssid);
+  final int duration;
+  WifiConnected(String ssid, String bssid, this.duration)
+      : super(ssid: ssid, bssid: bssid);
 }
 
 class WifiDisConnected extends WifiState {

@@ -1,154 +1,80 @@
+import 'dart:convert';
+
 import 'package:homg_long/proxy/timeDataProxy.dart';
 
-abstract class TimeData {
-  int hour;
-  int minute;
-  DateTime prevTime;
+class TimeData {
+  List<int> timeData;
+  int today;
+  int week;
+  int month;
 
-  TimeData() {
-    hour = 0;
-    minute = 0;
-    prevTime = DateTime.now();
-  }
+  TimeData() {}
 
-  int get _hour => hour;
-  int get _minute => minute;
+  void toSumOfWeek(List<int> timeData) {
+    int size = timeData.length < 7 ? timeData.length : 7;
 
-  set _hour(int hour) {
-    this.hour = hour;
-  }
-
-  set _minute(int minute) {
-    this.minute = minute;
-  }
-
-  void incrementMinute();
-  bool needReset();
-  void reset() {
-    hour = 0;
-    minute = 0;
-  }
-
-  factory TimeData.fromJson(Map<String, dynamic> json) {
-    int hour = json['hour'];
-    int minute = json['minute'];
-    String dataType = json['dataType'];
-
-    if (dataType == TimeDataProxy.DataTypeDay) {
-      return DayTime(hour, minute);
-    } else if (dataType == TimeDataProxy.DataTypeWeek) {
-      return WeekTime(hour, minute);
-    } else if (dataType == TimeDataProxy.DataTypeMonth) {
-      return MonthTime(hour, minute);
-    } else {
-      return UnknownTime();
+    for (int i = 0; i < size; i++) {
+      week += i;
     }
   }
 
-  void copyOf(TimeData source) {
-    this.hour = source._hour;
-    this.minute = source._minute;
+  void toSumOfMonth(List<int> timeData) {
+    int size = timeData.length < 30 ? timeData.length : 30;
+
+    for (int i = 0; i < size; i++) {
+      month += i;
+    }
+  }
+
+  int get _today => today;
+  int get _week => week;
+  int get _month => month;
+
+  set _timeData(List<int> timeData) {
+    this.timeData = timeData;
+    toSumOfWeek(timeData);
+    toSumOfMonth(timeData);
+  }
+
+  set _today(int today) {
+    this.today = today;
+  }
+
+  set _week(int week) {
+    this.week = week;
+  }
+
+  set _month(int month) {
+    this.month = month;
+  }
+
+  factory TimeData.fromJson(List<dynamic> parsed) {
+    TimeData data = TimeData();
+    data._timeData = parsed.map((item) => item['time']).toList();
+    return data;
+  }
+
+  int getHour(int time) {
+    return (time / 60).floor();
+  }
+
+  int getMinute(int time) {
+    return time % 60;
+  }
+
+  void updateTime(int duration) {
+    today += duration;
+    week += duration;
+    month += duration;
   }
 
   @override
   String toString() {
-    return hour.toString() + " : " + minute.toString();
-  }
-}
-
-class UnknownTime extends TimeData {
-  @override
-  void incrementMinute() {
-    print("UnknownDayTime");
-  }
-
-  @override
-  bool needReset() {
-    return true;
-  }
-}
-
-class DayTime extends TimeData {
-  DayTime(int hour, int minute) {
-    this._hour = hour;
-    this._minute = minute;
-  }
-  @override
-  void incrementMinute() {
-    minute++;
-    if (minute >= 60) {
-      minute = 0;
-      hour++;
-    }
-    if (needReset()) return;
-  }
-
-  @override
-  bool needReset() {
-    bool result = false;
-    DateTime today = DateTime.now();
-    if (prevTime.day != today.day) {
-      result = true;
-      reset();
-    }
-    prevTime = today;
-    return result;
-  }
-}
-
-class WeekTime extends TimeData {
-  WeekTime(int hour, int minute) {
-    this._hour = hour;
-    this._minute = minute;
-  }
-  @override
-  void incrementMinute() {
-    minute++;
-    if (minute >= 60) {
-      minute = 0;
-      hour++;
-    }
-    if (needReset()) return;
-  }
-
-  @override
-  bool needReset() {
-    bool result = false;
-    DateTime thisWeek = DateTime.now();
-    if ((prevTime.weekday == DateTime.sunday) &&
-        (thisWeek.weekday == DateTime.monday)) {
-      result = true;
-      reset();
-    }
-    prevTime = thisWeek;
-    return result;
-  }
-}
-
-class MonthTime extends TimeData {
-  MonthTime(int hour, int minute) {
-    this._hour = hour;
-    this._minute = minute;
-  }
-  @override
-  void incrementMinute() {
-    minute++;
-    if (minute >= 60) {
-      minute = 0;
-      hour++;
-    }
-    if (needReset()) return;
-  }
-
-  @override
-  bool needReset() {
-    bool result = false;
-    DateTime thisMonth = DateTime.now();
-    if (prevTime.month != thisMonth.month) {
-      result = true;
-      reset();
-    }
-    prevTime = thisMonth;
-    return result;
+    return "today : " +
+        today.toString() +
+        ", week : " +
+        week.toString() +
+        ", month : " +
+        month.toString();
   }
 }

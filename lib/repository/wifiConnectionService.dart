@@ -10,15 +10,19 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';
 
 class WifiConnectionService {
-  StreamController<WifiState> _onNewData = StreamController<WifiState>.broadcast();
+  StreamController<WifiState> _onNewData =
+      StreamController<WifiState>.broadcast();
   Stream<WifiState> get onNewData => _onNewData.stream;
 
   String _connectionStatus = 'Unknown';
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   final WifiInfo _wifiInfo = WifiInfo();
+  final period = 5; // second
   String ssid;
   String bssid;
+  int duration = 0;
+  Timer timer;
 
   WifiConnectionService();
 
@@ -26,7 +30,7 @@ class WifiConnectionService {
     ssid = "Unknonw";
     bssid = "Unknonw";
     initConnectivity();
-    if(_connectivitySubscription == null || _connectivitySubscription.isPaused)
+    if (_connectivitySubscription == null || _connectivitySubscription.isPaused)
       _connectivitySubscription =
           _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     print("wifi service init");
@@ -87,18 +91,22 @@ class WifiConnectionService {
             'Wifi Name: $ssid\n'
             'Wifi BSSID: $bssid\n';
         print(_connectionStatus);
-
-        _onNewData.sink.add(WifiConnected(ssid, bssid));
+        _onNewData.sink.add(WifiConnected(ssid, bssid, duration));
+        //starCounter();
         break;
       case ConnectivityResult.mobile:
       case ConnectivityResult.none:
+        duration = 0;
         _connectionStatus = result.toString();
         _onNewData.sink.add(WifiDisConnected(ssid, bssid));
+        stopCounter();
         print(_connectionStatus);
         break;
       default:
+        duration = 0;
         _connectionStatus = 'Failed to get connectivity.';
         _onNewData.sink.add(WifiDisConnected(ssid, bssid));
+        stopCounter();
         print(_connectionStatus);
         break;
     }
@@ -152,5 +160,19 @@ class WifiConnectionService {
       wifiBSSID = "Failed to get Wifi BSSID";
     }
     return wifiBSSID;
+  }
+
+  void starCounter() {
+    print("startTimer");
+    if (timer != null) timer.cancel();
+    timer = Timer.periodic(Duration(seconds: period), (timer) {
+      duration += period;
+      print("onMinuteTimeEvent : " + duration.toString());
+      _onNewData.sink.add(WifiConnected(ssid, bssid, duration));
+    });
+  }
+
+  void stopCounter() {
+    timer.cancel();
   }
 }
