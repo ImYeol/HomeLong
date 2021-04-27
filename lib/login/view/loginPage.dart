@@ -21,12 +21,21 @@ class LoginPage extends StatelessWidget {
     print("build login page");
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
-      body: Center(
-        child: BlocProvider(
-          create: (_) => loginCubit(context.read<AuthenticationRepository>()),
-          child: LoginForm(),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+            image: AssetImage("images/login_background.jpg"),
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
+        child: Center(
+          child: BlocProvider(
+            create: (_) => loginCubit(context.read<AuthenticationRepository>()),
+            child: LoginForm(),
+          ),
+        ),
+      )
     );
   }
 }
@@ -49,6 +58,7 @@ class LoginForm extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(10),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -89,6 +99,7 @@ class LoginForm extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 RaisedButton(
                   onPressed: () {
@@ -129,7 +140,7 @@ class _MainIcon extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(left: 0),
         child: Image.asset(
-          'images/lover.png',
+          'images/house.png',
         ),
       ),
     );
