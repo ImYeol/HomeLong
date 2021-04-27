@@ -9,9 +9,21 @@ abstract class HomeState {
 }
 
 class TimeDataLoading extends HomeState {
-  TimeDataLoading(TimeData data) : super(time: data);
+  TimeDataLoading() : super(time: TimeData());
 }
 
 class TimeDataLoaded extends HomeState {
   TimeDataLoaded(TimeData data) : super(time: data);
+}
+
+class TimeDataSaving extends HomeState {
+  TimeDataSaving() : super(time: TimeData());
+}
+
+class TimeDataSaved extends HomeState {
+  TimeDataSaved() : super(time: TimeData());
+}
+
+class TimeDataError extends HomeState {
+  TimeDataError(TimeData data) : super(time: data);
 }

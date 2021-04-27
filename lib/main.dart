@@ -38,9 +38,8 @@ class MyApp extends StatelessWidget {
     '/Main': (BuildContext context) =>
         BlocProvider<BottomNavigationCubit>.value(
             value: BottomNavigationCubit(
-                homeCubit: HomeCubit(context.read<WifiConnectionService>()),
-                rankCubit: RankCubit())
-              ..dispatch(BottomNavigationCubit.HOME_PAGE),
+                homeCubit: HomeCubit(),
+                rankCubit: RankCubit()),
             child: AppScreen()),
     '/Wifi': (BuildContext context) => WifiSettingPage()
   };

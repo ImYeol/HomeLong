@@ -8,7 +8,11 @@ class TimeData {
   int week;
   int month;
 
-  TimeData() {}
+  TimeData() {
+    today = 0;
+    week = 0;
+    month = 0;
+  }
 
   void toSumOfWeek(List<int> timeData) {
     int size = timeData.length < 7 ? timeData.length : 7;
@@ -76,5 +80,17 @@ class TimeData {
         week.toString() +
         ", month : " +
         month.toString();
+  }
+
+  String toDayString() {
+    return getHour(today).toString() + " : " + getMinute(today).toString();
+  }
+
+  String toWeekString() {
+    return getHour(week).toString() + " : " + getMinute(week).toString();
+  }
+
+  String toMonthString() {
+    return getHour(month).toString() + " : " + getMinute(month).toString();
   }
 }

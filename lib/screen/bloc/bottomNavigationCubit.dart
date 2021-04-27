@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/homePage.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/repository/model/UserInfo.dart';
+import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/screen/model/bottomNavigationState.dart';
 
 class BottomNavigationCubit extends Cubit<BottomNavigationState> {
@@ -21,19 +23,24 @@ class BottomNavigationCubit extends Cubit<BottomNavigationState> {
 
   int get _currentPage => currentPage;
 
+  void init(BuildContext context) {
+    context.read<WifiConnectionService>().init();
+    dispatch(HOME_PAGE);
+  }
+
   void dispatch(int tappedIndex) {
     switch (tappedIndex) {
       case HOME_PAGE:
-        emit(HomePageLoaded(BlocProvider<HomeCubit>.value(
-            value: homeCubit, child: HomePage())));
+        emit(HomePageLoaded(BlocProvider<HomeCubit>(
+            create: (context) => HomeCubit(), child: HomePage())));
         break;
       case RANK_PAGE:
-        emit(RankPageLoaded(BlocProvider<RankCubit>.value(
-            value: rankCubit, child: RankPage())));
+        emit(RankPageLoaded(BlocProvider<RankCubit>(
+            create: (context) => RankCubit(), child: RankPage())));
         break;
       case SETTING_PAGE:
-        emit(SettingPageLoaded(BlocProvider<HomeCubit>.value(
-            value: homeCubit, child: HomePage())));
+        emit(SettingPageLoaded(BlocProvider<HomeCubit>(
+            create: (context) => HomeCubit(), child: HomePage())));
     }
   }
 }

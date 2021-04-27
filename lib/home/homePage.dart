@@ -1,20 +1,15 @@
-import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/model/homeState.dart';
-import 'package:homg_long/repository/model/UserInfo.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/rank/rank.dart';
-import 'package:homg_long/repository/wifiConnectionService.dart';
-import 'package:homg_long/setting/setting.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // context.read<HomeCubit>().init();
+    context.read<HomeCubit>().loadTimeData(context);
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
@@ -95,7 +90,7 @@ class TimerTextDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
         buildWhen: (previousState, currentState) {
-      return currentState is DataLoaded;
+      return currentState is TimeDataLoaded;
     }, builder: (context, event) {
       return Center(
           child: Text(
@@ -107,10 +102,10 @@ class TimerTextDisplay extends StatelessWidget {
 
   String getTimerValue(HomeState event) {
     if (timerType == "day")
-      return event.day.toString();
+      return event.time.toDayString();
     else if (timerType == "week")
-      return event.week.toString();
-    else if (timerType == "month") return event.month.toString();
+      return event.time.toWeekString();
+    else if (timerType == "month") return event.time.toMonthString();
   }
 }
 
