@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/repository/db.dart';
+import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';
@@ -21,7 +22,7 @@ class WifiConnectionService {
   Stream<WifiState> get onNewData => _onNewData.stream;
 
   String _connectionStatus = 'Unknown';
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  StreamSubscription<ConnectivityResult> _connectivitySubscription = null;
   ConnectivityResult currentConnectivityState = ConnectivityResult.none;
 
   String ssid = "Unknonw";
@@ -32,35 +33,26 @@ class WifiConnectionService {
   WifiConnectionService();
 
   void init() {
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     loadUserInfo();
-    if (_connectivitySubscription == null ||
-        _connectivitySubscription.isPaused) {
-      _connectivitySubscription =
-          _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-      initConnectivity();
-    }
+    initConnectivity();
     print("wifi service init");
   }
 
-  bool requestTimeData() {
-    if (_onNewData == null) return false;
-    if (_onNewData.isPaused || _onNewData.isPaused) return false;
-
-    if (currentConnectivityState == ConnectivityResult.wifi) {
-      _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
-    } else {
-      _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
-    }
-
-    return true;
+  TimeData getCurrentTimeData() {
+    return timeData;
   }
 
   bool loadUserInfo() {
     // load user info
+    DBHelper().getUser();
+    timeData.setFromTimeString(InAppUser().timeInfo);
     return true;
   }
 
-  bool saveUserInfo() {
+  bool saveTimeInfo() {
+    DBHelper().updateTimeInfo(timeData.toTimeInfoString());
     return true;
   }
 
@@ -122,14 +114,14 @@ class WifiConnectionService {
             'Wifi BSSID: $bssid\n';
         print(_connectionStatus);
         _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
-        //starCounter();
+        starCounter();
         break;
       case ConnectivityResult.mobile:
       case ConnectivityResult.none:
         _connectionStatus = result.toString();
         _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
         stopCounter();
-        saveUserInfo();
+        saveTimeInfo();
         print(_connectionStatus);
         break;
       default:
@@ -192,7 +184,7 @@ class WifiConnectionService {
   }
 
   void starCounter() {
-    print("startTimer");
+    print("startTimer : ${timeData.timeData == null}");
     if (timer != null) timer.cancel();
     timer = Timer.periodic(Duration(seconds: period), (timer) {
       timeData.updateTime(period);

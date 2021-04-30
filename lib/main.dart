@@ -35,12 +35,8 @@ class MyApp extends StatelessWidget {
 
   final routes = {
     '/Login': (BuildContext context) => LoginPage(),
-    '/Main': (BuildContext context) =>
-        BlocProvider<BottomNavigationCubit>.value(
-            value: BottomNavigationCubit(
-                homeCubit: HomeCubit(),
-                rankCubit: RankCubit()),
-            child: AppScreen()),
+    '/Main': (BuildContext context) => BlocProvider<BottomNavigationCubit>(
+        create: (context) => BottomNavigationCubit(), child: AppScreen()),
     '/Wifi': (BuildContext context) => WifiSettingPage()
   };
 

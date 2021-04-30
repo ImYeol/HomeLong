@@ -5,22 +5,23 @@ class InAppUser {
   String image;
   String ssid;
   String bssid;
-  int timeInfo;
+  String week;
+  String timeInfo;
 
   InAppUser._();
   static final InAppUser _user = new InAppUser._();
 
   // factory constructor.
-  factory InAppUser(){
+  factory InAppUser() {
     return _user;
   }
 
   setUser(Map<String, dynamic> json) {
-      id = json['id'];
-      image= json['image'];
-      ssid= json['ssid'];
-      bssid= json['bssid'];
-      timeInfo= json['timeInfo'];
+    id = json['id'];
+    image = json['image'];
+    ssid = json['ssid'];
+    bssid = json['bssid'];
+    timeInfo = json['timeInfo'];
   }
 
   Map<String, dynamic> getUser() {

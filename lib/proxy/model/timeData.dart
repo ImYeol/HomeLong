@@ -8,10 +8,13 @@ class TimeData {
   int week;
   int month;
 
+  DateTime prevDate;
+
   TimeData() {
     today = 0;
     week = 0;
     month = 0;
+    prevDate = DateTime.now();
   }
 
   void toSumOfWeek(List<int> timeData) {
@@ -66,10 +69,30 @@ class TimeData {
     return time % 60;
   }
 
+  //TODO: day by day update
   void updateTime(int duration) {
-    today += duration;
-    week += duration;
-    month += duration;
+    DateTime now = DateTime.now();
+
+    timeData[now.day] += duration;
+    if (prevDate.day != now.day) {
+      today = 0;
+    } else {
+      today = timeData[now.day];
+    }
+
+    if (prevDate.weekday != now.weekday && now.weekday == DateTime.monday) {
+      week = 0;
+    } else {
+      week += duration;
+    }
+
+    if (prevDate.month != now.month) {
+      month = 0;
+    } else {
+      month += duration;
+    }
+
+    prevDate = now;
   }
 
   @override
@@ -92,5 +115,21 @@ class TimeData {
 
   String toMonthString() {
     return getHour(month).toString() + " : " + getMinute(month).toString();
+  }
+
+  String toTimeInfoString() {
+    StringBuffer result = StringBuffer();
+    timeData.map((day) => result.write(day.toString() + ","));
+
+    return result.toString();
+  }
+
+  void setFromTimeString(String timeString) {
+    if (timeString == null) {
+      print("Loaded timeString null");
+      timeData = List.generate(31, (index) => 0);
+      return;
+    }
+    timeData = timeString.split(",").map((data) => int.parse(data)).toList();
   }
 }

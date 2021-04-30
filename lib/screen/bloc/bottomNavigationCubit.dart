@@ -9,8 +9,8 @@ import 'package:homg_long/screen/model/bottomNavigationState.dart';
 
 class BottomNavigationCubit extends Cubit<BottomNavigationState> {
   static const int HOME_PAGE = 0;
-  static const int RANK_PAGE = 0;
-  static const int SETTING_PAGE = 0;
+  static const int RANK_PAGE = 1;
+  static const int SETTING_PAGE = 2;
 
   int currentPage = 0;
   UserInfo userInfo;
@@ -24,11 +24,12 @@ class BottomNavigationCubit extends Cubit<BottomNavigationState> {
   int get _currentPage => currentPage;
 
   void init(BuildContext context) {
-    context.read<WifiConnectionService>().init();
-    dispatch(HOME_PAGE);
+    context.watch<WifiConnectionService>().init();
+    dispatch(currentPage);
   }
 
   void dispatch(int tappedIndex) {
+    currentPage = tappedIndex;
     switch (tappedIndex) {
       case HOME_PAGE:
         emit(HomePageLoaded(BlocProvider<HomeCubit>(

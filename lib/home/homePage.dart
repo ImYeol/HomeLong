@@ -9,54 +9,63 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<HomeCubit>().loadTimeData(context);
-    return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).backgroundColor,
-          elevation: 0,
-          actions: [
-            IconButton(
-              icon: Icon(Icons.share,
-                  color: AppTheme.icon_color, size: AppTheme.icon_size),
-              onPressed: () {},
+    return BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+      if (state is TimeDataLoading) {
+        print("home : TimeDataLoading");
+        context.watch<HomeCubit>().loadTimeData(context);
+        return Center(child: CircularProgressIndicator());
+      } else if (state is TimeDataLoaded) {
+        return Scaffold(
+            backgroundColor: Theme.of(context).backgroundColor,
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).backgroundColor,
+              elevation: 0,
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.share,
+                      color: AppTheme.icon_color, size: AppTheme.icon_size),
+                  onPressed: () {},
+                ),
+              ],
             ),
-          ],
-        ),
-        body: Container(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 20,
+            body: Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TitleWidget(
+                    title: "Staying At Home For",
+                  ),
+                  SizedBox(
+                    height: 50,
+                  ),
+                  TimerTextDisplay(
+                      timeString: state.time.toDayString(),
+                      textStyle: TextStyle(
+                          fontSize: AppTheme.subtitle_font_size_big,
+                          color: AppTheme.font_color,
+                          fontWeight: FontWeight.bold)),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  DateDisplay(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  DetailsSubTitle(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  AverageTimeDisplay(
+                      weekTimeString: state.time.toWeekString(),
+                      monthTimeString: state.time.toMonthString())
+                ],
               ),
-              TitleWidget(
-                title: "Staying At Home For",
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              TimerTextDisplay(
-                  timerType: "day",
-                  textStyle: TextStyle(
-                      fontSize: AppTheme.subtitle_font_size_big,
-                      color: AppTheme.font_color,
-                      fontWeight: FontWeight.bold)),
-              SizedBox(
-                height: 20,
-              ),
-              DateDisplay(),
-              SizedBox(
-                height: 20,
-              ),
-              DetailsSubTitle(),
-              SizedBox(
-                height: 20,
-              ),
-              AverageTimeDisplay()
-            ],
-          ),
-        ));
+            ));
+      }
+    });
   }
 }
 
@@ -81,31 +90,18 @@ class TitleWidget extends StatelessWidget {
 }
 
 class TimerTextDisplay extends StatelessWidget {
-  final String timerType;
+  final String timeString;
   final TextStyle textStyle;
 
-  const TimerTextDisplay({this.timerType, this.textStyle});
+  const TimerTextDisplay({this.timeString, this.textStyle});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeState>(
-        buildWhen: (previousState, currentState) {
-      return currentState is TimeDataLoaded;
-    }, builder: (context, event) {
-      return Center(
-          child: Text(
-        getTimerValue(event),
-        style: textStyle,
-      ));
-    });
-  }
-
-  String getTimerValue(HomeState event) {
-    if (timerType == "day")
-      return event.time.toDayString();
-    else if (timerType == "week")
-      return event.time.toWeekString();
-    else if (timerType == "month") return event.time.toMonthString();
+    return Center(
+        child: Text(
+      timeString,
+      style: textStyle,
+    ));
   }
 }
 
@@ -162,7 +158,9 @@ class DetailsSubTitle extends StatelessWidget {
 }
 
 class AverageTimeDisplay extends StatelessWidget {
-  const AverageTimeDisplay({Key key}) : super(key: key);
+  final String weekTimeString;
+  final String monthTimeString;
+  const AverageTimeDisplay({this.weekTimeString, this.monthTimeString});
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +178,7 @@ class AverageTimeDisplay extends StatelessWidget {
                 height: 10,
               ),
               TimerTextDisplay(
-                  timerType: "week",
+                  timeString: weekTimeString,
                   textStyle: TextStyle(
                       fontSize: AppTheme.subtitle_font_size_small,
                       color: AppTheme.font_color,
@@ -196,7 +194,7 @@ class AverageTimeDisplay extends StatelessWidget {
                 height: 10,
               ),
               TimerTextDisplay(
-                  timerType: "month",
+                  timeString: monthTimeString,
                   textStyle: TextStyle(
                       fontSize: AppTheme.subtitle_font_size_small,
                       color: AppTheme.font_color,

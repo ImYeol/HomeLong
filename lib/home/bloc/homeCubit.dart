@@ -15,12 +15,16 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(TimeDataLoading());
 
   void loadTimeData(BuildContext context) {
-    if (!(this.state is TimeDataLoading)) emit(TimeDataLoading());
-    listenTimerEvent(context.read<WifiConnectionService>());
+    WifiConnectionService connectionService =
+        context.watch<WifiConnectionService>();
+    print("loadTimeData");
+    listenTimerEvent(connectionService);
+    emit(TimeDataLoaded(connectionService.getCurrentTimeData()));
   }
 
   void listenTimerEvent(WifiConnectionService connectionService) {
     connectionSubscription = connectionService.onNewData.listen((state) {
+      print("homeCubit : data loaded from service");
       emit(TimeDataLoaded(state.timeData));
     }, onError: (error) {
       print(error);

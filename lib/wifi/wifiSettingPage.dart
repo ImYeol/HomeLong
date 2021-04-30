@@ -133,8 +133,9 @@ class HomeWifiSelector extends StatelessWidget {
                     onPressed: () {
                       UserInfo userInfo =
                           context.read<AuthenticationRepository>().user;
-                      context.read<WifiSettingCubit>().postWifiAPInfo(
-                          userInfo.id, connInfo.ssid, connInfo.bssid);
+                      // context.read<WifiSettingCubit>().postWifiAPInfo(
+                      //     userInfo.id, connInfo.ssid, connInfo.bssid);
+                      Navigator.pushNamed(context, "/Main");
                     },
                     child: Text("NEXT")),
             ])));

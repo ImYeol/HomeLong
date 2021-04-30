@@ -78,13 +78,10 @@ class LoginForm extends StatelessWidget {
                 _kakaoLogin()
               ],
             ),
-
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: [
-                _facebookLogin()
-              ],
+              children: [_facebookLogin()],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -92,9 +89,7 @@ class LoginForm extends StatelessWidget {
               children: <Widget>[
                 RaisedButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (BuildContext context) => WifiSettingPage())
-                    );
+                    context.read<loginCubit>().fakeLogin();
                   },
                   child: Text('Temp button next'),
                 ),
@@ -159,7 +154,6 @@ class _kakaoLogin extends StatelessWidget {
   }
 }
 
-
 class _facebookLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -182,4 +176,3 @@ class _facebookLogin extends StatelessWidget {
     );
   }
 }
-

@@ -13,6 +13,7 @@ class AppScreen extends StatelessWidget {
         body: BlocBuilder<BottomNavigationCubit, BottomNavigationState>(
             builder: (context, state) {
           if (state is PageLoading) {
+            context.watch<BottomNavigationCubit>().init(context);
             return Center(child: CircularProgressIndicator());
           } else if (state is HomePageLoaded) {
             return state.widget;
@@ -50,7 +51,7 @@ class AppScreen extends StatelessWidget {
           selectedTitle: Text("Setting"),
         ),
       ],
-      currentIndex: context.read<BottomNavigationCubit>().currentPage,
+      currentIndex: context.watch<BottomNavigationCubit>().currentPage,
       onTap: (index) => context.read<BottomNavigationCubit>().dispatch(index),
     );
   }

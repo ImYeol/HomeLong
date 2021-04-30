@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/proxy/timeDataProxy.dart';
 import 'package:homg_long/proxy/wifiApDataProxy.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
@@ -13,7 +14,7 @@ class WifiSettingCubit extends Cubit<WifiState> {
   StreamSubscription<WifiState> connectionSubscription;
 
   WifiSettingCubit(WifiConnectionService connectionService)
-      : super(WifiDisConnected(null, null)) {
+      : super(WifiDisConnected("Unknonw", "Unknown", TimeData())) {
     this.connectionService = connectionService;
     this.subscribeWifiEvent();
   }
