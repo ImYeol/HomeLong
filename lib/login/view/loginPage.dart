@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
@@ -10,7 +11,10 @@ import 'package:homg_long/wifi/wifiSettingPage.dart';
 enum LoginState { LOGIN, UNLOGIN }
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({Key key}) : super(key: key);
+
+  LogUtil logUtil = LogUtil();
+
+  LoginPage({Key key}) : super(key: key);
 
   static Route route() {
     return MaterialPageRoute<void>(builder: (_) => LoginPage());
@@ -18,7 +22,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("build login page");
+    logUtil.logger.d("build login page");
+    // log.logger.d("build login page");
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Container(
@@ -41,18 +46,19 @@ class LoginPage extends StatelessWidget {
 }
 
 class LoginForm extends StatelessWidget {
+  LogUtil log = LogUtil();
   LoginForm({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print("build login form");
+    log.logger.d("build login form");
     return BlocListener<loginCubit, LoginState>(
       listener: (context, state) {
         if (state == LoginState.LOGIN) {
-          print("LoginState=$state");
+          log.logger.d("LoginState=$state");
           Navigator.pushNamed(context, "/Wifi");
         } else if (state == LoginState.UNLOGIN) {
-          print("LoginState=$state");
+          log.logger.d("LoginState=$state");
         }
       },
       child: Container(

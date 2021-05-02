@@ -5,6 +5,7 @@ import 'package:connectivity/connectivity.dart'
     show Connectivity, ConnectivityResult;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
@@ -13,6 +14,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';
 
 class WifiConnectionService {
+  final logUtil = LogUtil();
+
   final period = 5; // second
   final Connectivity _connectivity = Connectivity();
   final WifiInfo _wifiInfo = WifiInfo();
@@ -37,7 +40,7 @@ class WifiConnectionService {
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     loadUserInfo();
     initConnectivity();
-    print("wifi service init");
+    logUtil.logger.d("wifi service init");
   }
 
   TimeData getCurrentTimeData() {
@@ -69,7 +72,7 @@ class WifiConnectionService {
     try {
       result = await _connectivity.checkConnectivity();
     } on PlatformException catch (e) {
-      print(e.toString());
+      logUtil.logger.e(e);
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -79,7 +82,7 @@ class WifiConnectionService {
     //   return Future.value(null);
     // }
     if (Platform.isAndroid) {
-      print('Checking Android permissions');
+      logUtil.logger.d('Checking Android permissions');
       Permission permission = Permission.location;
       PermissionStatus permissionStatus = await permission.status;
       // Blocked?
@@ -87,15 +90,15 @@ class WifiConnectionService {
           permissionStatus == PermissionStatus.undetermined ||
           permissionStatus == PermissionStatus.restricted) {
         // Ask the user to unblock
-        print('ask request');
+        logUtil.logger.d('ask request');
         if (await Permission.location.request().isGranted) {
           // Either the permission was already granted before or the user just granted it.
-          print('Location permission granted');
+          logUtil.logger.d('Location permission granted');
         } else {
-          print('Location permission not granted');
+          logUtil.logger.d('Location permission not granted');
         }
       } else {
-        print('Permission already granted (previous execution?)');
+        logUtil.logger.d('Permission already granted (previous execution?)');
       }
     }
     return _updateConnectionStatus(result);
@@ -112,7 +115,7 @@ class WifiConnectionService {
         _connectionStatus = '$result\n'
             'Wifi Name: $ssid\n'
             'Wifi BSSID: $bssid\n';
-        print(_connectionStatus);
+        logUtil.logger.d(_connectionStatus);
         _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
         starCounter();
         break;
@@ -122,13 +125,13 @@ class WifiConnectionService {
         _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
         stopCounter();
         saveTimeInfo();
-        print(_connectionStatus);
+        logUtil.logger.d(_connectionStatus);
         break;
       default:
         _connectionStatus = 'Failed to get connectivity.';
         _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
         stopCounter();
-        print(_connectionStatus);
+        logUtil.logger.d(_connectionStatus);
         break;
     }
   }
@@ -152,7 +155,7 @@ class WifiConnectionService {
         wifiName = await _wifiInfo.getWifiName();
       }
     } on PlatformException catch (e) {
-      print(e.toString());
+      logUtil.logger.e(e);
       wifiName = "Failed to get Wifi Name";
     }
     return wifiName;
@@ -177,24 +180,24 @@ class WifiConnectionService {
         wifiBSSID = await _wifiInfo.getWifiBSSID();
       }
     } on PlatformException catch (e) {
-      print(e.toString());
+      logUtil.logger.e(e);
       wifiBSSID = "Failed to get Wifi BSSID";
     }
     return wifiBSSID;
   }
 
   void starCounter() {
-    print("startTimer : ${timeData.timeData == null}");
+    logUtil.logger.d("startTimer : ${timeData.timeData == null}");
     if (timer != null) timer.cancel();
     timer = Timer.periodic(Duration(seconds: period), (timer) {
       timeData.updateTime(period);
-      print("onMinuteTimeEvent : " + period.toString());
+      logUtil.logger.d("onMinuteTimeEvent : " + period.toString());
       _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
     });
   }
 
   void stopCounter() {
-    print("stopTimer");
+    logUtil.logger.d("stopTimer");
     timer.cancel();
   }
 }

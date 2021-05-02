@@ -4,10 +4,12 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:homg_long/log/logger.dart';
 
 final String _tableName = 'homebody';
 
 class DBHelper {
+  final logUtil = LogUtil();
   DBHelper._();
   static final DBHelper _db = DBHelper._();
 
@@ -25,7 +27,7 @@ class DBHelper {
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, 'homebody.db');
-    print("[database] initialize(path=$path)");
+    logUtil.logger.d("[database] initialize(path=$path)");
 
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(
@@ -34,16 +36,16 @@ class DBHelper {
   }
 
   setUser(InAppUser user) async {
-    print("[database] set user");
+    logUtil.logger.d("[database] set user");
     final db = await database;
     var res = await db.insert(_tableName, user.getUser());
     var id = user.id;
-    print("[database] set user result(id:$id):" + res.toString());
+    logUtil.logger.d("[database] set user result(id:$id):" + res.toString());
     return res;
   }
 
   getUser() async {
-    print("[database] get user");
+    logUtil.logger.d("[database] get user");
     final db = await database;
     var res = await db.query(_tableName);
     InAppUser _user = InAppUser();
@@ -52,15 +54,15 @@ class DBHelper {
     }
     _user.setUser(res.first);
     var id = _user.id;
-    print("[database] get user result(id:$id):" + _user.toString());
+    logUtil.logger.d("[database] get user result(id:$id):" + _user.toString());
     return res;
   }
 
   deleteUser() async {
-    print("[database] delete user");
+    logUtil.logger.d("[database] delete user");
     final db = await database;
     var res = db.delete(_tableName);
-    print("[database] delete user result:" + res.toString());
+    logUtil.logger.d("[database] delete user result:" + res.toString());
     return res;
   }
 
@@ -70,6 +72,6 @@ class DBHelper {
     _user.timeInfo = timeInfo;
     db.update(_tableName, _user.getUser(),
         where: "id = ?", whereArgs: [_user.id]);
-    print("[database] updateMonth");
+    logUtil.logger.d("[database] updateMonth");
   }
 }

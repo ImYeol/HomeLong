@@ -3,15 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/model/homeState.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/log/logger.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key key}) : super(key: key);
+  final logUtil = LogUtil();
+
+  HomePage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
       if (state is TimeDataLoading) {
-        print("home : TimeDataLoading");
+        logUtil.logger.d("home : TimeDataLoading");
         context.watch<HomeCubit>().loadTimeData(context);
         return Center(child: CircularProgressIndicator());
       } else if (state is TimeDataLoaded) {
