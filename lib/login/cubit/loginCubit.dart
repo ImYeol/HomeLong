@@ -10,11 +10,10 @@ import 'package:homg_long/repository/authRepository.dart';
 import 'package:homg_long/login/view/loginPage.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
 
-
 class loginCubit extends Cubit<LoginState> {
   final AuthenticationRepository _authenticationRepository;
 
-  loginCubit(this._authenticationRepository) : super(null){
+  loginCubit(this._authenticationRepository) : super(null) {
     assert(_authenticationRepository != null);
     this.dbInfoLogin();
   }
@@ -22,7 +21,7 @@ class loginCubit extends Cubit<LoginState> {
   void kakaoLogin() {
     print("[loginCubit] kakaoLogin");
     Future<bool> success = _authenticationRepository.kakaoLogin();
-    print("[loginCubit] kakaoLogin:"+success.toString());
+    print("[loginCubit] kakaoLogin:" + success.toString());
 
     success.then((value) {
       if (value == true) {
@@ -51,21 +50,37 @@ class loginCubit extends Cubit<LoginState> {
     });
   }
 
-  dbInfoLogin() async{
+  void fakeLogin() {
+    Future<bool> success = _authenticationRepository.fakeLogin();
+
+    success.then((value) {
+      print("fake login : ${value}");
+      if (value == true) {
+        emit(LoginState.LOGIN);
+      } else {
+        emit(LoginState.UNLOGIN);
+      }
+    }).catchError((error) {
+      print(error);
+      emit(LoginState.UNLOGIN);
+    });
+  }
+
+  dbInfoLogin() async {
     print("[loginCubit] dbInfoLogin");
     await DBHelper().getUser();
     InAppUser _user = InAppUser();
-    print("[loginCubit] user:"+_user.getUser().toString());
-    if (_user.id != null){
+    print("[loginCubit] user:" + _user.getUser().toString());
+    if (_user.id != null) {
       emit(LoginState.LOGIN);
     }
   }
 
-  dbInfoLogOut() async{
+  dbInfoLogOut() async {
     print("[loginCubit] dbInfoLogOut");
     await DBHelper().deleteUser();
     InAppUser _user = InAppUser();
-    print("[loginCubit] user:"+_user.getUser().toString());
+    print("[loginCubit] user:" + _user.getUser().toString());
     emit(LoginState.UNLOGIN);
   }
 }

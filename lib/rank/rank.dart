@@ -1,2 +1,2 @@
-export 'bloc/rank_bloc.dart';
+export 'bloc/rankCubit.dart';
 export 'rankPage.dart';

@@ -29,7 +29,7 @@ class DBHelper {
 
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(
-          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, timeInfo INTEGER)');
+          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, month TEXT)');
     }, onUpgrade: (db, oldVersion, newVersion) {});
   }
 
@@ -38,7 +38,7 @@ class DBHelper {
     final db = await database;
     var res = await db.insert(_tableName, user.getUser());
     var id = user.id;
-    print("[database] set user result(id:$id):"+res.toString());
+    print("[database] set user result(id:$id):" + res.toString());
     return res;
   }
 
@@ -52,7 +52,7 @@ class DBHelper {
     }
     _user.setUser(res.first);
     var id = _user.id;
-    print("[database] get user result(id:$id):"+_user.toString());
+    print("[database] get user result(id:$id):" + _user.toString());
     return res;
   }
 
@@ -60,8 +60,16 @@ class DBHelper {
     print("[database] delete user");
     final db = await database;
     var res = db.delete(_tableName);
-    print("[database] delete user result:"+res.toString());
+    print("[database] delete user result:" + res.toString());
     return res;
   }
 
+  updateTimeInfo(String timeInfo) async {
+    final db = await database;
+    InAppUser _user = InAppUser();
+    _user.timeInfo = timeInfo;
+    db.update(_tableName, _user.getUser(),
+        where: "id = ?", whereArgs: [_user.id]);
+    print("[database] updateMonth");
+  }
 }

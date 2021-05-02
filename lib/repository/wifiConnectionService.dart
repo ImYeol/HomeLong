@@ -5,31 +5,55 @@ import 'package:connectivity/connectivity.dart'
     show Connectivity, ConnectivityResult;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:homg_long/proxy/model/timeData.dart';
+import 'package:homg_long/repository/db.dart';
+import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';
 
 class WifiConnectionService {
-  StreamController<WifiState> _onNewData = StreamController<WifiState>.broadcast();
+  final period = 5; // second
+  final Connectivity _connectivity = Connectivity();
+  final WifiInfo _wifiInfo = WifiInfo();
+
+  StreamController<WifiState> _onNewData =
+      StreamController<WifiState>.broadcast();
   Stream<WifiState> get onNewData => _onNewData.stream;
 
   String _connectionStatus = 'Unknown';
-  final Connectivity _connectivity = Connectivity();
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final WifiInfo _wifiInfo = WifiInfo();
-  String ssid;
-  String bssid;
+  StreamSubscription<ConnectivityResult> _connectivitySubscription = null;
+  ConnectivityResult currentConnectivityState = ConnectivityResult.none;
+
+  String ssid = "Unknonw";
+  String bssid = "Unknonw";
+  TimeData timeData = TimeData();
+  Timer timer;
 
   WifiConnectionService();
 
   void init() {
-    ssid = "Unknonw";
-    bssid = "Unknonw";
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    loadUserInfo();
     initConnectivity();
-    if(_connectivitySubscription == null || _connectivitySubscription.isPaused)
-      _connectivitySubscription =
-          _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     print("wifi service init");
+  }
+
+  TimeData getCurrentTimeData() {
+    return timeData;
+  }
+
+  bool loadUserInfo() {
+    // load user info
+    DBHelper().getUser();
+    timeData.setFromTimeString(InAppUser().timeInfo);
+    return true;
+  }
+
+  bool saveTimeInfo() {
+    DBHelper().updateTimeInfo(timeData.toTimeInfoString());
+    return true;
   }
 
   void dispose() {
@@ -78,6 +102,8 @@ class WifiConnectionService {
   }
 
   Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    currentConnectivityState = result;
+
     switch (result) {
       case ConnectivityResult.wifi:
         ssid = await getWifiSsid();
@@ -87,18 +113,21 @@ class WifiConnectionService {
             'Wifi Name: $ssid\n'
             'Wifi BSSID: $bssid\n';
         print(_connectionStatus);
-
-        _onNewData.sink.add(WifiConnected(ssid, bssid));
+        _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
+        starCounter();
         break;
       case ConnectivityResult.mobile:
       case ConnectivityResult.none:
         _connectionStatus = result.toString();
-        _onNewData.sink.add(WifiDisConnected(ssid, bssid));
+        _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
+        stopCounter();
+        saveTimeInfo();
         print(_connectionStatus);
         break;
       default:
         _connectionStatus = 'Failed to get connectivity.';
-        _onNewData.sink.add(WifiDisConnected(ssid, bssid));
+        _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
+        stopCounter();
         print(_connectionStatus);
         break;
     }
@@ -152,5 +181,20 @@ class WifiConnectionService {
       wifiBSSID = "Failed to get Wifi BSSID";
     }
     return wifiBSSID;
+  }
+
+  void starCounter() {
+    print("startTimer : ${timeData.timeData == null}");
+    if (timer != null) timer.cancel();
+    timer = Timer.periodic(Duration(seconds: period), (timer) {
+      timeData.updateTime(period);
+      print("onMinuteTimeEvent : " + period.toString());
+      _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
+    });
+  }
+
+  void stopCounter() {
+    print("stopTimer");
+    timer.cancel();
   }
 }

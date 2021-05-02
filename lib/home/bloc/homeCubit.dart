@@ -1,36 +1,32 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/home/model/homeState.dart';
-import 'package:homg_long/home/model/timeData.dart';
-import 'package:homg_long/repository/model/UserInfo.dart';
+import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  WifiConnectionService connectionService;
   StreamSubscription<WifiState> connectionSubscription;
-  UserInfo userInfo;
-  TimeData day = DayTime();
-  TimeData week = WeekTime();
-  TimeData month = MonthTime();
-  Timer timer;
 
-  HomeCubit(WifiConnectionService connectionService) : super(HomeInit()) {
-    this.connectionService = connectionService;
-    init();
+  HomeCubit() : super(TimeDataLoading());
+
+  void loadTimeData(BuildContext context) {
+    WifiConnectionService connectionService =
+        context.watch<WifiConnectionService>();
+    print("loadTimeData");
+    listenTimerEvent(connectionService);
+    emit(TimeDataLoaded(connectionService.getCurrentTimeData()));
   }
 
-  void init() {
-    connectionService.init();
+  void listenTimerEvent(WifiConnectionService connectionService) {
     connectionSubscription = connectionService.onNewData.listen((state) {
-      if (state is WifiConnected) {
-        starCounter();
-      } else if (state is WifiDisConnected) {
-        stopCounter();
-      }
+      print("homeCubit : data loaded from service");
+      emit(TimeDataLoaded(state.timeData));
     }, onError: (error) {
       print(error);
+      emit(TimeDataError(TimeData()));
     }, onDone: () {
       print("wifi event stream closed!");
     });
@@ -38,32 +34,5 @@ class HomeCubit extends Cubit<HomeState> {
 
   void dispose() {
     connectionSubscription.cancel();
-  }
-
-  void starCounter() {
-    print("startTimer");
-    //countSubscription = counterService.onNewData.listen((event) {\
-    if (timer != null) timer.cancel();
-    timer = Timer.periodic(Duration(seconds: 5), (timer) {
-      day.incrementMinute();
-      week.incrementMinute();
-      month.incrementMinute();
-
-      print("onMinuteTimeEvent : " +
-          day.toString() +
-          " / time: " +
-          DateTime.now().toString());
-      emit(DataLoaded(day, week, month));
-    });
-  }
-
-  void stopCounter() {
-    timer.cancel();
-  }
-
-  void updateUserInfo() async {
-    userInfo = UserInfo(
-        bssid: "00:00:00:00", id: "AAAAA", image: "null", ssid: "android-ap");
-    Future.delayed(Duration(seconds: 1), () => emit(UserInfoLoaded()));
   }
 }

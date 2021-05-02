@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/repository/db.dart';
 
 import 'model/InAppUser.dart';
-import 'model/UserInfo.dart';
+import 'model/userInfo.dart';
 import 'package:homg_long/const/URL.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
@@ -17,6 +18,26 @@ class AuthenticationRepository {
 
   UserInfo _userInfo;
   var loginStatusCode;
+
+  Future<bool> fakeLogin() async {
+    InAppUser _user = InAppUser();
+    _user.setUser({
+      'id': "aaa",
+      'image': null,
+    });
+
+    DBHelper().deleteUser();
+    DBHelper().setUser(_user);
+
+    _userInfo = UserInfo(
+        bssid: "unknown",
+        ssid: "unknown",
+        id: "aaa",
+        timeInfo: TimeData(),
+        image: null);
+
+    return Future.delayed(Duration(milliseconds: 10), () => true);
+  }
 
   Future<bool> kakaoLogin() async {
     // homelong kakao info
@@ -110,8 +131,9 @@ class AuthenticationRepository {
         url,
         body: body,
       );
-      print("[kakao] http response statusCode:"+response.statusCode.toString());
-      if(response.statusCode == statusCode.statusOK) {
+      print(
+          "[kakao] http response statusCode:" + response.statusCode.toString());
+      if (response.statusCode == statusCode.statusOK) {
         print("[kakao] success");
         return true;
       } else {
@@ -162,7 +184,7 @@ class AuthenticationRepository {
         break;
     }
 
-    if(loginStatusCode == statusCode.statusOK)
+    if (loginStatusCode == statusCode.statusOK)
       return true;
     else {
       return false;
