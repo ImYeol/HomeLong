@@ -55,6 +55,8 @@ dependencies:
   path_provider: ^1.2.0
   path: ^1.6.2
 
+  # log
+  logger: ^1.0.0
 
 dev_dependencies:
   flutter_test:

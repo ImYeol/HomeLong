@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:homg_long/proxy/timeDataProxy.dart';
+import 'package:homg_long/log/logger.dart';
 
 class TimeData {
+  final logUtil = LogUtil();
+
   List<int> timeData;
   int today;
   int week;
@@ -125,15 +128,15 @@ class TimeData {
   }
 
   void setFromTimeString(String timeString) {
-    print("setFromTimeString : ${timeString}");
+    logUtil.logger.d("setFromTimeString : ${timeString}");
     if (timeString == null || timeString.isEmpty) {
-      print("Loaded timeString null");
+      logUtil.logger.d("Loaded timeString null");
       timeData = List.generate(31, (index) => 0);
       return;
     }
     List<String> times = timeString.split(",");
     for (int i = 0; i < times.length; i++) {
-      print("time : ${times[i]}");
+      logUtil.logger.d("time : ${times[i]}");
       timeData[i] = int.parse(times[i]);
     }
     //timeData = timeString.split(",").map((data) => print("${data}"); int.parse(data)).toList();

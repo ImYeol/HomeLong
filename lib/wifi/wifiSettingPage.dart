@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/authRepository.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
@@ -8,11 +9,12 @@ import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'bloc/wifi_setting_cubit.dart';
 
 class WifiSettingPage extends StatelessWidget {
+  LogUtil logUtil = LogUtil();
   WifiSettingPage() : super();
 
   @override
   Widget build(BuildContext context) {
-    print("build wifi page");
+    logUtil.logger.d("build wifi page");
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: BlocProvider(

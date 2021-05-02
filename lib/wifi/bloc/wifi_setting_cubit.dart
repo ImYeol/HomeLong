@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/proxy/timeDataProxy.dart';
 import 'package:homg_long/proxy/wifiApDataProxy.dart';
@@ -9,6 +10,7 @@ import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 
 class WifiSettingCubit extends Cubit<WifiState> {
+  LogUtil logUtil = LogUtil();
   String url = 'http://{{ endpoint }}:{{ port }}/register/user/ap';
   WifiConnectionService connectionService;
   StreamSubscription<WifiState> connectionSubscription;
@@ -24,9 +26,9 @@ class WifiSettingCubit extends Cubit<WifiState> {
     connectionSubscription = connectionService.onNewData.listen((event) {
       emit(event);
     }, onError: (error) {
-      print(error);
+      logUtil.logger.e(error);
     }, onDone: () {
-      print("wifi event stream closed!");
+      logUtil.logger.d("wifi event stream closed!");
     });
   }
 

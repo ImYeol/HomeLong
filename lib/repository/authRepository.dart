@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/repository/db.dart';
 
@@ -12,6 +13,7 @@ import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:homg_long/const/statusCode.dart';
 
 class AuthenticationRepository {
+  LogUtil logUtil = LogUtil();
   UserInfo get user {
     return _userInfo;
   }
@@ -46,7 +48,7 @@ class AuthenticationRepository {
 
     // check kakao app is installed in phone.
     final kakaoTalkInstalled = await isKakaoTalkInstalled();
-    print("[kakao] kakaoTalkInstalled: $kakaoTalkInstalled");
+    logUtil.logger.d("[kakao] kakaoTalkInstalled: $kakaoTalkInstalled");
 
     if (kakaoTalkInstalled == true) {
       // login with kakao app.
