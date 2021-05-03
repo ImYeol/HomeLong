@@ -31,7 +31,7 @@ class DBHelper {
 
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(
-          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, month TEXT)');
+          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, timeInfo TEXT, latitude REAL, longitude REAL)');
     }, onUpgrade: (db, oldVersion, newVersion) {});
   }
 
@@ -50,28 +50,54 @@ class DBHelper {
     var res = await db.query(_tableName);
     InAppUser _user = InAppUser();
     if (res.length == 0) {
+      logUtil.logger.d("[datebase] $_tableName table has null");
       return;
     }
     _user.setUser(res.first);
     var id = _user.id;
     logUtil.logger.d("[database] get user result(id:$id):" + _user.toString());
-    return res;
   }
 
   deleteUser() async {
     logUtil.logger.d("[database] delete user");
     final db = await database;
-    var res = db.delete(_tableName);
-    logUtil.logger.d("[database] delete user result:" + res.toString());
+    InAppUser _user = InAppUser();
+    _user.setUser({});
+    var res = db.update(_tableName, _user.getUser(), where: "id = ?", whereArgs: [_user.id]);
+    res.then((value) {
+      logUtil.logger.d("[database] delete user success");
+    }).catchError((error){
+      logUtil.logger.e("[database] delete user fail:$error");
+    });
     return res;
   }
 
   updateTimeInfo(String timeInfo) async {
+    logUtil.logger.d("[database] update time info");
     final db = await database;
     InAppUser _user = InAppUser();
     _user.timeInfo = timeInfo;
-    db.update(_tableName, _user.getUser(),
-        where: "id = ?", whereArgs: [_user.id]);
-    logUtil.logger.d("[database] updateMonth");
+    var res = db.update(_tableName, _user.getUser(), where: "id = ?", whereArgs: [_user.id]);
+    res.then((value){
+      logUtil.logger.d("[database] update time info success");
+    }).catchError((error){
+      logUtil.logger.d("[database] update time info fail:$error");
+    });
+
+  }
+
+  updateLocation(double latitude, double longitude) async {
+    logUtil.logger.d("[database] update location");
+    final db = await database;
+    InAppUser _user = InAppUser();
+    _user.latitude =  latitude;
+    _user.longitude = longitude;
+    var res = db.update(_tableName, _user.getUser(), where: "id = ?", whereArgs: [_user.id]);
+    res.then((value){
+      logUtil.logger.d("[database] update location success");
+    }).catchError((error){
+      logUtil.logger.d("[database] update location fail:$error");
+    });
+
   }
 }

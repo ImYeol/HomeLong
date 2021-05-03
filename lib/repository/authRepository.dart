@@ -28,8 +28,8 @@ class AuthenticationRepository {
       'image': null,
     });
 
-    DBHelper().deleteUser();
-    DBHelper().setUser(_user);
+    await DBHelper().deleteUser();
+    await DBHelper().setUser(_user);
 
     _userInfo = UserInfo(
         bssid: "unknown",
@@ -62,13 +62,13 @@ class AuthenticationRepository {
   // login with kakao app.
   Future<bool> _loginWithKakao() async {
     try {
-      print("[kakao] loginWithKakao");
+      logUtil.logger.d("[kakao] loginWithKakao");
       // request authorization code.
       var code = await AuthCodeClient.instance.requestWithTalk();
-      print("[kakao] code=$code");
+      logUtil.logger.d("[kakao] code=$code");
       return await _issueAccessToken(code);
     } catch (e) {
-      print(e);
+      logUtil.logger.e(e);
       return false;
     }
   }
@@ -76,13 +76,13 @@ class AuthenticationRepository {
   // login with kakao web view.
   Future<bool> _loginWithKakaoWebview() async {
     try {
-      print("[kakao] loginWithKakaoWebview");
+      logUtil.logger.d("[kakao] loginWithKakaoWebview");
       // request authorization code.
       var code = await AuthCodeClient.instance.request();
-      print("[kakao] code=$code");
+      logUtil.logger.d("[kakao] code=$code");
       return await _issueAccessToken(code);
     } catch (e) {
-      print(e);
+      logUtil.logger.e(e);
       return false;
     }
   }
@@ -90,16 +90,16 @@ class AuthenticationRepository {
   // authorization with auth code.
   Future<bool> _issueAccessToken(String authCode) async {
     try {
-      print("[kakao] issueAccessToken");
+      logUtil.logger.d("[kakao] issueAccessToken");
       // request user token with authorization code.
       var token = await AuthApi.instance.issueAccessToken(authCode);
-      print("[kakao] token=$token");
+      logUtil.logger.d("[kakao] token=$token");
       AccessTokenStore.instance.toStore(token);
 
       // request user info with kakao account.
       return await _getKakaoInfo();
     } catch (e) {
-      print("[kakao] error on issuing access token: $e");
+      logUtil.logger.d("[kakao] error on issuing access token: $e");
       return false;
     }
   }
@@ -107,7 +107,7 @@ class AuthenticationRepository {
   // get user info.
   // register user info when user is not registered before.
   Future<bool> _getKakaoInfo() async {
-    print("[kakao] getKakaoInfo");
+    logUtil.logger.d("[kakao] getKakaoInfo");
     try {
       User user = await UserApi.instance.me();
 
@@ -116,7 +116,7 @@ class AuthenticationRepository {
         'id': user.id.toString(),
         'image': user.properties["profile_image"],
       });
-      print("[kakao] put kakao info body:" + body.toString());
+      logUtil.logger.d("[kakao] put kakao info body:" + body.toString());
 
       InAppUser _user = InAppUser();
       _user.setUser({
@@ -124,8 +124,8 @@ class AuthenticationRepository {
         'image': user.properties["profile_image"],
       });
 
-      DBHelper().deleteUser();
-      DBHelper().setUser(_user);
+      await DBHelper().deleteUser();
+      await DBHelper().setUser(_user);
 
       // post request.
       var url = URL.kakaoLoginURL;
@@ -133,17 +133,16 @@ class AuthenticationRepository {
         url,
         body: body,
       );
-      print(
-          "[kakao] http response statusCode:" + response.statusCode.toString());
+      logUtil.logger.d("[kakao] http response statusCode:" + response.statusCode.toString());
       if (response.statusCode == statusCode.statusOK) {
-        print("[kakao] success");
+        logUtil.logger.d("[kakao] success");
         return true;
       } else {
-        print("[kakao] fail");
+        logUtil.logger.d("[kakao] fail");
         return false;
       }
     } catch (e) {
-      print(e);
+      logUtil.logger.e(e);
       return false;
     }
   }
@@ -155,7 +154,7 @@ class AuthenticationRepository {
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         final FacebookAccessToken accessToken = result.accessToken;
-        print('''
+        logUtil.logger.d('''
          Logged in!
          Token: ${accessToken.token}
          User id: ${accessToken.userId}
@@ -167,21 +166,21 @@ class AuthenticationRepository {
         var body = jsonEncode({
           'id': accessToken.userId,
         });
-        print("body:" + body.toString());
+        logUtil.logger.d("body:" + body.toString());
 
         var url = URL.facebookLoginURL;
         final response = await http.post(
           url,
           body: body,
         );
-        print("http response statusCode:$response.statusCode");
+        logUtil.logger.d("http response statusCode:$response.statusCode");
         loginStatusCode = response.statusCode;
         break;
       case FacebookLoginStatus.cancelledByUser:
-        print('Login cancelled by the user.');
+        logUtil.logger.e('Login cancelled by the user.');
         break;
       case FacebookLoginStatus.error:
-        print('Something went wrong with the login process.\n'
+        logUtil.logger.e('Something went wrong with the login process.\n'
             'Here\'s the error Facebook gave us: ${result.errorMessage}');
         break;
     }
