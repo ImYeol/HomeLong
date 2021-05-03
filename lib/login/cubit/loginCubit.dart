@@ -10,11 +10,11 @@ import 'package:kakao_flutter_sdk/all.dart';
 import 'package:homg_long/repository/authRepository.dart';
 import 'package:homg_long/login/view/loginPage.dart';
 
-class loginCubit extends Cubit<LoginState> {
+class LoginCubit extends Cubit<LoginState> {
   LogUtil logUtil = LogUtil();
   final AuthenticationRepository _authenticationRepository;
 
-  loginCubit(this._authenticationRepository) : super(null) {
+  LoginCubit(this._authenticationRepository) : super(null){
     assert(_authenticationRepository != null);
     this.dbInfoLogin();
   }
@@ -22,16 +22,11 @@ class loginCubit extends Cubit<LoginState> {
   void kakaoLogin() {
     logUtil.logger.d("kakaoLogin");
     Future<bool> success = _authenticationRepository.kakaoLogin();
-    logUtil.logger.d("kakaoLogin result:" + success.toString());
-
-    success.then((value) {
-      if (value == true) {
-        emit(LoginState.LOGIN);
-      } else {
-        emit(LoginState.UNLOGIN);
-      }
+    success.then((value){
+      logUtil.logger.d("authentication repository success");
+      emit(LoginState.LOGIN);
     }).catchError((error) {
-      print(error);
+      logUtil.logger.d("authentication repository fail:$error");
       emit(LoginState.UNLOGIN);
     });
   }

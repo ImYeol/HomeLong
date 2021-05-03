@@ -7,6 +7,8 @@ class InAppUser {
   String bssid;
   String week;
   String timeInfo;
+  double latitude;
+  double longitude;
 
   InAppUser._();
   static final InAppUser _user = new InAppUser._();
@@ -22,6 +24,8 @@ class InAppUser {
     ssid = json['ssid'];
     bssid = json['bssid'];
     timeInfo = json['timeInfo'];
+    latitude = json['latitude'];
+    longitude = json['longitude'];
   }
 
   Map<String, dynamic> getUser() {
@@ -31,6 +35,8 @@ class InAppUser {
       "ssid": this.ssid,
       "bssid": this.bssid,
       "timeInfo": this.timeInfo,
+      "latitude": this.latitude,
+      "longitude": this.longitude,
     };
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/gps/view/gpsSettingPage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
@@ -11,9 +12,7 @@ import 'package:homg_long/wifi/wifiSettingPage.dart';
 enum LoginState { LOGIN, UNLOGIN }
 
 class LoginPage extends StatelessWidget {
-
   LogUtil logUtil = LogUtil();
-
   LoginPage({Key key}) : super(key: key);
 
   static Route route() {
@@ -36,7 +35,7 @@ class LoginPage extends StatelessWidget {
         ),
         child: Center(
           child: BlocProvider(
-            create: (_) => loginCubit(context.read<AuthenticationRepository>()),
+            create: (_) => LoginCubit(context.read<AuthenticationRepository>()),
             child: LoginForm(),
           ),
         ),
@@ -52,7 +51,7 @@ class LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log.logger.d("build login form");
-    return BlocListener<loginCubit, LoginState>(
+    return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state == LoginState.LOGIN) {
           log.logger.d("LoginState=$state");
@@ -97,7 +96,9 @@ class LoginForm extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: [_facebookLogin()],
+              children: [
+                _facebookLogin()
+              ],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -106,7 +107,7 @@ class LoginForm extends StatelessWidget {
               children: <Widget>[
                 RaisedButton(
                   onPressed: () {
-                    context.read<loginCubit>().fakeLogin();
+                    context.read<LoginCubit>().fakeLogin();
                   },
                   child: Text('Temp button next'),
                 ),
@@ -118,12 +119,26 @@ class LoginForm extends StatelessWidget {
               children: <Widget>[
                 RaisedButton(
                   onPressed: () {
-                    context.read<loginCubit>().dbInfoLogOut();
+                    context.read<LoginCubit>().dbInfoLogOut();
                   },
                   child: Text('Log out'),
                 ),
               ],
-            )
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                RaisedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (BuildContext context) => GPSSettingPage())
+                    );
+                  },
+                  child: Text('Temp gps setting'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -160,7 +175,7 @@ class _kakaoLogin extends StatelessWidget {
           // // color: Theme.of(context).accentColor,
           disabledColor: Theme.of(context).accentColor,
           splashColor: Colors.grey,
-          onPressed: () => context.read<loginCubit>().kakaoLogin(),
+          onPressed: () => context.read<LoginCubit>().kakaoLogin(),
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(
@@ -183,7 +198,7 @@ class _facebookLogin extends StatelessWidget {
           // color: Theme.of(context).accentColor,
           disabledColor: Theme.of(context).accentColor,
           splashColor: Colors.grey,
-          onPressed: () => context.read<loginCubit>().facebookLogin(),
+          onPressed: () => context.read<LoginCubit>().facebookLogin(),
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(

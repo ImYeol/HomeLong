@@ -7,6 +7,7 @@ import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/repository/authRepository.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/repository/gpsService.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/splashPage.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
@@ -48,6 +49,8 @@ class MyApp extends StatelessWidget {
               create: (context) => AuthenticationRepository()),
           RepositoryProvider<WifiConnectionService>(
               create: (context) => WifiConnectionService()),
+          RepositoryProvider<GPSService>(
+            create: (context) => GPSService()),
         ],
         child: MaterialApp(
           theme: ThemeData(
