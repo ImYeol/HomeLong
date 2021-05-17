@@ -45,7 +45,7 @@ dependencies:
   package_info:
   connectivity: ^3.0.3
   wifi_info_flutter: ^2.0.0
-  permission_handler: ^5.0.1
+  permission_handler: ^7.1.0
   stop_watch_timer: ^1.0.0
   equatable:
   flutter_facebook_login: ^3.0.0
@@ -62,6 +62,10 @@ dependencies:
 
   # log
   logger: ^1.0.0
+
+  # geofence
+  background_fetch: ^0.7.2
+  geofence_service: ^3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -7,8 +7,8 @@ class InAppUser {
   String bssid;
   String week;
   String timeInfo;
-  double latitude;
-  double longitude;
+  double latitude = double.infinity; // as initial value
+  double longitude = double.infinity; // as initial value
 
   InAppUser._();
   static final InAppUser _user = new InAppUser._();
@@ -38,5 +38,23 @@ class InAppUser {
       "latitude": this.latitude,
       "longitude": this.longitude,
     };
+  }
+
+  @override
+  String toString() {
+    return "aaa";
+    // TODO: implement toString
+    // return "id:" +
+    //     this.id +
+    //     ", image:" +
+    //     this.image +
+    //     ", ssid:" +
+    //     this.ssid +
+    //     ", bssid:" +
+    //     this.bssid;
+    // ", latitude:" +
+    // this.latitude?.toString() +
+    // ", longitude:" +
+    // this.longitude?.toString();
   }
 }

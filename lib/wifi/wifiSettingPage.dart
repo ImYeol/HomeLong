@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/authRepository.dart';
+import 'package:homg_long/repository/db.dart';
+import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
@@ -133,8 +135,7 @@ class HomeWifiSelector extends StatelessWidget {
               if (connInfo.bssid != null)
                 TextButton(
                     onPressed: () {
-                      UserInfo userInfo =
-                          context.read<AuthenticationRepository>().user;
+                      DBHelper().updateWifiInfo(connInfo.ssid, connInfo.bssid);
                       // context.read<WifiSettingCubit>().postWifiAPInfo(
                       //     userInfo.id, connInfo.ssid, connInfo.bssid);
                       Navigator.pushNamed(context, "/Main");

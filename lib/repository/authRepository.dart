@@ -27,8 +27,6 @@ class AuthenticationRepository {
       'id': "aaa",
       'image': null,
     });
-
-    await DBHelper().deleteUser();
     await DBHelper().setUser(_user);
 
     _userInfo = UserInfo(

@@ -9,17 +9,16 @@ abstract class WifiState {
 
   String get _ssid => ssid;
   String get _bssid => bssid;
-  TimeData get _timeData => timeData;
 }
 
 class WifiConnected extends WifiState {
-  WifiConnected(String ssid, String bssid, TimeData timeData)
-      : super(ssid: ssid, bssid: bssid, timeData: timeData);
+  WifiConnected(String ssid, String bssid)
+      : super(ssid: ssid, bssid: bssid);
 }
 
 class WifiDisConnected extends WifiState {
-  WifiDisConnected(String ssid, String bssid, TimeData timeData)
-      : super(ssid: ssid, bssid: bssid, timeData: timeData);
+  WifiDisConnected(String ssid, String bssid)
+      : super(ssid: ssid, bssid: bssid);
 }
 
 class WifiInfoSaved extends WifiState {

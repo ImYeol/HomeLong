@@ -4,6 +4,19 @@
 <dict>
 	<key>KAKAO_APP_KEY</key>
 	<string>234991db49db0e7808bf5cea94beabff</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Used to provide geofence service.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Used to provide geofence services in the background.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Used to provide geofence services in the background.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+    	<string>fetch</string>
+    	<string>location</string>
+	</array>
+	<key>NSMotionUsageDescription</key>
+	<string>Used to recognize user activity information.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
