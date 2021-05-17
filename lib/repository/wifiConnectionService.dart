@@ -14,15 +14,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';
 
 class WifiConnectionService {
-  final logUtil = LogUtil();
+  WifiConnectionService._internal();
 
-  final period = 5; // second
+  /// Instance of [WifiConnectionService].
+  static final instance = WifiConnectionService._internal();
+  final logUtil = LogUtil();
   final Connectivity _connectivity = Connectivity();
   final WifiInfo _wifiInfo = WifiInfo();
-
-  StreamController<WifiState> _onNewData =
-      StreamController<WifiState>.broadcast();
-  Stream<WifiState> get onNewData => _onNewData.stream;
 
   String _connectionStatus = 'Unknown';
   StreamSubscription<ConnectivityResult> _connectivitySubscription = null;
@@ -30,43 +28,25 @@ class WifiConnectionService {
 
   String ssid = "Unknonw";
   String bssid = "Unknonw";
-  TimeData timeData = TimeData();
-  Timer timer;
 
-  WifiConnectionService();
+  void Function(WifiState) callback;
 
-  void init() {
+  void listenWifiStateChanged(Function(WifiState) callback) {
+    logUtil.logger.d("registerWifiStateCallback");
+    this.callback = callback;
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-    loadUserInfo();
-    initConnectivity();
-    logUtil.logger.d("wifi service init");
   }
 
-  TimeData getCurrentTimeData() {
-    return timeData;
-  }
-
-  bool loadUserInfo() {
-    // load user info
-    DBHelper().getUser();
-    timeData.setFromTimeString(InAppUser().timeInfo);
-    return true;
-  }
-
-  bool saveTimeInfo() {
-    DBHelper().updateTimeInfo(timeData.toTimeInfoString());
-    return true;
-  }
-
-  void dispose() {
-    _onNewData.close();
+  void unlistenWifiStateChanged() {
+    logUtil.logger.d("unRegisterWifiStateCallback");
+    this.callback = null;
     _connectivitySubscription.cancel();
     _connectivitySubscription = null;
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initConnectivity() async {
+  Future<void> checkNowConnectionState() async {
     ConnectivityResult result;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
@@ -87,7 +67,7 @@ class WifiConnectionService {
       PermissionStatus permissionStatus = await permission.status;
       // Blocked?
       if (permissionStatus == PermissionStatus.denied ||
-          permissionStatus == PermissionStatus.undetermined ||
+          permissionStatus == PermissionStatus.limited ||
           permissionStatus == PermissionStatus.restricted) {
         // Ask the user to unblock
         logUtil.logger.d('ask request');
@@ -116,21 +96,18 @@ class WifiConnectionService {
             'Wifi Name: $ssid\n'
             'Wifi BSSID: $bssid\n';
         logUtil.logger.d(_connectionStatus);
-        _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
-        starCounter();
+        // if not null, call the function
+        callback?.call(WifiConnected(ssid, bssid));
         break;
       case ConnectivityResult.mobile:
       case ConnectivityResult.none:
         _connectionStatus = result.toString();
-        _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
-        stopCounter();
-        saveTimeInfo();
+        callback?.call(WifiDisConnected(ssid, bssid));
         logUtil.logger.d(_connectionStatus);
         break;
       default:
         _connectionStatus = 'Failed to get connectivity.';
-        _onNewData.sink.add(WifiDisConnected(ssid, bssid, timeData));
-        stopCounter();
+        callback?.call(WifiDisConnected(ssid, bssid));
         logUtil.logger.d(_connectionStatus);
         break;
     }
@@ -184,20 +161,5 @@ class WifiConnectionService {
       wifiBSSID = "Failed to get Wifi BSSID";
     }
     return wifiBSSID;
-  }
-
-  void starCounter() {
-    logUtil.logger.d("startTimer : ${timeData.timeData == null}");
-    if (timer != null) timer.cancel();
-    timer = Timer.periodic(Duration(seconds: period), (timer) {
-      timeData.updateTime(period);
-      logUtil.logger.d("onMinuteTimeEvent : " + period.toString());
-      _onNewData.sink.add(WifiConnected(ssid, bssid, timeData));
-    });
-  }
-
-  void stopCounter() {
-    logUtil.logger.d("stopTimer");
-    timer.cancel();
   }
 }

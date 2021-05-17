@@ -16,24 +16,18 @@ class WifiSettingCubit extends Cubit<WifiState> {
   StreamSubscription<WifiState> connectionSubscription;
 
   WifiSettingCubit(WifiConnectionService connectionService)
-      : super(WifiDisConnected("Unknonw", "Unknown", TimeData())) {
+      : super(WifiDisConnected("Unknonw", "Unknown")) {
     this.connectionService = connectionService;
     this.subscribeWifiEvent();
   }
 
   void subscribeWifiEvent() {
-    connectionService.init();
-    connectionSubscription = connectionService.onNewData.listen((event) {
-      emit(event);
-    }, onError: (error) {
-      logUtil.logger.e(error);
-    }, onDone: () {
-      logUtil.logger.d("wifi event stream closed!");
-    });
+    connectionService.listenWifiStateChanged((state) => emit(state));
+    connectionService.checkNowConnectionState();
   }
 
   void unSubscribeWifiEvent() {
-    connectionSubscription.cancel();
+    connectionService.unlistenWifiStateChanged();
   }
 
   void postWifiAPInfo(String id, String ssid, String bssid) async {

@@ -4,6 +4,7 @@ import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/model/homeState.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/log/logger.dart';
+import 'package:homg_long/proxy/model/timeData.dart';
 
 class HomePage extends StatelessWidget {
   final logUtil = LogUtil();
@@ -12,12 +13,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
-      if (state is TimeDataLoading) {
-        logUtil.logger.d("home : TimeDataLoading");
-        context.watch<HomeCubit>().loadTimeData(context);
-        return Center(child: CircularProgressIndicator());
-      } else if (state is TimeDataLoaded) {
+    return StreamBuilder(
+      initialData: TimeData(),
+      stream: context.watch<HomeCubit>().counterStream,
+      builder: (context, snapshot) {
         return Scaffold(
             backgroundColor: Theme.of(context).backgroundColor,
             appBar: AppBar(
@@ -45,7 +44,7 @@ class HomePage extends StatelessWidget {
                     height: 50,
                   ),
                   TimerTextDisplay(
-                      timeString: state.time.toDayString(),
+                      timeString: snapshot.data.toDayString(),
                       textStyle: TextStyle(
                           fontSize: AppTheme.subtitle_font_size_big,
                           color: AppTheme.font_color,
@@ -62,13 +61,13 @@ class HomePage extends StatelessWidget {
                     height: 20,
                   ),
                   AverageTimeDisplay(
-                      weekTimeString: state.time.toWeekString(),
-                      monthTimeString: state.time.toMonthString())
+                      weekTimeString: snapshot.data.toWeekString(),
+                      monthTimeString: snapshot.data.toMonthString())
                 ],
               ),
             ));
       }
-    });
+    );
   }
 }
 

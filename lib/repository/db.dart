@@ -28,7 +28,8 @@ class DBHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, 'homebody.db');
     logUtil.logger.d("[database] initialize(path=$path)");
-
+    // DB Version Must be updated if the table has been changed.
+    // await deleteDatabase(path);
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(
           'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, timeInfo TEXT, latitude REAL, longitude REAL)');
@@ -63,10 +64,11 @@ class DBHelper {
     final db = await database;
     InAppUser _user = InAppUser();
     _user.setUser({});
-    var res = db.update(_tableName, _user.getUser(), where: "id = ?", whereArgs: [_user.id]);
+    var res = db.update(_tableName, _user.getUser(),
+        where: "id = ?", whereArgs: [_user.id]);
     res.then((value) {
       logUtil.logger.d("[database] delete user success");
-    }).catchError((error){
+    }).catchError((error) {
       logUtil.logger.e("[database] delete user fail:$error");
     });
     return res;
@@ -77,27 +79,42 @@ class DBHelper {
     final db = await database;
     InAppUser _user = InAppUser();
     _user.timeInfo = timeInfo;
-    var res = db.update(_tableName, _user.getUser(), where: "id = ?", whereArgs: [_user.id]);
-    res.then((value){
+    var res = db.update(_tableName, _user.getUser(),
+        where: "id = ?", whereArgs: [_user.id]);
+    res.then((value) {
       logUtil.logger.d("[database] update time info success");
-    }).catchError((error){
+    }).catchError((error) {
       logUtil.logger.d("[database] update time info fail:$error");
     });
-
   }
 
   updateLocation(double latitude, double longitude) async {
     logUtil.logger.d("[database] update location");
     final db = await database;
     InAppUser _user = InAppUser();
-    _user.latitude =  latitude;
+    _user.latitude = latitude;
     _user.longitude = longitude;
-    var res = db.update(_tableName, _user.getUser(), where: "id = ?", whereArgs: [_user.id]);
-    res.then((value){
+    var res = db.update(_tableName, _user.getUser(),
+        where: "id = ?", whereArgs: [_user.id]);
+    res.then((value) {
       logUtil.logger.d("[database] update location success");
-    }).catchError((error){
+    }).catchError((error) {
       logUtil.logger.d("[database] update location fail:$error");
     });
+  }
 
+  updateWifiInfo(String ssid, String bssid) async {
+    logUtil.logger.d("[database] update location");
+    final db = await database;
+    InAppUser _user = InAppUser();
+    _user.ssid = ssid;
+    _user.bssid = bssid;
+    var res = db.update(_tableName, _user.getUser(),
+        where: "id = ?", whereArgs: [_user.id]);
+    res.then((value) {
+      logUtil.logger.d("[database] update wifi info success");
+    }).catchError((error) {
+      logUtil.logger.d("[database] update wifi info fail:$error");
+    });
   }
 }

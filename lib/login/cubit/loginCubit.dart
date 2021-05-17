@@ -14,7 +14,7 @@ class LoginCubit extends Cubit<LoginState> {
   LogUtil logUtil = LogUtil();
   final AuthenticationRepository _authenticationRepository;
 
-  LoginCubit(this._authenticationRepository) : super(null){
+  LoginCubit(this._authenticationRepository) : super(null) {
     assert(_authenticationRepository != null);
     this.dbInfoLogin();
   }
@@ -22,7 +22,7 @@ class LoginCubit extends Cubit<LoginState> {
   void kakaoLogin() {
     logUtil.logger.d("kakaoLogin");
     Future<bool> success = _authenticationRepository.kakaoLogin();
-    success.then((value){
+    success.then((value) {
       logUtil.logger.d("authentication repository success");
       emit(LoginState.LOGIN);
     }).catchError((error) {
@@ -74,7 +74,11 @@ class LoginCubit extends Cubit<LoginState> {
 
   dbInfoLogOut() async {
     logUtil.logger.d("[loginCubit] dbInfoLogOut");
-    await DBHelper().deleteUser();
+    try {
+      await DBHelper().deleteUser();
+    } on Exception catch (_) {
+      logUtil.logger.e("error : failed to delete user");
+    }
     InAppUser _user = InAppUser();
     logUtil.logger.d("[loginCubit] user:" + _user.getUser().toString());
     emit(LoginState.UNLOGIN);
