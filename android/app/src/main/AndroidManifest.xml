@@ -69,11 +69,12 @@
         <!-- Use for kakao login API -->
         <activity
                 android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity">
-          <intent-filter android:label="flutter_web_auth">
+          <intent-filter>
               <action android:name="android.intent.action.VIEW" />
               <category android:name="android.intent.category.DEFAULT" />
               <category android:name="android.intent.category.BROWSABLE" />
-              <data android:scheme="kakao234991db49db0e7808bf5cea94beabff" android:host="oauth"/>
+              <data android:host="oauth"
+                    android:scheme="kakao234991db49db0e7808bf5cea94beabff" />
           </intent-filter>
         </activity>
 

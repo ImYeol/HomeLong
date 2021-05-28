@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/model/homeState.dart';
-import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 
@@ -14,60 +14,59 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      initialData: TimeData(),
-      stream: context.watch<HomeCubit>().counterStream,
-      builder: (context, snapshot) {
-        return Scaffold(
-            backgroundColor: Theme.of(context).backgroundColor,
-            appBar: AppBar(
+        initialData: TimeData(),
+        stream: context.watch<HomeCubit>().counterStream,
+        builder: (context, snapshot) {
+          return Scaffold(
               backgroundColor: Theme.of(context).backgroundColor,
-              elevation: 0,
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.share,
-                      color: AppTheme.icon_color, size: AppTheme.icon_size),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-            body: Container(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 20,
+              appBar: AppBar(
+                backgroundColor: Theme.of(context).backgroundColor,
+                elevation: 0,
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.share,
+                        color: AppTheme.icon_color, size: AppTheme.icon_size),
+                    onPressed: () {},
                   ),
-                  TitleWidget(
-                    title: "Staying At Home For",
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  TimerTextDisplay(
-                      timeString: snapshot.data.toDayString(),
-                      textStyle: TextStyle(
-                          fontSize: AppTheme.subtitle_font_size_big,
-                          color: AppTheme.font_color,
-                          fontWeight: FontWeight.bold)),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  DateDisplay(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  DetailsSubTitle(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  AverageTimeDisplay(
-                      weekTimeString: snapshot.data.toWeekString(),
-                      monthTimeString: snapshot.data.toMonthString())
                 ],
               ),
-            ));
-      }
-    );
+              body: Container(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TitleWidget(
+                      title: "Staying At Home For",
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    TimerTextDisplay(
+                        timeString: snapshot.data.toDayString(),
+                        textStyle: TextStyle(
+                            fontSize: AppTheme.subtitle_font_size_big,
+                            color: AppTheme.font_color,
+                            fontWeight: FontWeight.bold)),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    DateDisplay(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    DetailsSubTitle(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    AverageTimeDisplay(
+                        weekTimeString: snapshot.data.toWeekString(),
+                        monthTimeString: snapshot.data.toMonthString())
+                  ],
+                ),
+              ));
+        });
   }
 }
 

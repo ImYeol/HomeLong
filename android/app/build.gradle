@@ -40,7 +40,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.homg_long"
-        minSdkVersion 19
+        minSdkVersion 20
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -53,6 +53,15 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 flutter {
@@ -62,6 +71,7 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.facebook.android:facebook-login:[8.1)' // facebook login
-    // implementation "com.kakao.sdk:v2-user:2.4.0" // 카카오 로그인
-    // implementation "com.kakao.sdk:v2-talk:2.4.0" // 친구, 메시지(카카오톡)
+//    implementation "com.kakao.sdk:v2-user:2.5.1" // 카카오 로그인
+//    implementation "com.kakao.sdk:v2-talk:2.5.1" // 친구, 메시지(카카오톡)
+//    implementation "com.kakao.sdk:v2-story:2.5.1" // 카카오스토리
 }

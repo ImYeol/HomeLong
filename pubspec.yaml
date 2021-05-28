@@ -27,22 +27,28 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+
+  # ui
   cupertino_icons: ^0.1.3
   flutter_bloc: ^6.1.1
-  google_fonts: ^1.1.1
+  google_fonts:
   custom_navigation_bar: ^0.7.1
   fl_chart: ^0.36.1
   table_calendar: ^2.3.3
   font_awesome_flutter: ^8.11.0
-  http: ^0.12.0+2
-  
+  fluttertoast: ^8.0.7
+
+  # http
+  http: ^0.13.3
+  http_parser: ^4.0.0
+
   # auth
-  kakao_flutter_sdk: ^0.5.4
-  dio: ^3.0.9
-  json_annotation:
-  shared_preferences: ^0.5.7
-  platform: ^2.2.1
-  package_info:
+  kakao_flutter_sdk: ^0.6.1
+  dio: ^4.0.0
+  json_annotation: ^4.0.1
+  shared_preferences: ^2.0.5
+  platform: ^3.0.0
+  package_info: ^2.0.0
   connectivity: ^3.0.3
   wifi_info_flutter: ^2.0.0
   permission_handler: ^7.1.0
@@ -52,13 +58,13 @@ dependencies:
 
   # db
   sqflite: ^1.1.6
-  path_provider: ^1.2.0
+  path_provider: ^2.0.0
   path: ^1.6.2
 
   # location
-  google_maps_flutter: ^2.0.3
   geolocator:
   geocoding:
+  google_maps_flutter: ^2.0.6
 
   # log
   logger: ^1.0.0

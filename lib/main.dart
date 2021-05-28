@@ -1,21 +1,17 @@
-import 'package:background_fetch/background_fetch.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geofence_service/geofence_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/repository/authRepository.dart';
-import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/repository/gpsService.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/splashPage.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
 import 'package:homg_long/screen/appScreen.dart';
-import 'home/homePage.dart';
+import 'gps/view/gpsSettingPage.dart';
 import 'login/view/loginPage.dart';
 import 'simple_bloc_observer.dart';
 
@@ -49,7 +45,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final routes = {
     '/Login': (BuildContext context) => LoginPage(),
     '/Main': (BuildContext context) => AppScreen(),
-    '/Wifi': (BuildContext context) => WifiSettingPage()
+    '/Wifi': (BuildContext context) => WifiSettingPage(),
+    '/GPS': (BuildContext context) => GPSSettingPage()
   };
 
   @override

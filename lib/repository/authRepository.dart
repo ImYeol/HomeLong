@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/repository/db.dart';
-
 import 'model/InAppUser.dart';
-import 'model/userInfo.dart';
 import 'package:homg_long/const/URL.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
@@ -14,13 +11,10 @@ import 'package:homg_long/const/statusCode.dart';
 
 class AuthenticationRepository {
   LogUtil logUtil = LogUtil();
-  UserInfo get user {
-    return _userInfo;
-  }
 
-  UserInfo _userInfo;
   var loginStatusCode;
 
+  // TODO: will be removed.
   Future<bool> fakeLogin() async {
     InAppUser _user = InAppUser();
     _user.setUser({
@@ -28,13 +22,6 @@ class AuthenticationRepository {
       'image': null,
     });
     await DBHelper().setUser(_user);
-
-    _userInfo = UserInfo(
-        bssid: "unknown",
-        ssid: "unknown",
-        id: "aaa",
-        timeInfo: TimeData(),
-        image: null);
 
     return Future.delayed(Duration(milliseconds: 10), () => true);
   }
@@ -108,13 +95,10 @@ class AuthenticationRepository {
     logUtil.logger.d("[kakao] getKakaoInfo");
     try {
       User user = await UserApi.instance.me();
+      logUtil.logger.d("kakao user info:$user");
 
-      // login request body.
-      var body = jsonEncode({
-        'id': user.id.toString(),
-        'image': user.properties["profile_image"],
-      });
-      logUtil.logger.d("[kakao] put kakao info body:" + body.toString());
+      // delete pre account info.
+      await DBHelper().deleteUser();
 
       InAppUser _user = InAppUser();
       _user.setUser({
@@ -122,21 +106,28 @@ class AuthenticationRepository {
         'image': user.properties["profile_image"],
       });
 
-      await DBHelper().deleteUser();
+      // set up new account.
       await DBHelper().setUser(_user);
 
       // post request.
-      var url = URL.kakaoLoginURL;
+      Uri url = Uri.parse(URL.kakaoLoginURL);
+
+      // login request body.
+      var body = jsonEncode({
+        'id': user.id.toString(),
+        'image': user.properties["profile_image"],
+      });
+
       final response = await http.post(
         url,
         body: body,
       );
-      logUtil.logger.d("[kakao] http response statusCode:" + response.statusCode.toString());
-      if (response.statusCode == statusCode.statusOK) {
+
+      if (response.statusCode == StatusCode.statusOK) {
         logUtil.logger.d("[kakao] success");
         return true;
       } else {
-        logUtil.logger.d("[kakao] fail");
+        logUtil.logger.d("[kakao] fail(${response.statusCode})");
         return false;
       }
     } catch (e) {
@@ -161,17 +152,25 @@ class AuthenticationRepository {
          Declined permissions: ${accessToken.declinedPermissions}
          ''');
 
+        await DBHelper().deleteUser();
+
+        InAppUser _user = InAppUser();
+        _user.setUser({
+          "id": accessToken.userId,
+        });
+        await DBHelper().setUser(_user);
+
         var body = jsonEncode({
           'id': accessToken.userId,
         });
         logUtil.logger.d("body:" + body.toString());
 
-        var url = URL.facebookLoginURL;
+        Uri url = Uri.parse(URL.facebookLoginURL);
         final response = await http.post(
           url,
           body: body,
         );
-        logUtil.logger.d("http response statusCode:$response.statusCode");
+        logUtil.logger.d("http response:$response");
         loginStatusCode = response.statusCode;
         break;
       case FacebookLoginStatus.cancelledByUser:
@@ -183,9 +182,11 @@ class AuthenticationRepository {
         break;
     }
 
-    if (loginStatusCode == statusCode.statusOK)
+    if (loginStatusCode == StatusCode.statusOK) {
+      logUtil.logger.d("[facebook] login");
       return true;
-    else {
+    } else {
+      logUtil.logger.d("[facebook] fail($loginStatusCode)");
       return false;
     }
   }

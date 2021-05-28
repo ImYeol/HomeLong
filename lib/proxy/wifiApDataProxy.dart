@@ -10,7 +10,7 @@ class WifiApDataProxy {
   static Future<bool> uploadWifiAPInfo(
       String id, String ssid, String bssid) async {
     http.Response response = await http.post(
-      post_wifi_ap_url,
+      Uri.parse(post_wifi_ap_url),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
@@ -20,8 +20,8 @@ class WifiApDataProxy {
   }
 
   static Future<APInfo> fetchApInfo(String id) async {
-    final response =
-        await http.get('https://jsonplaceholder.typicode.com/posts/1');
+    final response = await http
+        .get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
 
     if (response.statusCode == 200) {
       // 만약 서버로의 요청이 성공하면, JSON을 파싱합니다.
