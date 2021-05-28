@@ -15,7 +15,7 @@ class TimeDataProxy {
   static Future<bool> uploadTimeData(
       String id, int date, String dataType) async {
     http.Response response = await http.post(
-      prefixUrl + dataType + "/set",
+      Uri.parse(prefixUrl + dataType + "/set"),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
@@ -25,8 +25,8 @@ class TimeDataProxy {
   }
 
   static Future<TimeData> fetchAllTimeData(String id, String dataType) async {
-    final response = await http
-        .get(prefixUrl + dataType + "/get" + "/" + id + "/" + getNowTime());
+    final response = await http.get(Uri.parse(
+        prefixUrl + dataType + "/get" + "/" + id + "/" + getNowTime()));
 
     if (response.statusCode == 200) {
       return compute(parseTimeData, response.body);

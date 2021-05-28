@@ -14,7 +14,15 @@ class InAppUser {
   static final InAppUser _user = new InAppUser._();
 
   // factory constructor.
-  factory InAppUser() {
+  factory InAppUser(
+      {String id,
+      String image,
+      String ssid,
+      String bssid,
+      String week,
+      String timeInfo,
+      double latitude,
+      double longitude}) {
     return _user;
   }
 
@@ -23,6 +31,7 @@ class InAppUser {
     image = json['image'];
     ssid = json['ssid'];
     bssid = json['bssid'];
+    week = json['week'];
     timeInfo = json['timeInfo'];
     latitude = json['latitude'];
     longitude = json['longitude'];
@@ -34,6 +43,7 @@ class InAppUser {
       "image": this.image,
       "ssid": this.ssid,
       "bssid": this.bssid,
+      "week": this.week,
       "timeInfo": this.timeInfo,
       "latitude": this.latitude,
       "longitude": this.longitude,
@@ -42,7 +52,7 @@ class InAppUser {
 
   @override
   String toString() {
-    return "aaa";
+    return "";
     // TODO: implement toString
     // return "id:" +
     //     this.id +
@@ -57,4 +67,17 @@ class InAppUser {
     // ", longitude:" +
     // this.longitude?.toString();
   }
+}
+
+Map<String, dynamic> getEmptyUser(){
+  return {
+    "id": "",
+    "image": "",
+    "ssid": "",
+    "bssid": "",
+    "week": "",
+    "timeInfo": "",
+    "latitude": 0.0,
+    "longitude": 0.0,
+  };
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/gps/view/gpsSettingPage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
@@ -24,23 +24,24 @@ class LoginPage extends StatelessWidget {
     logUtil.logger.d("build login page");
     // log.logger.d("build login page");
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
-            image: AssetImage("images/login_background.jpg"),
-            fit: BoxFit.cover,
+        backgroundColor: Theme.of(context).backgroundColor,
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage("images/login_background.jpg"),
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: Center(
-          child: BlocProvider(
-            create: (_) => LoginCubit(context.read<AuthenticationRepository>()),
-            child: LoginForm(),
+          child: Center(
+            child: BlocProvider(
+              create: (_) =>
+                  LoginCubit(context.read<AuthenticationRepository>()),
+              child: LoginForm(),
+            ),
           ),
-        ),
-      )
-    );
+        ));
   }
 }
 
@@ -55,7 +56,7 @@ class LoginForm extends StatelessWidget {
       listener: (context, state) {
         if (state == LoginState.LOGIN) {
           log.logger.d("LoginState=$state");
-          Navigator.pushNamed(context, "/Wifi");
+          Navigator.pushNamed(context, "/GPS");
         } else if (state == LoginState.UNLOGIN) {
           log.logger.d("LoginState=$state");
         }
@@ -96,9 +97,7 @@ class LoginForm extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: [
-                _facebookLogin()
-              ],
+              children: [_facebookLogin()],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -131,9 +130,8 @@ class LoginForm extends StatelessWidget {
               children: <Widget>[
                 RaisedButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (BuildContext context) => GPSSettingPage())
-                    );
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => GPSSettingPage()));
                   },
                   child: Text('Temp gps setting'),
                 ),

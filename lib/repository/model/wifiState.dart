@@ -12,13 +12,11 @@ abstract class WifiState {
 }
 
 class WifiConnected extends WifiState {
-  WifiConnected(String ssid, String bssid)
-      : super(ssid: ssid, bssid: bssid);
+  WifiConnected(String ssid, String bssid) : super(ssid: ssid, bssid: bssid);
 }
 
 class WifiDisConnected extends WifiState {
-  WifiDisConnected(String ssid, String bssid)
-      : super(ssid: ssid, bssid: bssid);
+  WifiDisConnected(String ssid, String bssid) : super(ssid: ssid, bssid: bssid);
 }
 
 class WifiInfoSaved extends WifiState {
