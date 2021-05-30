@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path/path.dart';
 
 class CounterPage extends StatefulWidget {
   CounterPage({Key key}) : super(key: key);
@@ -13,7 +14,7 @@ class CounterPage extends StatefulWidget {
 class _CounterPageState extends State<CounterPage> {
   int touchedIndex = -1;
   Color backgroundColor = Colors.grey[150];
-  Color subTitleColor = Colors.purpleAccent;
+  Color subTitleColor = Colors.brown[300];
 
   @override
   Widget build(BuildContext context) {
@@ -24,48 +25,53 @@ class _CounterPageState extends State<CounterPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          buildSubTitle("Homebody Level", subTitleColor),
+          buildSubTitle("Today In & Out", subTitleColor),
           Padding(
               padding: EdgeInsets.only(left: 15, right: 15),
               child: Card(
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30))),
                 color: Colors.white,
                 child: buildChart(),
               )),
           SizedBox(
             height: 10,
           ),
-          Center(
-            child: buildInAndOutWidget("In", 16),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Center(
-            child: buildInAndOutWidget("Out", 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              buildInAndOutWidget("In", "15:42"),
+              buildInAndOutWidget("Out", "8:18"),
+            ],
           )
         ],
       ),
     ));
   }
 
-  Widget buildInAndOutWidget(String title, int time) {
-    return Row(
+  Widget buildInAndOutWidget(String title, String time) {
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buildTitle(title + " : ", 50, Colors.green[500]),
-        SizedBox(
-          height: 20,
-        ),
-        buildTitle(time.toString(), 50, Colors.purple[800]),
+        buildTitle(title, 30, Colors.brown[500]),
+        Card(
+          elevation: 10,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
+          child: Container(
+              width: 150,
+              height: 70,
+              child: Center(child: buildTitle(time, 30, Colors.purple[800]))),
+        )
       ],
     );
   }
 
   Widget buildTitle(String title, double size, Color color) {
-    return Text(
-      title,
-      style: GoogleFonts.bebasNeue(color: color, fontSize: size),
-    );
+    return Text(title,
+        style: GoogleFonts.firaSans(
+            color: color, fontSize: size, fontWeight: FontWeight.bold));
   }
 
   Widget buildSubTitle(String title, Color color) {
@@ -86,9 +92,9 @@ class _CounterPageState extends State<CounterPage> {
           alignment: Alignment.center,
           children: [
             Text(
-              "24 / 3",
+              "70%",
               style:
-                  GoogleFonts.bebasNeue(color: Colors.green[500], fontSize: 50),
+                  GoogleFonts.bebasNeue(color: Colors.brown[400], fontSize: 50),
             ),
             PieChart(
               PieChartData(
@@ -113,6 +119,29 @@ class _CounterPageState extends State<CounterPage> {
                   centerSpaceRadius: 80,
                   sections: showingSections()),
             ),
+            Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Indicator(
+                            color: Colors.brown[500],
+                            isSquare: true,
+                            size: 16,
+                            text: "In",
+                            textColor: Colors.brown[500],
+                          ),
+                          Indicator(
+                            color: Colors.cyan[500],
+                            isSquare: true,
+                            size: 16,
+                            text: "out",
+                            textColor: Colors.brown[500],
+                          )
+                        ])))
           ],
         ));
   }
@@ -125,9 +154,10 @@ class _CounterPageState extends State<CounterPage> {
       switch (i) {
         case 0:
           return PieChartSectionData(
-            color: const Color(0xff0293ee),
+            showTitle: false,
+            color: Colors.brown[400], //const Color(0xff0293ee),
             value: 70,
-            title: '70%',
+            title: null,
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -136,9 +166,10 @@ class _CounterPageState extends State<CounterPage> {
           );
         case 1:
           return PieChartSectionData(
-            color: const Color(0xfff8b250),
+            showTitle: false,
+            color: Colors.cyan[500], //const Color(0xfff8b250),
             value: 30,
-            title: '30%',
+            title: null,
             radius: radius,
             titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -149,5 +180,47 @@ class _CounterPageState extends State<CounterPage> {
           throw Error();
       }
     });
+  }
+}
+
+class Indicator extends StatelessWidget {
+  final Color color;
+  final String text;
+  final bool isSquare;
+  final double size;
+  final Color textColor;
+
+  const Indicator(
+      {Key key,
+      this.color,
+      this.text,
+      this.isSquare,
+      this.size = 16,
+      this.textColor})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: isSquare ? BoxShape.rectangle : BoxShape.circle,
+            color: color,
+          ),
+        ),
+        const SizedBox(
+          width: 4,
+        ),
+        Text(
+          text,
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
+        )
+      ],
+    );
   }
 }

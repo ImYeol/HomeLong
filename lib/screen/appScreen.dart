@@ -109,35 +109,48 @@ class _AppScreenState extends State<AppScreen>
               // show Graient background
               flexibleSpace: Container(
                   decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(35),
+                          bottomRight: Radius.circular(35)),
                       gradient: LinearGradient(
                           begin: Alignment.bottomLeft,
                           end: Alignment.topRight,
                           colors: <Color>[
-                        Colors.green[800],
-                        Colors.green[200]
-                      ])),
+                            Colors.brown[900],
+                            Colors.brown[200]
+                          ])),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 50),
                     child: Align(
-                      alignment: Alignment.centerRight,
-                      widthFactor: 0.5,
-                      child: Text(
-                        "HomeBody",
-                        style: GoogleFonts.bebasNeue(
-                            color: Colors.white, fontSize: 55),
-                      ),
-                    ),
+                        alignment: Alignment.centerRight,
+                        widthFactor: 0.5,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("HomeBody",
+                                style: GoogleFonts.workSans(
+                                    color: Colors.white,
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold)),
+                            Text("Check your life style",
+                                style: GoogleFonts.workSans(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold))
+                          ],
+                        )),
                   )),
               elevation: 0,
               bottom: TabBar(
-                  labelColor: Colors.green[600], // tab icon color
+                  labelColor: Colors.brown[600], // tab icon color
                   unselectedLabelColor:
                       Colors.white, // unselected tab icon color
                   indicatorSize: TabBarIndicatorSize.label,
                   indicator: BoxDecoration(
                       borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15), // for tab border shape
-                          topRight: Radius.circular(15)),
+                          topLeft: Radius.circular(45), // for tab border shape
+                          topRight: Radius.circular(45)),
                       color: Colors.white),
                   tabs: [
                     Tab(
