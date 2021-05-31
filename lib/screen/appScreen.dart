@@ -2,7 +2,9 @@ import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geofence_service/geofence_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/home/bloc/homeCubit.dart';
+import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/home/homePage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/rank/bloc/rankCubit.dart';
@@ -17,7 +19,8 @@ class AppScreen extends StatefulWidget {
   _AppScreenState createState() => _AppScreenState();
 }
 
-class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
+class _AppScreenState extends State<AppScreen>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   LogUtil logUtil = LogUtil();
   final AppScreenCubit cubit = AppScreenCubit();
 
@@ -76,8 +79,6 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
         notificationTitle: 'Geofence Service is running',
         notificationText: 'Tap to return to the app',
         child: Scaffold(
-          appBar:
-              AppBar(title: const Text('Geofence Service'), centerTitle: true),
           body: BlocProvider<AppScreenCubit>.value(
               value: cubit, child: _buildMainContents(context)),
         ));
@@ -85,45 +86,99 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
 
   Widget _buildMainContents(BuildContext context) {
     return BlocConsumer<AppScreenCubit, AppScreenState>(
-      listenWhen: (previous, current) =>
-          (previous is! PageLoading) && (previous != current),
-      listener: (context, state) {
-        if (state == HomePage) {
-          logUtil.logger.d("state is homePage");
-        }
-      },
-      builder: (context, state) => Scaffold(
-        body: state.widget,
-        bottomNavigationBar: _buildOriginDesign(context),
-      ),
-    );
+        listenWhen: (previous, current) =>
+            (previous is! PageLoading) && (previous != current),
+        listener: (context, state) {
+          if (state == HomePage) {
+            logUtil.logger.d("state is homePage");
+          }
+        },
+        builder: (context, state) => _buildTabController(context));
   }
 
-  Widget _buildOriginDesign(BuildContext context) {
-    return CustomNavigationBar(
-      iconSize: 30.0,
-      selectedColor: Theme.of(context).focusColor,
-      strokeColor: Colors.white,
-      unSelectedColor: Theme.of(context).disabledColor,
-      backgroundColor: Theme.of(context).bottomAppBarColor,
-      bubbleCurve: Curves.linear,
-      opacity: 1.0,
-      items: [
-        CustomNavigationBarItem(
-          icon: Icon(Icons.home),
-          selectedTitle: Text("Home"),
-        ),
-        CustomNavigationBarItem(
-          icon: Icon(Icons.people),
-          selectedTitle: Text("Rank"),
-        ),
-        CustomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          selectedTitle: Text("Setting"),
-        ),
-      ],
-      currentIndex: cubit.currentPage,
-      onTap: (index) => cubit.dispatch(index),
-    );
+  Widget _buildTabController(BuildContext context) {
+    double appBarheight = MediaQuery.of(context).size.height / 4;
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(appBarheight),
+            child: AppBar(
+              // empty leading
+              leading: Container(),
+              // show Graient background
+              flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(35),
+                          bottomRight: Radius.circular(35)),
+                      gradient: LinearGradient(
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                          colors: <Color>[
+                            Colors.brown[900],
+                            Colors.brown[200]
+                          ])),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 50),
+                    child: Align(
+                        alignment: Alignment.centerRight,
+                        widthFactor: 0.5,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("HomeBody",
+                                style: GoogleFonts.workSans(
+                                    color: Colors.white,
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold)),
+                            Text("Check your life style",
+                                style: GoogleFonts.workSans(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold))
+                          ],
+                        )),
+                  )),
+              elevation: 0,
+              bottom: TabBar(
+                  labelColor: Colors.brown[600], // tab icon color
+                  unselectedLabelColor:
+                      Colors.white, // unselected tab icon color
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicator: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(45), // for tab border shape
+                          topRight: Radius.circular(45)),
+                      color: Colors.white),
+                  tabs: [
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Icon(Icons.access_time_sharp),
+                      ),
+                    ),
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Icon(Icons.stacked_bar_chart),
+                      ),
+                    ),
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Icon(Icons.settings),
+                      ),
+                    ),
+                  ]),
+            ),
+          ),
+          body: TabBarView(children: [
+            CounterPage(),
+            RankPage(),
+            Icon(Icons.games),
+          ]),
+        ));
   }
 }
