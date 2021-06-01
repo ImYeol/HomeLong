@@ -34,7 +34,7 @@ class DBHelper {
     // await deleteDatabase(path);
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(
-          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, week TEXT, timeInfo TEXT, latitude REAL, longitude REAL)');
+          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, name TEXT, image TEXT, ssid TEXT, bssid TEXT, week TEXT, timeInfo TEXT, street TEXT, latitude REAL, longitude REAL)');
     }, onUpgrade: (db, oldVersion, newVersion) {});
   }
 
@@ -60,8 +60,7 @@ class DBHelper {
   deleteUser() async {
     final db = await database;
     InAppUser _user = InAppUser();
-    var res = db.delete(_tableName,
-        where: "id = ?", whereArgs: [_user.id]);
+    var res = db.delete(_tableName, where: "id = ?", whereArgs: [_user.id]);
     res.then((value) {
       // success to delete user.
     }).catchError((error) {
@@ -87,11 +86,12 @@ class DBHelper {
     });
   }
 
-  updateLocation(double latitude, double longitude) async {
+  updateLocation(double latitude, double longitude, String street) async {
     final db = await database;
     InAppUser _user = InAppUser();
     _user.latitude = latitude;
     _user.longitude = longitude;
+    _user.street = street;
     var res = db.update(_tableName, _user.getUser(),
         where: "id = ?", whereArgs: [_user.id]);
     res.then((value) {

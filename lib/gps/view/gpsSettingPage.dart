@@ -312,7 +312,7 @@ class AddressInput extends StatefulWidget {
   _AddressInputState createState() => _AddressInputState(
       width: this.width,
       addressController: this.addressController,
-      currentLocation: currentLocation);
+      currentLocation: this.currentLocation);
 }
 
 class _AddressInputState extends State<AddressInput> {
@@ -400,10 +400,12 @@ class _AddressInputState extends State<AddressInput> {
                           backgroundColor: MaterialStateProperty.all<Color>(
                               Colors.yellow[100]),
                         ),
-                        onPressed: () {
-                          _getLatLngFromAddress(addressController.text);
-                          DBHelper().updateLocation(currentLocation.latitude,
-                              currentLocation.longitude);
+                        onPressed: () async {
+                          await _getLatLngFromAddress(addressController.text);
+                          await DBHelper().updateLocation(
+                              this.currentLocation.latitude,
+                              this.currentLocation.longitude,
+                              addressController.text);
                           Navigator.pushNamed(context, '/Main');
                         },
                         child: Text('save'),

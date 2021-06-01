@@ -69,7 +69,7 @@ class LoginCubit extends Cubit<LoginState> {
   dbInfoLogin() async {
     logUtil.logger.d("[loginCubit] dbInfoLogin");
     InAppUser _user = await DBHelper().getUser();
-    if (_user == null){
+    if (_user == null) {
       emit(LoginState.UNLOGIN);
       return;
     }

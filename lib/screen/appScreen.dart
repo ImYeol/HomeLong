@@ -11,6 +11,7 @@ import 'package:homg_long/rank/bloc/rankCubit.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
+import 'package:homg_long/setting/setting.dart';
 
 class AppScreen extends StatefulWidget {
   AppScreen({Key key}) : super(key: key);
@@ -174,11 +175,8 @@ class _AppScreenState extends State<AppScreen>
                   ]),
             ),
           ),
-          body: TabBarView(children: [
-            CounterPage(),
-            RankPage(),
-            Icon(Icons.games),
-          ]),
+          body:
+              TabBarView(children: [CounterPage(), RankPage(), SettingPage()]),
         ));
   }
 }
