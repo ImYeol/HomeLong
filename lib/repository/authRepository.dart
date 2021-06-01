@@ -104,6 +104,7 @@ class AuthenticationRepository {
       _user.setUser({
         'id': user.id.toString(),
         'image': user.properties["profile_image"],
+        'name': user.properties["nickname"],
       });
 
       // set up new account.

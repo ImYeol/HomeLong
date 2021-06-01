@@ -2,11 +2,13 @@ import 'package:homg_long/repository/db.dart';
 
 class InAppUser {
   String id;
+  String name;
   String image;
   String ssid;
   String bssid;
   String week;
   String timeInfo;
+  String street;
   double latitude = double.infinity; // as initial value
   double longitude = double.infinity; // as initial value
 
@@ -16,11 +18,13 @@ class InAppUser {
   // factory constructor.
   factory InAppUser(
       {String id,
+      String name,
       String image,
       String ssid,
       String bssid,
       String week,
       String timeInfo,
+      String street,
       double latitude,
       double longitude}) {
     return _user;
@@ -28,11 +32,13 @@ class InAppUser {
 
   setUser(Map<String, dynamic> json) {
     id = json['id'];
+    name = json['name'];
     image = json['image'];
     ssid = json['ssid'];
     bssid = json['bssid'];
     week = json['week'];
     timeInfo = json['timeInfo'];
+    street = json['street'];
     latitude = json['latitude'];
     longitude = json['longitude'];
   }
@@ -40,11 +46,13 @@ class InAppUser {
   Map<String, dynamic> getUser() {
     return {
       "id": this.id,
+      "name": this.name,
       "image": this.image,
       "ssid": this.ssid,
       "bssid": this.bssid,
       "week": this.week,
       "timeInfo": this.timeInfo,
+      "street": this.street,
       "latitude": this.latitude,
       "longitude": this.longitude,
     };
@@ -67,17 +75,4 @@ class InAppUser {
     // ", longitude:" +
     // this.longitude?.toString();
   }
-}
-
-Map<String, dynamic> getEmptyUser(){
-  return {
-    "id": "",
-    "image": "",
-    "ssid": "",
-    "bssid": "",
-    "week": "",
-    "timeInfo": "",
-    "latitude": 0.0,
-    "longitude": 0.0,
-  };
 }

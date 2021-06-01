@@ -9,7 +9,7 @@ Random _rnd = Random();
 String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
     length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
-showToast(String msg){
+showToast(String msg) {
   Fluttertoast.showToast(
     msg: "$msg",
     toastLength: Toast.LENGTH_SHORT,
