@@ -1,16 +1,15 @@
-import 'dart:io';
-import 'package:kakao_flutter_sdk/all.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/log/logger.dart';
+import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 final String _tableName = 'homebody';
 
 class DBHelper {
   final logUtil = LogUtil();
+
   DBHelper._();
+
   static final DBHelper _db = DBHelper._();
 
   factory DBHelper() => _db;

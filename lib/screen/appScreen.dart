@@ -1,13 +1,10 @@
-import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geofence_service/geofence_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/home/homePage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/rank/bloc/rankCubit.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
@@ -144,9 +141,10 @@ class _AppScreenState extends State<AppScreen>
                   )),
               elevation: 0,
               bottom: TabBar(
-                  labelColor: Colors.brown[600], // tab icon color
-                  unselectedLabelColor:
-                      Colors.white, // unselected tab icon color
+                  labelColor: Colors.brown[600],
+                  // tab icon color
+                  unselectedLabelColor: Colors.white,
+                  // unselected tab icon color
                   indicatorSize: TabBarIndicatorSize.label,
                   indicator: BoxDecoration(
                       borderRadius: BorderRadius.only(

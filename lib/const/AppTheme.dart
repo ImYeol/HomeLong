@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  static String appName = "HomeLong";
+
   static double icon_size = 35.0;
   static Color icon_color = Colors.white;
   static Color bottomAppBarColor = Colors.white;
@@ -19,4 +21,8 @@ class AppTheme {
   static double subtitle_font_size_small = 15.0;
   static double subtitle_font_size_middle = 20.0;
   static double subtitle_font_size_big = 40.0;
+
+  // button
+  static Color alertButtonTextColor = Colors.white;
+  static Color alertButtonBackgroundColor = Colors.blueAccent;
 }

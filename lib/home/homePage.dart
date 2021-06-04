@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:homg_long/home/bloc/homeCubit.dart';
-import 'package:homg_long/home/model/homeState.dart';
 import 'package:homg_long/const/appTheme.dart';
+import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 
@@ -72,6 +71,7 @@ class HomePage extends StatelessWidget {
 
 class TitleWidget extends StatelessWidget {
   final String title;
+
   const TitleWidget({Key key, this.title}) : super(key: key);
 
   @override
@@ -161,6 +161,7 @@ class DetailsSubTitle extends StatelessWidget {
 class AverageTimeDisplay extends StatelessWidget {
   final String weekTimeString;
   final String monthTimeString;
+
   const AverageTimeDisplay({this.weekTimeString, this.monthTimeString});
 
   @override

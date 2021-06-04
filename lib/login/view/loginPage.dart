@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/appTheme.dart';
-import 'package:homg_long/gps/view/gpsSettingPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
-import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/authRepository.dart';
-import 'package:homg_long/wifi/wifiSettingPage.dart';
 
 enum LoginState { LOGIN, UNLOGIN }
 
 class LoginPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
+
   LoginPage({Key key}) : super(key: key);
 
   static Route route() {
@@ -47,6 +44,7 @@ class LoginPage extends StatelessWidget {
 
 class LoginForm extends StatelessWidget {
   LogUtil log = LogUtil();
+
   LoginForm({Key key}) : super(key: key);
 
   @override
@@ -84,58 +82,18 @@ class LoginForm extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ]),
+            SizedBox(
+              height: 30.0,
+            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: [
-                SizedBox(
-                  height: 30.0,
-                ),
-                _kakaoLogin()
-              ],
+              children: [_kakaoLogin()],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [_facebookLogin()],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                RaisedButton(
-                  onPressed: () {
-                    context.read<LoginCubit>().fakeLogin();
-                  },
-                  child: Text('Temp button next'),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                RaisedButton(
-                  onPressed: () {
-                    context.read<LoginCubit>().dbInfoLogOut();
-                  },
-                  child: Text('Log out'),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                RaisedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (BuildContext context) => GPSSettingPage()));
-                  },
-                  child: Text('Temp gps setting'),
-                ),
-              ],
             ),
           ],
         ),

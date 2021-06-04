@@ -39,6 +39,7 @@ class AppScreenCubit extends Cubit<AppScreenState> {
       useActivityRecognition: true,
       allowMockLocations: false,
       geofenceRadiusSortType: GeofenceRadiusSortType.DESC);
+
   // Create a [Geofence] list.
   final _geofenceList = <Geofence>[
     Geofence(
@@ -62,7 +63,9 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   AppScreenCubit() : super(PageLoading(CircularProgressIndicator()));
 
   int get currentPage => _currentPage;
+
   GeofenceService get geofenceService => _geofenceService;
+
   Stream<TimeData> get counterStream => _atHomeCounterStreamController.stream;
 
   void init() {

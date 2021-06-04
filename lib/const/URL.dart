@@ -1,5 +1,3 @@
-import 'package:http/http.dart' as http;
-
 class URL {
   static String serverHost = "http://61.98.89.97";
   static String serverPort = ":8083";
@@ -15,6 +13,6 @@ class URL {
 
   static String setDayTimeURL = serverHost + serverPort + "/time/day/set";
 
-  // friend
+// friend
 
 }

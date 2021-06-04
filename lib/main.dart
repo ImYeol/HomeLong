@@ -3,14 +3,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/authRepository.dart';
-import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/repository/gpsService.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
+import 'package:homg_long/screen/appScreen.dart';
 import 'package:homg_long/splashPage.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
-import 'package:homg_long/screen/appScreen.dart';
+
 import 'gps/view/gpsSettingPage.dart';
 import 'login/view/loginPage.dart';
 import 'simple_bloc_observer.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   LogUtil logUtil = LogUtil();
   final _navigatorKey = GlobalKey<NavigatorState>();
+
   NavigatorState get _navigator => _navigatorKey.currentState;
 
   final routes = {
@@ -103,9 +105,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             textTheme:
                 GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
             primarySwatch: AppTheme.primarySwatch,
-            primaryColor: AppTheme.primaryColor, // primary color
+            primaryColor: AppTheme.primaryColor,
+            // primary color
             accentColor: AppTheme.accentColor,
-            backgroundColor: AppTheme.backgroundColor, // background color
+            backgroundColor: AppTheme.backgroundColor,
+            // background color
             visualDensity: VisualDensity.adaptivePlatformDensity,
             bottomAppBarColor: AppTheme.bottomAppBarColor,
             textSelectionColor: AppTheme.primaryColor,

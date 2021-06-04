@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:getwidget/components/avatar/gf_avatar.dart';
 import 'package:getwidget/components/button/gf_button.dart';
-import 'package:getwidget/components/button/gf_button_bar.dart';
-import 'package:getwidget/components/card/gf_card.dart';
 import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
-import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/setting/bloc/settingCubit.dart';
 
 class SettingPage extends StatelessWidget {

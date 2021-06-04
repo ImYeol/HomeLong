@@ -2,7 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:path/path.dart';
 
 class CounterPage extends StatefulWidget {
   CounterPage({Key key}) : super(key: key);
@@ -155,7 +154,8 @@ class _CounterPageState extends State<CounterPage> {
         case 0:
           return PieChartSectionData(
             showTitle: false,
-            color: Colors.brown[400], //const Color(0xff0293ee),
+            color: Colors.brown[400],
+            //const Color(0xff0293ee),
             value: 70,
             title: null,
             radius: radius,
@@ -167,7 +167,8 @@ class _CounterPageState extends State<CounterPage> {
         case 1:
           return PieChartSectionData(
             showTitle: false,
-            color: Colors.cyan[500], //const Color(0xfff8b250),
+            color: Colors.cyan[500],
+            //const Color(0xfff8b250),
             value: 30,
             title: null,
             radius: radius,

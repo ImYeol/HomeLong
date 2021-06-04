@@ -1,5 +1,3 @@
-import 'package:homg_long/repository/db.dart';
-
 class InAppUser {
   String id;
   String name;
@@ -13,6 +11,7 @@ class InAppUser {
   double longitude = double.infinity; // as initial value
 
   InAppUser._();
+
   static final InAppUser _user = new InAppUser._();
 
   // factory constructor.

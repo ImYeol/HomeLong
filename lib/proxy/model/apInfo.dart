@@ -5,6 +5,7 @@ class APInfo {
   const APInfo({this.ssid, this.bssid});
 
   String get _ssid => ssid;
+
   String get _bssid => bssid;
 
   factory APInfo.fromJson(Map<String, dynamic> json) {
