@@ -3,6 +3,7 @@ import 'package:homg_long/log/logger.dart';
 
 class SimpleBlocObserver extends BlocObserver {
   final logUtil = LogUtil();
+
   @override
   void onEvent(Bloc bloc, Object event) {
     logUtil.logger.d('${bloc.runtimeType} $event');

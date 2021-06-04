@@ -8,9 +8,13 @@ class UserInfo {
   final TimeData timeInfo;
 
   String get _id => id;
+
   String get _image => image;
+
   String get _ssid => ssid;
+
   String get _bssid => bssid;
+
   TimeData get _timeInfo => timeInfo;
 
   const UserInfo({this.id, this.image, this.ssid, this.bssid, this.timeInfo});

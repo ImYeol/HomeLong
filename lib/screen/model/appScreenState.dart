@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:homg_long/repository/model/UserInfo.dart';
 
 abstract class AppScreenState {
   Widget widget;
+
   AppScreenState(this.widget);
 }
 

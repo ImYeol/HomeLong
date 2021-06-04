@@ -1,16 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:getwidget/components/button/gf_button.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/gps/cubit/gpsCubit.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/gpsService.dart';
 import 'package:homg_long/utils/utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:homg_long/const/errorMessage.dart';
 
 enum gpsState { GPSSET, GPSUNSET }
 
@@ -39,6 +40,7 @@ class GPSSettingForm extends StatelessWidget {
   // permission
   bool _serviceEnabled;
   LocationPermission _permission;
+  bool _permitted = false;
 
   // location
   LatLng _currentLocation = new LatLng(0.0, 0.0);
@@ -59,8 +61,12 @@ class GPSSettingForm extends StatelessWidget {
     init();
   }
 
-  init() {
-    _getCurrentLocation();
+  init() async {
+    _permitted = await _permissionCheck();
+    if (_permitted == true) {
+      _getCurrentLocation();
+      return;
+    }
   }
 
   @override
@@ -80,10 +86,11 @@ class GPSSettingForm extends StatelessWidget {
               _buildGoogleMapWidget(context),
               _buildZoomButton(),
               AddressInput(
-                  width: width,
-                  addressController: this._addressController,
-                  currentLocation: this._currentLocation),
-              _buildCurrentLocationButton(),
+                width: width,
+                addressController: this._addressController,
+                currentLocation: this._currentLocation,
+              ),
+              _buildCurrentLocationButton(context),
             ],
           ),
         ));
@@ -174,7 +181,7 @@ class GPSSettingForm extends StatelessWidget {
     );
   }
 
-  Widget _buildCurrentLocationButton() {
+  Widget _buildCurrentLocationButton(BuildContext context) {
     return SafeArea(
       child: Align(
         alignment: Alignment.bottomRight,
@@ -190,8 +197,39 @@ class GPSSettingForm extends StatelessWidget {
                   height: 56,
                   child: Icon(Icons.my_location),
                 ),
-                onTap: () {
-                  _getCurrentLocation();
+                onTap: () async {
+                  _permitted = await _permissionCheck();
+                  if (_permitted == false) {
+                    String alertRes = await showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                              title: Text('${AppTheme.appName}'),
+                              content: Text(
+                                  "Allow App to access this device's location"),
+                              actions: <Widget>[
+                                GFButton(
+                                  text: "OK",
+                                  textColor: AppTheme.alertButtonTextColor,
+                                  shape: GFButtonShape.pills,
+                                  color: AppTheme.alertButtonBackgroundColor,
+                                  onPressed: () {
+                                    Navigator.pop(context, "OK");
+                                  },
+                                ),
+                              ]);
+                        });
+                    if (alertRes == "OK") {
+                      Geolocator.openLocationSettings();
+                      return;
+                    }
+                  }
+
+                  _permitted = await _permissionCheck();
+                  if (_permitted == true) {
+                    _getCurrentLocation();
+                  }
                 },
               ),
             ),
@@ -203,13 +241,6 @@ class GPSSettingForm extends StatelessWidget {
 
   // Method for retrieving the current location
   _getCurrentLocation() async {
-    bool permitted = await _permissionCheck();
-    if (permitted == false) {
-      // location permission is not allowed.
-      showToast(SetLocationPermission);
-      return;
-    }
-
     // get current location with high accuracy.
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) async {
@@ -310,15 +341,17 @@ class AddressInput extends StatefulWidget {
 
   @override
   _AddressInputState createState() => _AddressInputState(
-      width: this.width,
-      addressController: this.addressController,
-      currentLocation: this.currentLocation);
+        width: this.width,
+        addressController: this.addressController,
+        currentLocation: this.currentLocation,
+      );
 }
 
 class _AddressInputState extends State<AddressInput> {
   double width;
   TextEditingController addressController;
   LatLng currentLocation;
+  bool permitted;
 
   _AddressInputState(
       {double width,
@@ -401,12 +434,46 @@ class _AddressInputState extends State<AddressInput> {
                               Colors.yellow[100]),
                         ),
                         onPressed: () async {
-                          await _getLatLngFromAddress(addressController.text);
-                          await DBHelper().updateLocation(
-                              this.currentLocation.latitude,
-                              this.currentLocation.longitude,
-                              addressController.text);
-                          Navigator.pushNamed(context, '/Main');
+                          this.permitted = await _permissionCheck();
+                          if (this.permitted == false) {
+                            String alertRes = await showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                      title: Text('${AppTheme.appName}'),
+                                      content: Text(
+                                          "Allow App to access this device's location"),
+                                      actions: <Widget>[
+                                        GFButton(
+                                          text: "OK",
+                                          textColor:
+                                              AppTheme.alertButtonTextColor,
+                                          shape: GFButtonShape.pills,
+                                          color: AppTheme
+                                              .alertButtonBackgroundColor,
+                                          onPressed: () {
+                                            Navigator.pop(context, "OK");
+                                          },
+                                        ),
+                                      ]);
+                                });
+
+                            if (alertRes == "OK") {
+                              Geolocator.openLocationSettings();
+                              return;
+                            }
+                          }
+
+                          this.permitted = await _permissionCheck();
+                          if (this.permitted == true) {
+                            await _getLatLngFromAddress(addressController.text);
+                            await DBHelper().updateLocation(
+                                this.currentLocation.latitude,
+                                this.currentLocation.longitude,
+                                addressController.text);
+                            Navigator.pushNamed(context, '/Main');
+                          }
                         },
                         child: Text('save'),
                       ),
@@ -427,6 +494,26 @@ class _AddressInputState extends State<AddressInput> {
       print("location[$i]:${locations[i].latitude}, ${locations[i].longitude}");
     }
     currentLocation = new LatLng(locations[0].latitude, locations[0].longitude);
+  }
+
+  Future<bool> _permissionCheck() async {
+    // check location services are enabled.
+    var _serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!_serviceEnabled) {
+      return false;
+    }
+
+    // check has permission to location.
+    var _permission = await Geolocator.checkPermission();
+    if (_permission == LocationPermission.denied) {
+      // request location permission.
+      _permission = await Geolocator.requestPermission();
+      if (_permission == LocationPermission.denied ||
+          _permission == LocationPermission.deniedForever) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 

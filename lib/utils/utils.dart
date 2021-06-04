@@ -12,7 +12,7 @@ String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
 showToast(String msg) {
   Fluttertoast.showToast(
     msg: "$msg",
-    toastLength: Toast.LENGTH_SHORT,
+    toastLength: Toast.LENGTH_LONG,
     gravity: ToastGravity.CENTER,
     backgroundColor: Colors.blue[100],
     textColor: Colors.white,

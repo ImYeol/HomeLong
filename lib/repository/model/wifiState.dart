@@ -8,6 +8,7 @@ abstract class WifiState {
   const WifiState({this.ssid, this.bssid, this.timeData});
 
   String get _ssid => ssid;
+
   String get _bssid => bssid;
 }
 

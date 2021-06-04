@@ -1,6 +1,4 @@
-import 'dart:convert';
 
-import 'package:homg_long/proxy/timeDataProxy.dart';
 import 'package:homg_long/log/logger.dart';
 
 class TimeData {
@@ -37,7 +35,9 @@ class TimeData {
   }
 
   int get _today => today;
+
   int get _week => week;
+
   int get _month => month;
 
   set _timeData(List<int> timeData) {

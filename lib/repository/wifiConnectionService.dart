@@ -6,9 +6,6 @@ import 'package:connectivity/connectivity.dart'
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/proxy/model/timeData.dart';
-import 'package:homg_long/repository/db.dart';
-import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';

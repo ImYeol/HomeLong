@@ -1,2 +1,2 @@
-export 'settingPage.dart';
 export 'bloc/settingCubit.dart';
+export 'settingPage.dart';
