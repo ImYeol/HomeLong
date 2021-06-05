@@ -34,7 +34,7 @@ class DBHelper {
     // await deleteDatabase(path);
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(
-          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, week TEXT, timeInfo TEXT, latitude REAL, longitude REAL)');
+          'CREATE TABLE $_tableName(id TEXT PRIMARY KEY, image TEXT, ssid TEXT, bssid TEXT, lastTimeStamp TEXT, timeInfo TEXT, latitude REAL, longitude REAL)');
     }, onUpgrade: (db, oldVersion, newVersion) {});
   }
 
@@ -60,8 +60,7 @@ class DBHelper {
   deleteUser() async {
     final db = await database;
     InAppUser _user = InAppUser();
-    var res = db.delete(_tableName,
-        where: "id = ?", whereArgs: [_user.id]);
+    var res = db.delete(_tableName, where: "id = ?", whereArgs: [_user.id]);
     res.then((value) {
       // success to delete user.
     }).catchError((error) {
@@ -72,6 +71,19 @@ class DBHelper {
     // logUtil.logger.d("drop table($dropRes)");
 
     return res;
+  }
+
+  updateLastTimeStamp(String timeStamp) async {
+    final db = await database;
+    InAppUser _user = InAppUser();
+    _user.lastTimeStamp = timeStamp;
+    var res = db.update(_tableName, _user.getUser(),
+        where: "id = ?", whereArgs: [_user.id]);
+    res.then((value) {
+      // success to update time info.
+    }).catchError((error) {
+      logUtil.logger.d("[database] update time info fail:$error");
+    });
   }
 
   updateTimeInfo(String timeInfo) async {

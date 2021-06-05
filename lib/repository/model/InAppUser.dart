@@ -5,7 +5,7 @@ class InAppUser {
   String image;
   String ssid;
   String bssid;
-  String week;
+  String lastTimeStamp;
   String timeInfo;
   double latitude = double.infinity; // as initial value
   double longitude = double.infinity; // as initial value
@@ -19,7 +19,7 @@ class InAppUser {
       String image,
       String ssid,
       String bssid,
-      String week,
+      String lastTimeStamp,
       String timeInfo,
       double latitude,
       double longitude}) {
@@ -31,7 +31,7 @@ class InAppUser {
     image = json['image'];
     ssid = json['ssid'];
     bssid = json['bssid'];
-    week = json['week'];
+    lastTimeStamp = json['lastTimeStamp'];
     timeInfo = json['timeInfo'];
     latitude = json['latitude'];
     longitude = json['longitude'];
@@ -43,7 +43,7 @@ class InAppUser {
       "image": this.image,
       "ssid": this.ssid,
       "bssid": this.bssid,
-      "week": this.week,
+      "lastTimeStamp": this.lastTimeStamp,
       "timeInfo": this.timeInfo,
       "latitude": this.latitude,
       "longitude": this.longitude,
@@ -69,13 +69,13 @@ class InAppUser {
   }
 }
 
-Map<String, dynamic> getEmptyUser(){
+Map<String, dynamic> getEmptyUser() {
   return {
     "id": "",
     "image": "",
     "ssid": "",
     "bssid": "",
-    "week": "",
+    "lastTimeStamp": "0",
     "timeInfo": "",
     "latitude": 0.0,
     "longitude": 0.0,

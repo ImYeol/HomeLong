@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,8 +57,6 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   final _pages = [HomePage(), RankPage(), RankPage()];
   final _wifiConnectionService = WifiConnectionService.instance;
   bool _userAtHome = false;
-  TimeData timeData = TimeData();
-  Timer timer;
 
   AppScreenCubit() : super(PageLoading(CircularProgressIndicator()));
 
@@ -139,7 +138,7 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     logUtil.logger.d('prevActivity: ${prevActivity.toMap()}');
     logUtil.logger.d('currActivity: ${currActivity.toMap()}\n');
     //_activityStreamController.sink.add(currActivity);
-    saveTimeInfo();
+    saveTimeStamp();
   }
 
   void _onWifiStateChanged(WifiState state) {
@@ -147,7 +146,7 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     enableCounterIfUserNotAtHome(enabled);
   }
 
-  void enableCounterIfUserNotAtHome(bool enabled) {
+  void updateTimeStamp(bool enabled) {
     // check if Already enabled
     if (enabled == _userAtHome) return;
     if (enabled) {
@@ -155,6 +154,16 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     } else {
       stopCounter();
     }
+  }
+
+  void saveTimeStamp() {
+    logUtil.logger.d("saveTimeStamp : " + DateTime.now().toString());
+    DBHelper().updateTimeInfo(DateTime.now().toString());
+  }
+
+  void resetTimeStamp() {
+    logUtil.logger.d("saveTimeStamp : " + DateTime.now().toString());
+    DBHelper().updateTimeInfo(jsonEncode(DateTime.now().toUtc()));
   }
 
   void _onError(dynamic error) {
@@ -167,21 +176,6 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     logUtil.logger.d('ErrorCode: $errorCode');
   }
 
-  void startCounter() {
-    logUtil.logger.d("startTimer : ${timeData.timeData == null}");
-    if (timer != null) timer.cancel();
-    timer = Timer.periodic(Duration(seconds: period), (timer) {
-      timeData.updateTime(period);
-      logUtil.logger.d("onMinuteTimeEvent : " + period.toString());
-      _atHomeCounterStreamController.sink.add(timeData);
-    });
-  }
-
-  void stopCounter() {
-    logUtil.logger.d("stopTimer");
-    if (timer != null) timer.cancel();
-  }
-
   bool loadUserInfo() {
     // load user info
     DBHelper().getUser();
@@ -189,11 +183,6 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     logUtil.logger.d("user : $_userInfo");
     timeData.setFromTimeString(InAppUser().timeInfo);
     logUtil.logger.d("loadUserInfo : " + _userInfo?.toString());
-    return true;
-  }
-
-  bool saveTimeInfo() {
-    DBHelper().updateTimeInfo(timeData.toTimeInfoString());
     return true;
   }
 
