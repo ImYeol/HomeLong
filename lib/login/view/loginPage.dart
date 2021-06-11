@@ -1,14 +1,18 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
 import 'package:homg_long/repository/authRepository.dart';
+import 'package:logging/logging.dart' as logging;
 
 enum LoginState { LOGIN, UNLOGIN }
 
 class LoginPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
+  final log = logging.Logger('LoginPage');
 
   LoginPage({Key key}) : super(key: key);
 
@@ -18,7 +22,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logUtil.logger.d("build login page");
+    log.info("build login page");
     // log.logger.d("build login page");
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,

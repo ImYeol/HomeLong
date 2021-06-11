@@ -17,6 +17,7 @@ import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
+import 'package:logging/logging.dart';
 
 class AppScreenCubit extends Cubit<AppScreenState> {
   static const int HOME_PAGE = 0;
@@ -24,6 +25,8 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   static const int SETTING_PAGE = 2;
 
   final LogUtil logUtil = LogUtil();
+  final log = Logger("AppScreenCubit");
+
   int _currentPage = 0;
   final period = 5; // second
   InAppUser _userInfo;
@@ -78,7 +81,7 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   void startWifiConnectionService() {
     if (_userInfo.ssid == null || _userInfo.ssid.isEmpty) return;
 
-    logUtil.logger.d("init Wifi service");
+    log.info("init Wifi service");
     _wifiConnectionService.listenWifiStateChanged(_onWifiStateChanged);
     _wifiConnectionService.checkNowConnectionState();
   }
@@ -87,7 +90,7 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     if (_userInfo.latitude == double.infinity ||
         _userInfo.longitude == double.infinity) return;
 
-    logUtil.logger.d("init geofence service");
+    log.info("init geofence service");
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _geofenceService
           .addGeofenceStatusChangedListener(_onGeofenceStatusChanged);
@@ -121,9 +124,9 @@ class AppScreenCubit extends Cubit<AppScreenState> {
       GeofenceRadius geofenceRadius,
       GeofenceStatus geofenceStatus,
       Position position) async {
-    logUtil.logger.d('geofence: ${geofence.toMap()}');
-    logUtil.logger.d('geofenceRadius: ${geofenceRadius.toMap()}');
-    logUtil.logger.d('geofenceStatus: ${geofenceStatus.toString()}\n');
+    log.info('geofence: ${geofence.toMap()}');
+    log.info('geofenceRadius: ${geofenceRadius.toMap()}');
+    log.info('geofenceStatus: ${geofenceStatus.toString()}\n');
 
     switch (geofenceStatus) {
       case GeofenceStatus.ENTER:
@@ -139,8 +142,8 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   }
 
   void _onActivityChanged(Activity prevActivity, Activity currActivity) {
-    logUtil.logger.d('prevActivity: ${prevActivity.toMap()}');
-    logUtil.logger.d('currActivity: ${currActivity.toMap()}\n');
+    log.info('prevActivity: ${prevActivity.toMap()}');
+    log.info('currActivity: ${currActivity.toMap()}\n');
     //_activityStreamController.sink.add(currActivity);
     saveTimeInfo();
   }
@@ -163,25 +166,25 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   void _onError(dynamic error) {
     final errorCode = getErrorCodesFromError(error);
     if (errorCode == null) {
-      logUtil.logger.d('Undefined error: $error');
+      log.info('Undefined error: $error');
       return;
     }
 
-    logUtil.logger.d('ErrorCode: $errorCode');
+    log.info('ErrorCode: $errorCode');
   }
 
   void startCounter() {
-    logUtil.logger.d("startTimer : ${timeData.timeData == null}");
+    log.info("startTimer : ${timeData.timeData == null}");
     if (timer != null) timer.cancel();
     timer = Timer.periodic(Duration(seconds: period), (timer) {
       timeData.updateTime(period);
-      logUtil.logger.d("onMinuteTimeEvent : " + period.toString());
+      log.info("onMinuteTimeEvent : " + period.toString());
       _atHomeCounterStreamController.sink.add(timeData);
     });
   }
 
   void stopCounter() {
-    logUtil.logger.d("stopTimer");
+    log.info("stopTimer");
     if (timer != null) timer.cancel();
   }
 
@@ -189,9 +192,9 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     // load user info
     DBHelper().getUser();
     _userInfo = InAppUser();
-    logUtil.logger.d("user : $_userInfo");
+    log.info("user : $_userInfo");
     timeData.setFromTimeString(InAppUser().timeInfo);
-    logUtil.logger.d("loadUserInfo : " + _userInfo?.toString());
+    log.info("loadUserInfo : " + _userInfo?.toString());
     return true;
   }
 
@@ -203,12 +206,12 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   void dispatch(int tappedIndex) {
     _currentPage = tappedIndex;
     Widget widget = Container();
-    logUtil.logger.d("counter controller closed : ${tappedIndex}");
+    log.info("counter controller closed : ${tappedIndex}");
     switch (tappedIndex) {
       case HOME_PAGE:
         _atHomeCounterStreamController.close();
         _atHomeCounterStreamController = StreamController<TimeData>();
-        logUtil.logger.d("counter controller closed");
+        log.info("counter controller closed");
         widget = BlocProvider(
           create: (_) => HomeCubit(_atHomeCounterStreamController.hasListener
               ? null

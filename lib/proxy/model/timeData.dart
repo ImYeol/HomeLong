@@ -1,8 +1,9 @@
-
 import 'package:homg_long/log/logger.dart';
+import 'package:logging/logging.dart';
 
 class TimeData {
   final logUtil = LogUtil();
+  final log = Logger("TimeDate");
 
   List<int> timeData;
   int today;
@@ -128,15 +129,15 @@ class TimeData {
   }
 
   void setFromTimeString(String timeString) {
-    logUtil.logger.d("setFromTimeString : ${timeString}");
+    log.info("setFromTimeString : ${timeString}");
     if (timeString == null || timeString.isEmpty) {
-      logUtil.logger.d("Loaded timeString null");
+      log.info("Loaded timeString null");
       timeData = List.generate(31, (index) => 0);
       return;
     }
     List<String> times = timeString.split(",");
     for (int i = 0; i < times.length; i++) {
-      logUtil.logger.d("time : ${times[i]}");
+      log.info("time : ${times[i]}");
       timeData[i] = int.parse(times[i]);
     }
     //timeData = timeString.split(",").map((data) => print("${data}"); int.parse(data)).toList();

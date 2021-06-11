@@ -69,6 +69,7 @@ dependencies:
   google_maps_flutter: ^2.0.6
 
   # log
+  logging: ^1.0.1
   logger: ^1.0.0
 
   # geofence

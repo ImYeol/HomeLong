@@ -16,20 +16,20 @@ class HomeCubit extends Cubit<HomeState> {
   Stream<TimeData> get _counterStream => counterStream;
 
 // void loadTimeData(BuildContext context) {
-//   logUtil.logger.d("loadTimeData");
+//   log.info("loadTimeData");
 //   listenTimerEvent(connectionService);
 //   emit(TimeDataLoaded(connectionService.getCurrentTimeData()));
 // }
 
 // void listenTimerEvent(WifiConnectionService connectionService) {
 //   connectionSubscription = connectionService.onNewData.listen((state) {
-//     logUtil.logger.d("homeCubit : data loaded from service");
+//     log.info("homeCubit : data loaded from service");
 //     emit(TimeDataLoaded(state.timeData));
 //   }, onError: (error) {
 //     logUtil.logger.e(error);
 //     emit(TimeDataError(TimeData()));
 //   }, onDone: () {
-//     logUtil.logger.d("wifi event stream closed!");
+//     log.info("wifi event stream closed!");
 //   });
 // }
 

@@ -8,11 +8,13 @@ import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
+import 'package:logging/logging.dart';
 
 import 'model/InAppUser.dart';
 
 class AuthenticationRepository {
   LogUtil logUtil = LogUtil();
+  final log = Logger("AuthenticationRepository");
 
   var loginStatusCode;
 
@@ -35,7 +37,7 @@ class AuthenticationRepository {
 
     // check kakao app is installed in phone.
     final kakaoTalkInstalled = await isKakaoTalkInstalled();
-    logUtil.logger.d("[kakao] kakaoTalkInstalled: $kakaoTalkInstalled");
+    log.info("[kakao] kakaoTalkInstalled: $kakaoTalkInstalled");
 
     if (kakaoTalkInstalled == true) {
       // login with kakao app.
@@ -49,10 +51,10 @@ class AuthenticationRepository {
   // login with kakao app.
   Future<bool> _loginWithKakao() async {
     try {
-      logUtil.logger.d("[kakao] loginWithKakao");
+      log.info("[kakao] loginWithKakao");
       // request authorization code.
       var code = await AuthCodeClient.instance.requestWithTalk();
-      logUtil.logger.d("[kakao] code=$code");
+      log.info("[kakao] code=$code");
       return await _issueAccessToken(code);
     } catch (e) {
       logUtil.logger.e(e);
@@ -63,10 +65,10 @@ class AuthenticationRepository {
   // login with kakao web view.
   Future<bool> _loginWithKakaoWebview() async {
     try {
-      logUtil.logger.d("[kakao] loginWithKakaoWebview");
+      log.info("[kakao] loginWithKakaoWebview");
       // request authorization code.
       var code = await AuthCodeClient.instance.request();
-      logUtil.logger.d("[kakao] code=$code");
+      log.info("[kakao] code=$code");
       return await _issueAccessToken(code);
     } catch (e) {
       logUtil.logger.e(e);
@@ -77,16 +79,16 @@ class AuthenticationRepository {
   // authorization with auth code.
   Future<bool> _issueAccessToken(String authCode) async {
     try {
-      logUtil.logger.d("[kakao] issueAccessToken");
+      log.info("[kakao] issueAccessToken");
       // request user token with authorization code.
       var token = await AuthApi.instance.issueAccessToken(authCode);
-      logUtil.logger.d("[kakao] token=$token");
+      log.info("[kakao] token=$token");
       AccessTokenStore.instance.toStore(token);
 
       // request user info with kakao account.
       return await _getKakaoInfo();
     } catch (e) {
-      logUtil.logger.d("[kakao] error on issuing access token: $e");
+      log.info("[kakao] error on issuing access token: $e");
       return false;
     }
   }
@@ -94,10 +96,10 @@ class AuthenticationRepository {
   // get user info.
   // register user info when user is not registered before.
   Future<bool> _getKakaoInfo() async {
-    logUtil.logger.d("[kakao] getKakaoInfo");
+    log.info("[kakao] getKakaoInfo");
     try {
       User user = await UserApi.instance.me();
-      logUtil.logger.d("kakao user info:$user");
+      log.info("kakao user info:$user");
 
       // delete pre account info.
       await DBHelper().deleteUser();
@@ -127,10 +129,10 @@ class AuthenticationRepository {
       );
 
       if (response.statusCode == StatusCode.statusOK) {
-        logUtil.logger.d("[kakao] success");
+        log.info("[kakao] success");
         return true;
       } else {
-        logUtil.logger.d("[kakao] fail(${response.statusCode})");
+        log.info("[kakao] fail(${response.statusCode})");
         return false;
       }
     } catch (e) {
@@ -146,7 +148,7 @@ class AuthenticationRepository {
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         final FacebookAccessToken accessToken = result.accessToken;
-        logUtil.logger.d('''
+        log.info('''
          Logged in!
          Token: ${accessToken.token}
          User id: ${accessToken.userId}
@@ -166,14 +168,14 @@ class AuthenticationRepository {
         var body = jsonEncode({
           'id': accessToken.userId,
         });
-        logUtil.logger.d("body:" + body.toString());
+        log.info("body:" + body.toString());
 
         Uri url = Uri.parse(URL.facebookLoginURL);
         final response = await http.post(
           url,
           body: body,
         );
-        logUtil.logger.d("http response:$response");
+        log.info("http response:$response");
         loginStatusCode = response.statusCode;
         break;
       case FacebookLoginStatus.cancelledByUser:
@@ -186,10 +188,10 @@ class AuthenticationRepository {
     }
 
     if (loginStatusCode == StatusCode.statusOK) {
-      logUtil.logger.d("[facebook] login");
+      log.info("[facebook] login");
       return true;
     } else {
-      logUtil.logger.d("[facebook] fail($loginStatusCode)");
+      log.info("[facebook] fail($loginStatusCode)");
       return false;
     }
   }
