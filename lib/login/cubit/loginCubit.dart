@@ -4,9 +4,12 @@ import 'package:homg_long/login/view/loginPage.dart';
 import 'package:homg_long/repository/authRepository.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:logging/logging.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   LogUtil logUtil = LogUtil();
+  final log = Logger('LoginCubit');
+
   final AuthenticationRepository _authenticationRepository;
 
   LoginCubit(this._authenticationRepository) : super(null) {
@@ -18,14 +21,14 @@ class LoginCubit extends Cubit<LoginState> {
     Future<bool> success = _authenticationRepository.kakaoLogin();
     success.then((value) {
       if (value == true) {
-        logUtil.logger.d("authentication repository success");
+        log.info("authentication repository success");
         emit(LoginState.LOGIN);
       } else {
-        logUtil.logger.d("authentication repository fail");
+        log.info("authentication repository fail");
         emit(LoginState.UNLOGIN);
       }
     }).catchError((error) {
-      logUtil.logger.d("authentication repository fail:$error");
+      log.info("authentication repository fail:$error");
       emit(LoginState.UNLOGIN);
     });
   }
@@ -49,7 +52,7 @@ class LoginCubit extends Cubit<LoginState> {
     Future<bool> success = _authenticationRepository.fakeLogin();
 
     success.then((value) {
-      logUtil.logger.d("fake login:$value");
+      log.info("fake login:$value");
       if (value == true) {
         emit(LoginState.LOGIN);
       } else {
@@ -62,13 +65,13 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   dbInfoLogin() async {
-    logUtil.logger.d("[loginCubit] dbInfoLogin");
+    log.info("[loginCubit] dbInfoLogin");
     InAppUser _user = await DBHelper().getUser();
     if (_user == null) {
       emit(LoginState.UNLOGIN);
       return;
     }
-    logUtil.logger.d("[loginCubit] user info:${_user.getUser()}");
+    log.info("[loginCubit] user info:${_user.getUser()}");
     if (_user.id != "") {
       emit(LoginState.LOGIN);
     }

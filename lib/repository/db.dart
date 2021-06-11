@@ -1,5 +1,6 @@
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -7,6 +8,7 @@ final String _tableName = 'homebody';
 
 class DBHelper {
   final logUtil = LogUtil();
+  final log = Logger("DBHelper");
 
   DBHelper._();
 
@@ -28,7 +30,7 @@ class DBHelper {
     // String path = join(documentsDirectory.path, 'homebody.db');
 
     String path = join(await getDatabasesPath(), 'homebody.db');
-    logUtil.logger.d("database initialize(path=$path)");
+    log.info("database initialize(path=$path)");
     // DB Version Must be updated if the table has been changed.
     // await deleteDatabase(path);
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
@@ -51,7 +53,7 @@ class DBHelper {
       logUtil.logger.e("[database] table($_tableName) has null");
       return null;
     }
-    logUtil.logger.d("getUser():$res");
+    log.info("getUser():$res");
     _user.setUser(res.first);
     return _user;
   }
@@ -67,7 +69,7 @@ class DBHelper {
     });
 
     // var dropRes = db.execute("DROP TABLE $_tableName");
-    // logUtil.logger.d("drop table($dropRes)");
+    // log.info("drop table($dropRes)");
 
     return res;
   }
@@ -81,7 +83,7 @@ class DBHelper {
     res.then((value) {
       // success to update time info.
     }).catchError((error) {
-      logUtil.logger.d("[database] update time info fail:$error");
+      log.info("[database] update time info fail:$error");
     });
   }
 
@@ -96,7 +98,7 @@ class DBHelper {
     res.then((value) {
       // success to update location info.
     }).catchError((error) {
-      logUtil.logger.d("[database] update location fail:$error");
+      log.info("[database] update location fail:$error");
     });
   }
 
@@ -110,7 +112,7 @@ class DBHelper {
     res.then((value) {
       // success to update wifi info.
     }).catchError((error) {
-      logUtil.logger.d("[database] update wifi info fail:$error");
+      log.info("[database] update wifi info fail:$error");
     });
   }
 }

@@ -5,17 +5,19 @@ import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
+import 'package:logging/logging.dart';
 
 import 'bloc/wifi_setting_cubit.dart';
 
 class WifiSettingPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
+  final log = Logger("WifiSettingPage");
 
   WifiSettingPage() : super();
 
   @override
   Widget build(BuildContext context) {
-    logUtil.logger.d("build wifi page");
+    log.info("build wifi page");
     return Scaffold(
         backgroundColor: Colors.brown[900],
         body: BlocProvider(

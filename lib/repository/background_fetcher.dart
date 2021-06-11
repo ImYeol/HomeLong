@@ -4,11 +4,13 @@ import 'dart:convert';
 
 import 'package:background_fetch/background_fetch.dart';
 import 'package:homg_long/log/logger.dart';
+import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BackgroundFetcher {
   final EVENTS_KEY = "fetch_events";
   final LogUtil logUtil = LogUtil();
+  final log = Logger("BackgroundFetcher");
 
   static final BackgroundFetcher instance = BackgroundFetcher._();
 
@@ -32,7 +34,7 @@ class BackgroundFetcher {
       return;
     }
 
-    logUtil.logger.d("[BackgroundFetch] Headless event received: $taskId");
+    log.info("[BackgroundFetch] Headless event received: $taskId");
     DateTime timestamp = DateTime.now();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -85,7 +87,7 @@ class BackgroundFetcher {
           ),
           onBackgroundFetch,
           onBackgroundFetchTimeout);
-      logUtil.logger.d('[BackgroundFetch] configure success: $status');
+      log.info('[BackgroundFetch] configure success: $status');
 
       _status = status;
 
@@ -120,7 +122,7 @@ class BackgroundFetcher {
     prefs.setString(EVENTS_KEY, jsonEncode(_events));
 
     if (taskId == "flutter_background_fetch") {
-      logUtil.logger.d("flutter_background_fetch onBackgroundFetch");
+      log.info("flutter_background_fetch onBackgroundFetch");
       // Schedule a one-shot task when fetch event received (for testing).
       /*
       BackgroundFetch.scheduleTask(TaskConfig(
@@ -135,9 +137,9 @@ class BackgroundFetcher {
       ));
        */
     } else if (taskId == "homelong") {
-      logUtil.logger.d("homelong onBackgroundFetch");
+      log.info("homelong onBackgroundFetch");
     } else {
-      logUtil.logger.d("back back onBackgroundFetch");
+      log.info("back back onBackgroundFetch");
     }
     // IMPORTANT:  You must signal completion of your fetch task or the OS can punish your app
     // for taking too long in the background.

@@ -9,6 +9,7 @@ import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
 import 'package:homg_long/setting/setting.dart';
+import 'package:logging/logging.dart';
 
 class AppScreen extends StatefulWidget {
   AppScreen({Key key}) : super(key: key);
@@ -20,6 +21,8 @@ class AppScreen extends StatefulWidget {
 class _AppScreenState extends State<AppScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   LogUtil logUtil = LogUtil();
+  final log = Logger("AppScreen");
+
   final AppScreenCubit cubit = AppScreenCubit();
 
   @override
@@ -27,27 +30,27 @@ class _AppScreenState extends State<AppScreen>
     super.initState();
     //WidgetsBinding.instance?.addObserver(this);
     cubit.init();
-    logUtil.logger.d("initstate app");
+    log.info("initialize app");
   }
 
   @override
   void dispose() {
     super.dispose();
     cubit.dispose();
-    logUtil.logger.d("dispose app");
+    log.info("dispose app");
     //WidgetsBinding.instance?.removeObserver(this);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    logUtil.logger.d("didChangeDependencies app");
+    log.info("didChangeDependencies app");
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    logUtil.logger.d("didchangeApplifeCycleState : $state");
+    log.info("didchangeApplifeCycleState : $state");
 
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) return;
@@ -55,7 +58,7 @@ class _AppScreenState extends State<AppScreen>
     final isBackground = state == AppLifecycleState.paused;
 
     if (isBackground) {
-      logUtil.logger.d("background app");
+      log.info("background app");
     }
   }
 
@@ -88,7 +91,7 @@ class _AppScreenState extends State<AppScreen>
             (previous is! PageLoading) && (previous != current),
         listener: (context, state) {
           if (state == HomePage) {
-            logUtil.logger.d("state is homePage");
+            log.info("state is homePage");
           }
         },
         builder: (context, state) => _buildTabController(context));

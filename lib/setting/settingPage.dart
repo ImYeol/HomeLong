@@ -8,6 +8,7 @@ import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/setting/bloc/settingCubit.dart';
+import 'package:logging/logging.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({Key key}) : super(key: key);
@@ -25,6 +26,7 @@ class SettingPage extends StatelessWidget {
 
 class _SettingPageState extends StatelessWidget {
   LogUtil _logUtil = LogUtil();
+  final log = Logger("SettingPage");
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,7 @@ class _SettingPageState extends StatelessWidget {
       );
     }
 
-    _logUtil.logger.d("profile:$user");
+    log.info("profile:$user");
 
     int latSubIdx = user.latitude.toString().indexOf(".");
     String latitude = user.latitude.toString().substring(0, latSubIdx + 3);

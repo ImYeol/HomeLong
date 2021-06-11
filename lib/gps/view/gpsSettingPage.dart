@@ -12,11 +12,13 @@ import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/gpsService.dart';
 import 'package:homg_long/utils/utils.dart';
+import 'package:logging/logging.dart';
 
 enum gpsState { GPSSET, GPSUNSET }
 
 class GPSSettingPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
+  final log = Logger("GPSSettingPage");
 
   GPSSettingPage() : super();
 
@@ -26,7 +28,7 @@ class GPSSettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logUtil.logger.d("build gps page");
+    log.info("build gps page");
     return Scaffold(
       body: BlocProvider(
         create: (_) => GPSSettingCubit(context.read<GPSService>()),
@@ -49,6 +51,7 @@ class GPSSettingForm extends StatelessWidget {
 
   // log
   LogUtil logUtil = LogUtil();
+  final log = Logger("GPSSettingPage");
 
   // google map
   CameraPosition _initialLocation = CameraPosition(target: LatLng(0.0, 0.0));
@@ -75,9 +78,9 @@ class GPSSettingForm extends StatelessWidget {
     return BlocListener<GPSSettingCubit, gpsState>(
         listener: (context, state) {
           if (state == gpsState.GPSSET) {
-            logUtil.logger.d("GPS info is loaded");
+            log.info("GPS info is loaded");
           } else {
-            logUtil.logger.d("GPS info is unloaded yet");
+            log.info("GPS info is unloaded yet");
           }
         },
         child: Scaffold(
@@ -250,7 +253,7 @@ class GPSSettingForm extends StatelessWidget {
         _updateCurrentLocation(position.latitude, position.longitude);
       }
 
-      logUtil.logger.d('_currentPosition:$_currentPosition');
+      log.info('_currentPosition:$_currentPosition');
       Placemark placeMark = await _getPlaceMark(
           new LatLng(position.latitude, position.longitude));
 
