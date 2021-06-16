@@ -1,16 +1,13 @@
 # homg_long
 
-A new Flutter project.
+## Developer guild
+1. info log는 Logger 사용
+```python
+final log = Logger("AppScreenCubit");
+```
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2. user info는 InAppUser를 사용
+DBHelper.getUser()필요없음 app initialize 하면서 InAppUser에 미리 복사해둠.
+```python
+InAppUser _user = InAppUser();
+````
