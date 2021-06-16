@@ -1,6 +1,6 @@
 # homg_long
 
-## Developer guild
+## Developer guide
 1. info log는 Logger 사용
 ```python
 final log = Logger("AppScreenCubit");
