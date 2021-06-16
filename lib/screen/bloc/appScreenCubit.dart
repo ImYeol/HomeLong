@@ -6,14 +6,15 @@ import 'package:geofence_service/geofence_service.dart';
 import 'package:geofence_service/models/geofence.dart';
 import 'package:geofence_service/models/geofence_radius.dart';
 import 'package:geofence_service/models/geofence_status.dart';
-import 'package:homg_long/home/bloc/homeCubit.dart';
-import 'package:homg_long/home/homePage.dart';
+import 'package:homg_long/counter/bloc/counterCubit.dart';
+import 'package:homg_long/counter/view/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/rank/bloc/rankCubit.dart';
 import 'package:homg_long/rank/rankPage.dart';
 import 'package:homg_long/repository/db.dart';
+import 'package:homg_long/repository/geofenceRepository.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:homg_long/repository/model/timeData.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
@@ -27,81 +28,74 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   final LogUtil logUtil = LogUtil();
   final log = Logger("AppScreenCubit");
 
+  var _geofenceRepository = GeofenceRepository();
+
   int _currentPage = 0;
-  final period = 5; // second
-  InAppUser _userInfo;
+
+  // TODO: Will be update 60 seconds(1 minute)
+  final period = 60; // second
+
+  InAppUser _userInfo = InAppUser();
+  TimeData _timeData = TimeData();
+
   final _activityStreamController = StreamController<Activity>();
   final _geofenceStreamController = StreamController<Geofence>();
-  var _atHomeCounterStreamController = StreamController<TimeData>();
+  var _counterCubit = CounterCubit();
 
-  final _geofenceService = GeofenceService.instance.setup(
-      interval: 5000,
-      accuracy: 100,
-      loiteringDelayMs: 60000,
-      statusChangeDelayMs: 10000,
-      useActivityRecognition: true,
-      allowMockLocations: false,
-      geofenceRadiusSortType: GeofenceRadiusSortType.DESC);
-
-  // Create a [Geofence] list.
-  final _geofenceList = <Geofence>[
-    Geofence(
-        id: 'place_1',
-        latitude: 35.103422,
-        longitude: 129.036023,
-        radius: [
-          GeofenceRadius(id: 'radius_100m', length: 100),
-          GeofenceRadius(id: 'radius_25m', length: 25),
-          GeofenceRadius(id: 'radius_250m', length: 250),
-          GeofenceRadius(id: 'radius_200m', length: 200)
-        ]),
-  ];
-
-  final _pages = [HomePage(), RankPage(), RankPage()];
+  final _pages = [CounterPage(), RankPage(), RankPage()];
   final _wifiConnectionService = WifiConnectionService.instance;
   bool _userAtHome = false;
-  TimeData timeData = TimeData();
+
   Timer timer;
 
-  AppScreenCubit() : super(PageLoading(CircularProgressIndicator()));
+  AppScreenCubit() : super(PageLoading(CircularProgressIndicator())) {
+    _geofenceRepository.updateGeofenceList(
+        'home', _userInfo.latitude, _userInfo.longitude);
+  }
 
   int get currentPage => _currentPage;
 
-  GeofenceService get geofenceService => _geofenceService;
-
-  Stream<TimeData> get counterStream => _atHomeCounterStreamController.stream;
+  // Stream<int> get counterStream => _atHomeCounterStreamController.stream;
 
   void init() {
     loadUserInfo();
     startGeofenceService();
     startWifiConnectionService();
-    dispatch(currentPage);
+    // dispatch(currentPage);
   }
 
   void startWifiConnectionService() {
+    // TODO: wifi info is not defined from user. (#47)
+    // https://github.com/ImYeol/HomeLong/issues/47
     if (_userInfo.ssid == null || _userInfo.ssid.isEmpty) return;
 
-    log.info("init Wifi service");
+    log.info("startWifiConnectionService");
+
     _wifiConnectionService.listenWifiStateChanged(_onWifiStateChanged);
     _wifiConnectionService.checkNowConnectionState();
   }
 
   void startGeofenceService() {
+    // TODO: user doesn't want to allow GPS permission. (#46)
+    // https://github.com/ImYeol/HomeLong/issues/46
     if (_userInfo.latitude == double.infinity ||
         _userInfo.longitude == double.infinity) return;
 
-    log.info("init geofence service");
+    log.info("startGeofenceService");
+
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      _geofenceService
+      _geofenceRepository.geofenceService
           .addGeofenceStatusChangedListener(_onGeofenceStatusChanged);
-      _geofenceService.addActivityChangedListener(_onActivityChanged);
-      _geofenceService.addStreamErrorListener(_onError);
-      _geofenceService.start(_geofenceList).catchError(_onError);
+      _geofenceRepository.geofenceService
+          .addActivityChangedListener(_onActivityChanged);
+      _geofenceRepository.geofenceService.addStreamErrorListener(_onError);
+      _geofenceRepository.geofenceService
+          .start(_geofenceRepository.geofenceList)
+          .catchError(_onError);
     });
   }
 
   bool needForegroundTask() {
-    DBHelper().getUser();
     _userInfo = InAppUser();
 
     if (_userInfo.ssid != null && _userInfo.ssid.isNotEmpty) return true;
@@ -116,7 +110,6 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   void dispose() {
     _activityStreamController.close();
     _geofenceStreamController.close();
-    _atHomeCounterStreamController.close();
   }
 
   Future<void> _onGeofenceStatusChanged(
@@ -174,33 +167,28 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   }
 
   void startCounter() {
-    log.info("startTimer : ${timeData.timeData == null}");
+    log.info("startCounter");
     if (timer != null) timer.cancel();
+
     timer = Timer.periodic(Duration(seconds: period), (timer) {
-      timeData.updateTime(period);
       log.info("onMinuteTimeEvent : " + period.toString());
-      _atHomeCounterStreamController.sink.add(timeData);
+      var day = DateTime.now().day;
+      _counterCubit.addMinute(day, 1);
     });
   }
 
   void stopCounter() {
-    log.info("stopTimer");
+    log.info("stopCounter");
     if (timer != null) timer.cancel();
   }
 
-  bool loadUserInfo() {
-    // load user info
-    DBHelper().getUser();
-    _userInfo = InAppUser();
-    log.info("user : $_userInfo");
-    timeData.setFromTimeString(InAppUser().timeInfo);
-    log.info("loadUserInfo : " + _userInfo?.toString());
-    return true;
+  void loadUserInfo() {
+    log.info("userInfo:$_userInfo");
+    log.info("timeData:$_timeData");
   }
 
-  bool saveTimeInfo() {
-    DBHelper().updateTimeInfo(timeData.toTimeInfoString());
-    return true;
+  saveTimeInfo() {
+    DBHelper().setTimeInfo(_timeData);
   }
 
   void dispatch(int tappedIndex) {
@@ -209,13 +197,8 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     log.info("counter controller closed : ${tappedIndex}");
     switch (tappedIndex) {
       case HOME_PAGE:
-        _atHomeCounterStreamController.close();
-        _atHomeCounterStreamController = StreamController<TimeData>();
-        log.info("counter controller closed");
         widget = BlocProvider(
-          create: (_) => HomeCubit(_atHomeCounterStreamController.hasListener
-              ? null
-              : _atHomeCounterStreamController.stream),
+          create: (_) => CounterCubit(),
           child: _pages[0],
         );
         emit(HomePageLoaded(widget));

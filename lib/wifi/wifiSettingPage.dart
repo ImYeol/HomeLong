@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
@@ -19,7 +20,7 @@ class WifiSettingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     log.info("build wifi page");
     return Scaffold(
-        backgroundColor: Colors.brown[900],
+        backgroundColor: AppTheme.appScreenMainColor,
         body: BlocProvider(
           create: (_) =>
               WifiSettingCubit(context.read<WifiConnectionService>()),

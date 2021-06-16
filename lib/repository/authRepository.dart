@@ -18,18 +18,6 @@ class AuthenticationRepository {
 
   var loginStatusCode;
 
-  // TODO: will be removed.
-  Future<bool> fakeLogin() async {
-    InAppUser _user = InAppUser();
-    _user.setUser({
-      'id': "aaa",
-      'image': null,
-    });
-    await DBHelper().setUser(_user);
-
-    return Future.delayed(Duration(milliseconds: 10), () => true);
-  }
-
   Future<bool> kakaoLogin() async {
     // homelong kakao info
     KakaoContext.clientId = "234991db49db0e7808bf5cea94beabff";
@@ -102,7 +90,7 @@ class AuthenticationRepository {
       log.info("kakao user info:$user");
 
       // delete pre account info.
-      await DBHelper().deleteUser();
+      await DBHelper().deleteUserInfo();
 
       InAppUser _user = InAppUser();
       _user.setUser({
@@ -112,7 +100,7 @@ class AuthenticationRepository {
       });
 
       // set up new account.
-      await DBHelper().setUser(_user);
+      await DBHelper().setUserInfo(_user);
 
       // post request.
       Uri url = Uri.parse(URL.kakaoLoginURL);
@@ -157,13 +145,13 @@ class AuthenticationRepository {
          Declined permissions: ${accessToken.declinedPermissions}
          ''');
 
-        await DBHelper().deleteUser();
+        await DBHelper().deleteUserInfo();
 
         InAppUser _user = InAppUser();
         _user.setUser({
           "id": accessToken.userId,
         });
-        await DBHelper().setUser(_user);
+        await DBHelper().setUserInfo(_user);
 
         var body = jsonEncode({
           'id': accessToken.userId,

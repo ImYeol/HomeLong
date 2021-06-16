@@ -1,4 +1,4 @@
-import 'package:homg_long/proxy/model/timeData.dart';
+import 'package:homg_long/repository/model/timeData.dart';
 
 abstract class WifiState {
   final String ssid;

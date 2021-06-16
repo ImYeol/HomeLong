@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geofence_service/geofence_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homg_long/home/counterPage.dart';
-import 'package:homg_long/home/homePage.dart';
+import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/counter/view/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
@@ -23,21 +23,21 @@ class _AppScreenState extends State<AppScreen>
   LogUtil logUtil = LogUtil();
   final log = Logger("AppScreen");
 
-  final AppScreenCubit cubit = AppScreenCubit();
+  AppScreenCubit cubit = AppScreenCubit();
 
   @override
   void initState() {
+    log.info("initialize app");
     super.initState();
     //WidgetsBinding.instance?.addObserver(this);
     cubit.init();
-    log.info("initialize app");
   }
 
   @override
   void dispose() {
+    log.info("dispose app");
     super.dispose();
     cubit.dispose();
-    log.info("dispose app");
     //WidgetsBinding.instance?.removeObserver(this);
   }
 
@@ -50,7 +50,7 @@ class _AppScreenState extends State<AppScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    log.info("didchangeApplifeCycleState : $state");
+    log.info("didChangeAppLifecycleState : $state");
 
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) return;
@@ -90,20 +90,18 @@ class _AppScreenState extends State<AppScreen>
         listenWhen: (previous, current) =>
             (previous is! PageLoading) && (previous != current),
         listener: (context, state) {
-          if (state == HomePage) {
-            log.info("state is homePage");
-          }
+          log.info("state:$state");
         },
         builder: (context, state) => _buildTabController(context));
   }
 
   Widget _buildTabController(BuildContext context) {
-    double appBarheight = MediaQuery.of(context).size.height / 4;
+    double appBarHeight = MediaQuery.of(context).size.height / 4;
     return DefaultTabController(
         length: 3,
         child: Scaffold(
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(appBarheight),
+            preferredSize: Size.fromHeight(appBarHeight),
             child: AppBar(
               // empty leading
               leading: Container(),
@@ -117,8 +115,8 @@ class _AppScreenState extends State<AppScreen>
                           begin: Alignment.bottomLeft,
                           end: Alignment.topRight,
                           colors: <Color>[
-                            Colors.brown[900],
-                            Colors.brown[200]
+                            AppTheme.appScreenMainColor,
+                            AppTheme.appScreenSubColor
                           ])),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 50),
@@ -144,7 +142,7 @@ class _AppScreenState extends State<AppScreen>
                   )),
               elevation: 0,
               bottom: TabBar(
-                  labelColor: Colors.brown[600],
+                  labelColor: AppTheme.appScreenTabColor,
                   // tab icon color
                   unselectedLabelColor: Colors.white,
                   // unselected tab icon color

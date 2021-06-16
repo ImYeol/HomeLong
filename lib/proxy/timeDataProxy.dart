@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:homg_long/proxy/model/timeData.dart';
+import 'package:homg_long/repository/model/timeData.dart';
 import 'package:http/http.dart' as http;
 
 class TimeDataProxy {
@@ -46,6 +46,6 @@ class TimeDataProxy {
 
   static TimeData parseTimeData(String responseBody) {
     List<dynamic> parsed = json.decode(responseBody);
-    return TimeData.fromJson(parsed);
+    // return TimeData.fromJson(parsed);
   }
 }

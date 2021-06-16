@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:homg_long/repository/gpsService.dart';
+import 'package:homg_long/repository/gpsRepository.dart';
 
 import '../view/gpsSettingPage.dart';
 

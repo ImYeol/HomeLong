@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static String appName = "HomeLong";
 
+  static Color appScreenMainColor = Colors.brown[900];
+  static Color appScreenSubColor = Colors.brown[200];
+  static Color appScreenTabColor = Colors.brown[600];
+
   static double icon_size = 35.0;
   static Color icon_color = Colors.white;
   static Color bottomAppBarColor = Colors.white;

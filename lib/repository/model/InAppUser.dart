@@ -15,18 +15,21 @@ class InAppUser {
   static final InAppUser _user = new InAppUser._();
 
   // factory constructor.
-  factory InAppUser(
-      {String id,
-      String name,
-      String image,
-      String ssid,
-      String bssid,
-      String week,
-      String timeInfo,
-      String street,
-      double latitude,
-      double longitude}) {
+  factory InAppUser() {
     return _user;
+  }
+
+  updateUser(InAppUser user){
+    this.id = user.id;
+    this.name = user.name;
+    this.image = user.image;
+    this.ssid = user.ssid;
+    this.bssid = user.bssid;
+    this.week = user.week;
+    this.timeInfo = user.timeInfo;
+    this.street =user.street;
+    this.latitude =user.latitude;
+    this.longitude = user.longitude;
   }
 
   setUser(Map<String, dynamic> json) {
@@ -55,6 +58,19 @@ class InAppUser {
       "latitude": this.latitude,
       "longitude": this.longitude,
     };
+  }
+
+  deleteUser() {
+    id = "";
+    name = "";
+    image = "";
+    ssid = "";
+    bssid = "";
+    week = "";
+    timeInfo = "";
+    street = "";
+    latitude = 0.0;
+    longitude = 0.0;
   }
 
   @override

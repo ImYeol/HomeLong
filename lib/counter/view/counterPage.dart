@@ -1,55 +1,70 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:logging/logging.dart';
 
-class CounterPage extends StatefulWidget {
+import '../bloc/counterCubit.dart';
+import '../model/counterState.dart';
+
+class CounterPage extends StatelessWidget {
   CounterPage({Key key}) : super(key: key);
 
   @override
-  _CounterPageState createState() => _CounterPageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: BlocProvider(
+        create: (_) => CounterCubit(),
+        child: _CounterPageState(),
+      ),
+    );
+  }
 }
 
-class _CounterPageState extends State<CounterPage> {
+class _CounterPageState extends StatelessWidget {
   int touchedIndex = -1;
   Color backgroundColor = Colors.grey[150];
   Color subTitleColor = Colors.brown[300];
 
+  final log = Logger("CounterPage");
+
   @override
   Widget build(BuildContext context) {
-    print("counterPage build");
-    return Expanded(
-        child: Container(
-      color: backgroundColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          buildSubTitle("Today In & Out", subTitleColor),
-          Padding(
-              padding: EdgeInsets.only(left: 15, right: 15),
-              child: Card(
-                elevation: 10,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30))),
-                color: Colors.white,
-                child: buildChart(),
-              )),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              buildInAndOutWidget("In", "15:42"),
-              buildInAndOutWidget("Out", "8:18"),
-            ],
-          )
-        ],
-      ),
-    ));
+    log.info("build _CounterPageState");
+    return BlocBuilder<CounterCubit, CounterState>(builder: (context, state) {
+      return Container(
+        color: backgroundColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            buildSubTitle("Today In & Out", subTitleColor),
+            Padding(
+                padding: EdgeInsets.only(left: 15, right: 15),
+                child: Card(
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30))),
+                  color: Colors.white,
+                  child: buildChart(state),
+                )),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                buildInWidget("In", state),
+                buildOutWidget("Out", state),
+              ],
+            )
+          ],
+        ),
+      );
+    });
   }
 
-  Widget buildInAndOutWidget(String title, String time) {
+  Widget buildInWidget(String title, CounterState counterState) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -61,7 +76,39 @@ class _CounterPageState extends State<CounterPage> {
           child: Container(
               width: 150,
               height: 70,
-              child: Center(child: buildTitle(time, 30, Colors.purple[800]))),
+              child: Center(
+                  child: buildTimeTitle(
+                      counterState != null
+                          ? counterState.getTimeData().minute
+                          : "0",
+                      30,
+                      Colors.purple[800]))),
+        )
+      ],
+    );
+  }
+
+  Widget buildOutWidget(String title, CounterState counterState) {
+    var now = DateTime.now();
+    var nowMinute = now.hour * 60 + now.minute;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        buildTitle(title, 30, Colors.brown[500]),
+        Card(
+          elevation: 10,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
+          child: Container(
+              width: 150,
+              height: 70,
+              child: Center(
+                  child: buildTimeTitle(
+                      counterState != null
+                          ? nowMinute - counterState.getTimeData().minute
+                          : "0",
+                      30,
+                      Colors.purple[800]))),
         )
       ],
     );
@@ -69,6 +116,14 @@ class _CounterPageState extends State<CounterPage> {
 
   Widget buildTitle(String title, double size, Color color) {
     return Text(title,
+        style: GoogleFonts.firaSans(
+            color: color, fontSize: size, fontWeight: FontWeight.bold));
+  }
+
+  Widget buildTimeTitle(int minute, double size, Color color) {
+    var hour = (minute / 60).floor();
+    var remainMinute = minute - (hour * 60);
+    return Text(hour.toString() + ':' + remainMinute.toString(),
         style: GoogleFonts.firaSans(
             color: color, fontSize: size, fontWeight: FontWeight.bold));
   }
@@ -84,32 +139,35 @@ class _CounterPageState extends State<CounterPage> {
     );
   }
 
-  Widget buildChart() {
+  // TODO: ReDrawing chart with time info (#49)
+  // https://github.com/ImYeol/HomeLong/issues/49
+  Widget buildChart(CounterState counterState) {
+    var now = DateTime.now();
     return AspectRatio(
         aspectRatio: 1.5,
         child: Stack(
           alignment: Alignment.center,
           children: [
             Text(
-              "70%",
+              (counterState.getTimeData().minute / 3600 * 100)
+                      .toStringAsFixed(2) +
+                  '%',
               style:
                   GoogleFonts.bebasNeue(color: Colors.brown[400], fontSize: 50),
             ),
             PieChart(
               PieChartData(
                   pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
-                    setState(() {
-                      final desiredTouch =
-                          pieTouchResponse.touchInput is! PointerExitEvent &&
-                              pieTouchResponse.touchInput is! PointerUpEvent;
-                      if (desiredTouch &&
-                          pieTouchResponse.touchedSection != null) {
-                        touchedIndex = pieTouchResponse
-                            .touchedSection?.touchedSectionIndex;
-                      } else {
-                        touchedIndex = -1;
-                      }
-                    });
+                    final desiredTouch =
+                        pieTouchResponse.touchInput is! PointerExitEvent &&
+                            pieTouchResponse.touchInput is! PointerUpEvent;
+                    if (desiredTouch &&
+                        pieTouchResponse.touchedSection != null) {
+                      touchedIndex =
+                          pieTouchResponse.touchedSection?.touchedSectionIndex;
+                    } else {
+                      touchedIndex = -1;
+                    }
                   }),
                   borderData: FlBorderData(
                     show: false,

@@ -1,18 +1,16 @@
-import 'dart:developer' as developer;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
 import 'package:homg_long/repository/authRepository.dart';
-import 'package:logging/logging.dart' as logging;
+import 'package:logging/logging.dart';
 
-enum LoginState { LOGIN, UNLOGIN }
+enum LoginState { LOGIN, LOGOUT }
 
 class LoginPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
-  final log = logging.Logger('LoginPage');
+  final log = Logger('LoginPage');
 
   LoginPage({Key key}) : super(key: key);
 
@@ -22,7 +20,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log.info("build login page");
+    log.info("build LoginPage");
     // log.logger.d("build login page");
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
@@ -39,28 +37,29 @@ class LoginPage extends StatelessWidget {
             child: BlocProvider(
               create: (_) =>
                   LoginCubit(context.read<AuthenticationRepository>()),
-              child: LoginForm(),
+              child: _LoginForm(),
             ),
           ),
         ));
   }
 }
 
-class LoginForm extends StatelessWidget {
-  LogUtil log = LogUtil();
+class _LoginForm extends StatelessWidget {
+  LogUtil logUtil = LogUtil();
+  final log = Logger("LoginPage");
 
-  LoginForm({Key key}) : super(key: key);
+  _LoginForm({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    log.logger.d("build login form");
+    log.info("build _LoginForm");
     return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state == LoginState.LOGIN) {
-          log.logger.d("LoginState=$state");
+          log.info("LoginState=$state");
           Navigator.pushNamed(context, "/GPS");
-        } else if (state == LoginState.UNLOGIN) {
-          log.logger.d("LoginState=$state");
+        } else if (state == LoginState.LOGOUT) {
+          log.info("LoginState=$state");
         }
       },
       child: Container(
@@ -92,12 +91,12 @@ class LoginForm extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: [_kakaoLogin()],
+              children: [_KakaoLogin()],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: [_facebookLogin()],
+              children: [_FacebookLogin()],
             ),
           ],
         ),
@@ -123,7 +122,7 @@ class _MainIcon extends StatelessWidget {
   }
 }
 
-class _kakaoLogin extends StatelessWidget {
+class _KakaoLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -146,7 +145,7 @@ class _kakaoLogin extends StatelessWidget {
   }
 }
 
-class _facebookLogin extends StatelessWidget {
+class _FacebookLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

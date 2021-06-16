@@ -55,7 +55,8 @@ class _SettingPageState extends StatelessWidget {
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           GFListTile(
             avatar: GFAvatar(
-              backgroundImage: NetworkImage(user.image),
+              backgroundImage:
+                  user.image == null ? null : NetworkImage(user.image),
               size: 60,
             ),
             titleText: user.name,
@@ -84,7 +85,7 @@ class _SettingPageState extends StatelessWidget {
           ),
           GFButton(
             onPressed: () async {
-              await DBHelper().deleteUser();
+              await DBHelper().deleteUserInfo();
               Navigator.pushNamed(context, '/Login');
             },
             text: "Logout",

@@ -18,6 +18,7 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void kakaoLogin() {
+    log.info("kakaoLogin");
     Future<bool> success = _authenticationRepository.kakaoLogin();
     success.then((value) {
       if (value == true) {
@@ -25,64 +26,57 @@ class LoginCubit extends Cubit<LoginState> {
         emit(LoginState.LOGIN);
       } else {
         log.info("authentication repository fail");
-        emit(LoginState.UNLOGIN);
+        emit(LoginState.LOGOUT);
       }
     }).catchError((error) {
-      log.info("authentication repository fail:$error");
-      emit(LoginState.UNLOGIN);
+      logUtil.logger.e("authentication repository fail:$error");
+      emit(LoginState.LOGOUT);
     });
   }
 
   void facebookLogin() {
+    log.info("facebookLogin");
     Future<bool> success = _authenticationRepository.facebookLogin();
 
     success.then((value) {
       if (value == true) {
+        log.info("authentication repository success");
         emit(LoginState.LOGIN);
       } else {
-        emit(LoginState.UNLOGIN);
+        log.info("authentication repository fail");
+        emit(LoginState.LOGOUT);
       }
     }).catchError((error) {
       logUtil.logger.e(error);
-      emit(LoginState.UNLOGIN);
-    });
-  }
-
-  void fakeLogin() {
-    Future<bool> success = _authenticationRepository.fakeLogin();
-
-    success.then((value) {
-      log.info("fake login:$value");
-      if (value == true) {
-        emit(LoginState.LOGIN);
-      } else {
-        emit(LoginState.UNLOGIN);
-      }
-    }).catchError((error) {
-      logUtil.logger.e(error);
-      emit(LoginState.UNLOGIN);
+      emit(LoginState.LOGOUT);
     });
   }
 
   dbInfoLogin() async {
-    log.info("[loginCubit] dbInfoLogin");
-    InAppUser _user = await DBHelper().getUser();
+    log.info("dbInfoLogin");
+
+    // get user info from inner DB.
+    InAppUser _user = await DBHelper().getUserInfo();
     if (_user == null) {
-      emit(LoginState.UNLOGIN);
+      // DB has not user info.
+      emit(LoginState.LOGOUT);
       return;
     }
-    log.info("[loginCubit] user info:${_user.getUser()}");
+
+    log.info("user info:${_user.getUser()}");
     if (_user.id != "") {
+      // DB has user info.
       emit(LoginState.LOGIN);
     }
   }
 
   dbInfoLogOut() async {
+    log.info("dbInfoLogOut");
     try {
-      await DBHelper().deleteUser();
+      await DBHelper().deleteUserInfo();
     } on Exception catch (_) {
       logUtil.logger.e("error : failed to delete user");
     }
-    emit(LoginState.UNLOGIN);
+    emit(LoginState.LOGOUT);
   }
 }

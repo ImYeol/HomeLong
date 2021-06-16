@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
 
 class SettingCubit extends Cubit<InAppUser> {
@@ -8,7 +7,7 @@ class SettingCubit extends Cubit<InAppUser> {
   }
 
   getUserInfo() async {
-    InAppUser _user = await DBHelper().getUser();
+    InAppUser _user = InAppUser();
     if (_user != null) {
       emit(_user);
     }
