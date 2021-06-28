@@ -10,8 +10,8 @@ class PageLoading extends AppScreenState {
   PageLoading(Widget widget) : super(widget);
 }
 
-class HomePageLoaded extends AppScreenState {
-  HomePageLoaded(Widget widget) : super(widget);
+class CounterPageLoaded extends AppScreenState {
+  CounterPageLoaded(Widget widget) : super(widget);
 }
 
 class RankPageLoaded extends AppScreenState {

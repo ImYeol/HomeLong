@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
-import 'package:homg_long/repository/wifiConnectionService.dart';
+import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
 import 'package:logging/logging.dart';
 
 import 'bloc/wifi_setting_cubit.dart';
@@ -22,7 +22,7 @@ class WifiSettingPage extends StatelessWidget {
         backgroundColor: Colors.brown[900],
         body: BlocProvider(
           create: (_) =>
-              WifiSettingCubit(context.read<WifiConnectionService>()),
+              WifiSettingCubit(context.read<ConnectivityServiceWrapper>()),
           child: WifiSettingForm(),
         ));
   }

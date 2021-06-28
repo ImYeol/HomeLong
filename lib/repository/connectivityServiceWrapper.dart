@@ -11,11 +11,11 @@ import 'package:logging/logging.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wifi_info_flutter/wifi_info_flutter.dart';
 
-class WifiConnectionService {
-  WifiConnectionService._internal();
+class ConnectivityServiceWrapper {
+  ConnectivityServiceWrapper._internal();
 
   /// Instance of [WifiConnectionService].
-  static final instance = WifiConnectionService._internal();
+  static final instance = ConnectivityServiceWrapper._internal();
   final logUtil = LogUtil();
   final log = Logger("WifiConnectionService");
 
@@ -35,7 +35,7 @@ class WifiConnectionService {
     log.info("registerWifiStateCallback");
     this.callback = callback;
     _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+        _connectivity.onConnectivityChanged.listen(onConnectionStatusChanged);
   }
 
   void unlistenWifiStateChanged() {
@@ -81,10 +81,10 @@ class WifiConnectionService {
         log.info('Permission already granted (previous execution?)');
       }
     }
-    return _updateConnectionStatus(result);
+    return onConnectionStatusChanged(result);
   }
 
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+  Future<void> onConnectionStatusChanged(ConnectivityResult result) async {
     currentConnectivityState = result;
 
     switch (result) {

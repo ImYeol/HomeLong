@@ -6,20 +6,21 @@ import 'package:geofence_service/geofence_service.dart';
 import 'package:geofence_service/models/geofence.dart';
 import 'package:geofence_service/models/geofence_radius.dart';
 import 'package:geofence_service/models/geofence_status.dart';
-import 'package:homg_long/home/bloc/homeCubit.dart';
-import 'package:homg_long/home/homePage.dart';
+import 'package:homg_long/home/bloc/counterCubit.dart';
+import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/rank/bloc/rankCubit.dart';
 import 'package:homg_long/rank/rankPage.dart';
+import 'package:homg_long/repository/connectivityServiceWrapper.dart';
 import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/model/InAppUser.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
-import 'package:homg_long/repository/wifiConnectionService.dart';
+import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
 import 'package:logging/logging.dart';
 
-class AppScreenCubit extends Cubit<AppScreenState> {
+class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   static const int HOME_PAGE = 0;
   static const int RANK_PAGE = 1;
   static const int SETTING_PAGE = 2;
@@ -34,7 +35,7 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   final _geofenceStreamController = StreamController<Geofence>();
   var _atHomeCounterStreamController = StreamController<TimeData>();
 
-  final _geofenceService = GeofenceService.instance.setup(
+  final _geofenceServiceWrapper = GeofenceService.instance.setup(
       interval: 5000,
       accuracy: 100,
       loiteringDelayMs: 60000,
@@ -57,9 +58,9 @@ class AppScreenCubit extends Cubit<AppScreenState> {
         ]),
   ];
 
-  final _pages = [HomePage(), RankPage(), RankPage()];
-  final _wifiConnectionService = WifiConnectionService.instance;
-  bool _userAtHome = false;
+  final _pages = [CounterPage(), RankPage(), RankPage()];
+  final _connectivityServiceWrapper = ConnectivityServiceWrapper.instance;
+  bool isAtHome = false;
   TimeData timeData = TimeData();
   Timer timer;
 
@@ -67,36 +68,34 @@ class AppScreenCubit extends Cubit<AppScreenState> {
 
   int get currentPage => _currentPage;
 
-  GeofenceService get geofenceService => _geofenceService;
-
-  Stream<TimeData> get counterStream => _atHomeCounterStreamController.stream;
+  GeofenceService get geofenceService => _geofenceServiceWrapper;
 
   void init() {
     loadUserInfo();
-    startGeofenceService();
-    startWifiConnectionService();
-    dispatch(currentPage);
+    startGeofenceServiceWrapper();
+    startConnectivityServiceWrapper();
+    dispatchPage(currentPage);
   }
 
-  void startWifiConnectionService() {
+  void startConnectivityServiceWrapper() {
     if (_userInfo.ssid == null || _userInfo.ssid.isEmpty) return;
 
     log.info("init Wifi service");
-    _wifiConnectionService.listenWifiStateChanged(_onWifiStateChanged);
-    _wifiConnectionService.checkNowConnectionState();
+    _connectivityServiceWrapper.listenWifiStateChanged(_onWifiStateChanged);
+    _connectivityServiceWrapper.checkNowConnectionState();
   }
 
-  void startGeofenceService() {
+  void startGeofenceServiceWrapper() {
     if (_userInfo.latitude == double.infinity ||
         _userInfo.longitude == double.infinity) return;
 
     log.info("init geofence service");
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      _geofenceService
+      _geofenceServiceWrapper
           .addGeofenceStatusChangedListener(_onGeofenceStatusChanged);
-      _geofenceService.addActivityChangedListener(_onActivityChanged);
-      _geofenceService.addStreamErrorListener(_onError);
-      _geofenceService.start(_geofenceList).catchError(_onError);
+      _geofenceServiceWrapper.addActivityChangedListener(_onActivityChanged);
+      _geofenceServiceWrapper.addStreamErrorListener(_onError);
+      _geofenceServiceWrapper.start(_geofenceList).catchError(_onError);
     });
   }
 
@@ -110,8 +109,6 @@ class AppScreenCubit extends Cubit<AppScreenState> {
 
     return false;
   }
-
-  void mockGeofenceMethod() {}
 
   void dispose() {
     _activityStreamController.close();
@@ -130,10 +127,10 @@ class AppScreenCubit extends Cubit<AppScreenState> {
 
     switch (geofenceStatus) {
       case GeofenceStatus.ENTER:
-        enableCounterIfUserNotAtHome(true);
+        onUserLocationChanged(true);
         break;
       case GeofenceStatus.EXIT:
-        enableCounterIfUserNotAtHome(false);
+        onUserLocationChanged(false);
         break;
       case GeofenceStatus.DWELL:
         break;
@@ -149,18 +146,8 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   }
 
   void _onWifiStateChanged(WifiState state) {
-    bool enabled = state is WifiConnected;
-    enableCounterIfUserNotAtHome(enabled);
-  }
-
-  void enableCounterIfUserNotAtHome(bool enabled) {
-    // check if Already enabled
-    if (enabled == _userAtHome) return;
-    if (enabled) {
-      startCounter();
-    } else {
-      stopCounter();
-    }
+    bool atHome = state is WifiConnected;
+    onUserLocationChanged(atHome);
   }
 
   void _onError(dynamic error) {
@@ -171,21 +158,6 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     }
 
     log.info('ErrorCode: $errorCode');
-  }
-
-  void startCounter() {
-    log.info("startTimer : ${timeData.timeData == null}");
-    if (timer != null) timer.cancel();
-    timer = Timer.periodic(Duration(seconds: period), (timer) {
-      timeData.updateTime(period);
-      log.info("onMinuteTimeEvent : " + period.toString());
-      _atHomeCounterStreamController.sink.add(timeData);
-    });
-  }
-
-  void stopCounter() {
-    log.info("stopTimer");
-    if (timer != null) timer.cancel();
   }
 
   bool loadUserInfo() {
@@ -203,22 +175,18 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     return true;
   }
 
-  void dispatch(int tappedIndex) {
+  void dispatchPage(int tappedIndex) {
     _currentPage = tappedIndex;
     Widget widget = Container();
     log.info("counter controller closed : ${tappedIndex}");
     switch (tappedIndex) {
       case HOME_PAGE:
-        _atHomeCounterStreamController.close();
-        _atHomeCounterStreamController = StreamController<TimeData>();
         log.info("counter controller closed");
         widget = BlocProvider(
-          create: (_) => HomeCubit(_atHomeCounterStreamController.hasListener
-              ? null
-              : _atHomeCounterStreamController.stream),
+          create: (_) => CounterCubit(this),
           child: _pages[0],
         );
-        emit(HomePageLoaded(widget));
+        emit(CounterPageLoaded(widget));
         break;
       case RANK_PAGE:
         widget = BlocProvider(
@@ -234,5 +202,37 @@ class AppScreenCubit extends Cubit<AppScreenState> {
         );
         emit(SettingPageLoaded(widget));
     }
+  }
+
+  @override
+  bool isUserAtHome() {
+    return isAtHome;
+  }
+
+  @override
+  void onUserLocationChanged(bool atHome) {
+    // check if Already enabled
+    if (this.isAtHome == isAtHome) return;
+    this.isAtHome = isAtHome;
+    if (isAtHome) {
+      enterHome();
+    } else {
+      exitHome();
+    }
+  }
+
+  @override
+  void enterHome() {}
+
+  @override
+  void exitHome() {}
+
+  @override
+  void changeDay() {}
+
+  @override
+  int getTotalTime(DateTime date) {
+    // TODO: implement getTotalTime
+    return 10;
   }
 }
