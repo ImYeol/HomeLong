@@ -19,3 +19,11 @@ showToast(String msg) {
     fontSize: 16.0,
   );
 }
+
+int getDay(DateTime time) {
+  return time.year * 10000 + time.month * 100 + time.day;
+}
+
+int getTime(DateTime time) {
+  return time.hour * 10000 + time.minute * 100 + time.second;
+}

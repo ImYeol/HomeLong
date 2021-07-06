@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/view/loginPage.dart';
 import 'package:homg_long/repository/authRepository.dart';
-import 'package:homg_long/repository/db.dart';
-import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:logging/logging.dart';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -48,30 +48,14 @@ class LoginCubit extends Cubit<LoginState> {
     });
   }
 
-  void fakeLogin() {
-    Future<bool> success = _authenticationRepository.fakeLogin();
-
-    success.then((value) {
-      log.info("fake login:$value");
-      if (value == true) {
-        emit(LoginState.LOGIN);
-      } else {
-        emit(LoginState.UNLOGIN);
-      }
-    }).catchError((error) {
-      logUtil.logger.e(error);
-      emit(LoginState.UNLOGIN);
-    });
-  }
-
   dbInfoLogin() async {
-    log.info("[loginCubit] dbInfoLogin");
-    InAppUser _user = await DBHelper().getUser();
+    log.info("dbInfoLogin");
+    UserInfo _user = await DBHelper().getUserInfo();
     if (_user == null) {
       emit(LoginState.UNLOGIN);
       return;
     }
-    log.info("[loginCubit] user info:${_user.getUser()}");
+    log.info("user info:${_user.toJson()}");
     if (_user.id != "") {
       emit(LoginState.LOGIN);
     }
@@ -79,7 +63,7 @@ class LoginCubit extends Cubit<LoginState> {
 
   dbInfoLogOut() async {
     try {
-      await DBHelper().deleteUser();
+      await DBHelper().deleteUserInfo();
     } on Exception catch (_) {
       logUtil.logger.e("error : failed to delete user");
     }

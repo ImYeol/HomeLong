@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:logging/logging.dart';
 
 class GPSService {}
 
@@ -18,20 +20,27 @@ class Suggestion {
 }
 
 class PlaceApiProvider {
+  String sessionToken;
+  var apiKey;
   final client = Client();
-
-  PlaceApiProvider(this.sessionToken);
-
-  final sessionToken;
+  final log = Logger("PlaceApiProvider");
 
   static final String androidKey = 'AIzaSyAGd5wfEqmJWKd4zxjsBHqrNYBn9T4tNjw';
   static final String iosKey = 'AIzaSyD0Palsyb5Wtg5_0uFHm6E6uFfCw0OD7W8';
   static final String other = 'AIzaSyDJlAkU9g2IFIyhfgx1xv_oke1hk1w2nKQ';
 
-  //TODO: for debugging
-  final apiKey = other;
+  PlaceApiProvider({String sessionToken}) {
+    this.sessionToken = sessionToken;
+    log.info("Platform:${Platform.operatingSystem}");
 
-  // final apiKey = Platform.isAndroid ? androidKey : iosKey;
+    if (Platform.isAndroid) {
+      apiKey = androidKey;
+    } else if (Platform.isIOS) {
+      apiKey = iosKey;
+    } else {
+      apiKey = other;
+    }
+  }
 
   Future<List<Suggestion>> fetchSuggestions(String input, String lang) async {
     final request =
@@ -54,39 +63,4 @@ class PlaceApiProvider {
       throw Exception('Failed to fetch suggestion');
     }
   }
-
-// Future<Place> getPlaceDetailFromId(String placeId) async {
-//   final request =
-//       'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$apiKey&sessiontoken=$sessionToken';
-//   final response = await client.get(request);
-//
-//   if (response.statusCode == 200) {
-//     final result = json.decode(response.body);
-//     if (result['status'] == 'OK') {
-//       final components =
-//       result['result']['address_components'] as List<dynamic>;
-//       // build result
-//       final place = Place();
-//       components.forEach((c) {
-//         final List type = c['types'];
-//         if (type.contains('street_number')) {
-//           place.streetNumber = c['long_name'];
-//         }
-//         if (type.contains('route')) {
-//           place.street = c['long_name'];
-//         }
-//         if (type.contains('locality')) {
-//           place.city = c['long_name'];
-//         }
-//         if (type.contains('postal_code')) {
-//           place.zipCode = c['long_name'];
-//         }
-//       });
-//       return place;
-//     }
-//     throw Exception(result['error_message']);
-//   } else {
-//     throw Exception('Failed to fetch suggestion');
-//   }
-// }
 }
