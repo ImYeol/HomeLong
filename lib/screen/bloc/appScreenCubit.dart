@@ -6,14 +6,14 @@ import 'package:geofence_service/geofence_service.dart';
 import 'package:geofence_service/models/geofence.dart';
 import 'package:geofence_service/models/geofence_radius.dart';
 import 'package:geofence_service/models/geofence_status.dart';
+import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/home/bloc/homeCubit.dart';
 import 'package:homg_long/home/homePage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/rank/bloc/rankCubit.dart';
 import 'package:homg_long/rank/rankPage.dart';
-import 'package:homg_long/repository/db.dart';
-import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/wifiConnectionService.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
@@ -29,7 +29,7 @@ class AppScreenCubit extends Cubit<AppScreenState> {
 
   int _currentPage = 0;
   final period = 5; // second
-  InAppUser _userInfo;
+  UserInfo _userInfo;
   final _activityStreamController = StreamController<Activity>();
   final _geofenceStreamController = StreamController<Geofence>();
   var _atHomeCounterStreamController = StreamController<TimeData>();
@@ -101,8 +101,8 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   }
 
   bool needForegroundTask() {
-    DBHelper().getUser();
-    _userInfo = InAppUser();
+    DBHelper().getUserInfo();
+    _userInfo = UserInfo();
 
     if (_userInfo.ssid != null && _userInfo.ssid.isNotEmpty) return true;
     if (_userInfo.latitude.isFinite || _userInfo.longitude.isFinite)
@@ -190,16 +190,16 @@ class AppScreenCubit extends Cubit<AppScreenState> {
 
   bool loadUserInfo() {
     // load user info
-    DBHelper().getUser();
-    _userInfo = InAppUser();
+    DBHelper().getUserInfo();
+    _userInfo = UserInfo();
     log.info("user : $_userInfo");
-    timeData.setFromTimeString(InAppUser().timeInfo);
+    timeData.setFromTimeString(UserInfo().timeInfo);
     log.info("loadUserInfo : " + _userInfo?.toString());
     return true;
   }
 
   bool saveTimeInfo() {
-    DBHelper().updateTimeInfo(timeData.toTimeInfoString());
+    // DBHelper().updateTimeInfo(timeData.toTimeInfoString());
     return true;
   }
 
