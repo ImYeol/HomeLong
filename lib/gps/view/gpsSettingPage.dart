@@ -7,9 +7,9 @@ import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/gps/cubit/gpsCubit.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/repository/db.dart';
 import 'package:homg_long/repository/gpsService.dart';
 import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
@@ -471,11 +471,11 @@ class _AddressInputState extends State<AddressInput> {
                           this.permitted = await _permissionCheck();
                           if (this.permitted == true) {
                             await _getLatLngFromAddress(addressController.text);
-                            await DBHelper().updateLocation(
+                            await DBHelper().updateLocationInfo(
                                 this.currentLocation.latitude,
                                 this.currentLocation.longitude,
                                 addressController.text);
-                            Navigator.pushNamed(context, '/Main');
+                            Navigator.pushNamed(context, '/Wifi');
                           }
                         },
                         child: Text('save'),
@@ -493,9 +493,6 @@ class _AddressInputState extends State<AddressInput> {
 
   _getLatLngFromAddress(String address) async {
     List<Location> locations = await locationFromAddress(address);
-    for (int i = 0; i < locations.length; i++) {
-      print("location[$i]:${locations[i].latitude}, ${locations[i].longitude}");
-    }
     currentLocation = new LatLng(locations[0].latitude, locations[0].longitude);
   }
 
@@ -555,7 +552,6 @@ class AddressSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    print("buildResults query=$query");
     if (query == '') {
       return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -599,7 +595,8 @@ class AddressSearch extends SearchDelegate<String> {
   Future _searchLocation() async {
     print("_searchLocation() start($query)");
     List<Suggestion> suggestions =
-        await PlaceApiProvider(_sessionString).fetchSuggestions(query, "ko");
+        await PlaceApiProvider(sessionToken: _sessionString)
+            .fetchSuggestions(query, "ko");
     List<String> addressList = new List<String>();
 
     // places.PlacesSearchResponse response = await googlePlace.searchByText(query);

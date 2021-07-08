@@ -4,31 +4,19 @@ import 'dart:convert';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:homg_long/const/URL.dart';
 import 'package:homg_long/const/statusCode.dart';
+import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/repository/db.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
 import 'package:logging/logging.dart';
 
-import 'model/InAppUser.dart';
+import 'model/userInfo.dart';
 
 class AuthenticationRepository {
   LogUtil logUtil = LogUtil();
   final log = Logger("AuthenticationRepository");
 
   var loginStatusCode;
-
-  // TODO: will be removed.
-  Future<bool> fakeLogin() async {
-    InAppUser _user = InAppUser();
-    _user.setUser({
-      'id': "aaa",
-      'image': null,
-    });
-    await DBHelper().setUser(_user);
-
-    return Future.delayed(Duration(milliseconds: 10), () => true);
-  }
 
   Future<bool> kakaoLogin() async {
     // homelong kakao info
@@ -102,17 +90,17 @@ class AuthenticationRepository {
       log.info("kakao user info:$user");
 
       // delete pre account info.
-      await DBHelper().deleteUser();
+      await DBHelper().deleteUserInfo();
 
-      InAppUser _user = InAppUser();
-      _user.setUser({
+      UserInfo _user = UserInfo();
+      _user.fromJson({
         'id': user.id.toString(),
         'image': user.properties["profile_image"],
         'name': user.properties["nickname"],
       });
 
       // set up new account.
-      await DBHelper().setUser(_user);
+      await DBHelper().setUserInfo(_user);
 
       // post request.
       Uri url = Uri.parse(URL.kakaoLoginURL);
@@ -157,13 +145,13 @@ class AuthenticationRepository {
          Declined permissions: ${accessToken.declinedPermissions}
          ''');
 
-        await DBHelper().deleteUser();
+        await DBHelper().deleteUserInfo();
 
-        InAppUser _user = InAppUser();
-        _user.setUser({
+        UserInfo _user = UserInfo();
+        _user.fromJson({
           "id": accessToken.userId,
         });
-        await DBHelper().setUser(_user);
+        await DBHelper().setUserInfo(_user);
 
         var body = jsonEncode({
           'id': accessToken.userId,

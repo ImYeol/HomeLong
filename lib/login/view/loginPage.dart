@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/appTheme.dart';
@@ -48,19 +46,20 @@ class LoginPage extends StatelessWidget {
 
 class LoginForm extends StatelessWidget {
   LogUtil log = LogUtil();
+  final _log = logging.Logger('LoginForm');
 
   LoginForm({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    log.logger.d("build login form");
+    _log.info("build login form");
     return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state == LoginState.LOGIN) {
-          log.logger.d("LoginState=$state");
+          _log.info("LoginState=$state");
           Navigator.pushNamed(context, "/GPS");
         } else if (state == LoginState.UNLOGIN) {
-          log.logger.d("LoginState=$state");
+          _log.info("LoginState=$state");
         }
       },
       child: Container(
@@ -94,6 +93,49 @@ class LoginForm extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: [_kakaoLogin()],
             ),
+            // Column(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   mainAxisSize: MainAxisSize.max,
+            //   children: [
+            //     TextButton(
+            //         style: ButtonStyle(
+            //           foregroundColor:
+            //               MaterialStateProperty.all<Color>(Colors.blue),
+            //         ),
+            //         child: Text('setTimeInfo'),
+            //         onPressed: () {
+            //           TimeData timedata = TimeData();
+            //           DateTime dateTime = DateTime.now();
+            //
+            //           int tenBefore =
+            //               getTime(dateTime.subtract(Duration(minutes: 10)));
+            //           _log.info("tenBefore=$tenBefore");
+            //
+            //           timedata.updateEnterTime(tenBefore);
+            //
+            //           int current = getTime(dateTime);
+            //           timedata.updateExitTime(current);
+            //
+            //           DBHelper().setTimeData(timedata);
+            //         })
+            //   ],
+            // ),
+            // Column(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   mainAxisSize: MainAxisSize.max,
+            //   children: [
+            //     TextButton(
+            //         style: ButtonStyle(
+            //           foregroundColor:
+            //               MaterialStateProperty.all<Color>(Colors.blue),
+            //         ),
+            //         child: Text('getTimeInfo'),
+            //         onPressed: () {
+            //           int today = getDay(DateTime.now());
+            //           DBHelper().getTimeData(today);
+            //         })
+            //   ],
+            // ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,

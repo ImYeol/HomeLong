@@ -4,5 +4,5 @@ abstract class UserActionManager {
   void enterHome();
   void exitHome();
   void changeDay();
-  int getTotalTime(DateTime date);
+  Future<int> getTotalTime(DateTime date);
 }

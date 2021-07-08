@@ -4,9 +4,9 @@ import 'package:getwidget/components/avatar/gf_avatar.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/repository/db.dart';
-import 'package:homg_long/repository/model/InAppUser.dart';
+import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/setting/bloc/settingCubit.dart';
 import 'package:logging/logging.dart';
 
@@ -30,12 +30,12 @@ class _SettingPageState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SettingCubit, InAppUser>(builder: (context, state) {
+    return BlocBuilder<SettingCubit, UserInfo>(builder: (context, state) {
       return profile(context, state);
     });
   }
 
-  Widget profile(BuildContext context, InAppUser user) {
+  Widget profile(BuildContext context, UserInfo user) {
     if (user == null) {
       return Column(
         children: [Text("Has no user Info")],
@@ -84,7 +84,7 @@ class _SettingPageState extends StatelessWidget {
           ),
           GFButton(
             onPressed: () async {
-              await DBHelper().deleteUser();
+              await DBHelper().deleteUserInfo();
               Navigator.pushNamed(context, '/Login');
             },
             text: "Logout",
