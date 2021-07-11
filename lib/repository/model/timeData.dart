@@ -42,5 +42,6 @@ class TimeData {
           ((toSeconds(time.exitTime) - toSeconds(time.enterTime)) / 60).floor();
       totalTime += diff;
     });
+    return totalTime;
   }
 }

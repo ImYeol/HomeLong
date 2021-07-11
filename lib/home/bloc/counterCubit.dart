@@ -61,9 +61,9 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   void updateTimes(DateTime now) async {
     DateTime onTimeToday = DateTime(now.year, now.month, now.day);
     atHomeTime = await userActionManager.getTotalTime(DateTime.now());
-    outHomeTime = TOTAL_MINUTE_A_DAY - outHomeTime;
+    outHomeTime = TOTAL_MINUTE_A_DAY - atHomeTime;
     updateUI();
-    log.info("atHomeTime: " +
+    log.info("updateTimes - atHomeTime: " +
         atHomeTime.toString() +
         " outHomeTime: " +
         outHomeTime.toString());
@@ -71,6 +71,8 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
 
   void updateTimesIfdayChanged(DateTime now) {
     if (now.day != tickDateTime.day) {
+      log.info(
+          "updateTimesIfdayChanged - atHomeTime: ${atHomeTime}, outHomeTime: ${outHomeTime}");
       userActionManager.changeDay();
       updateTimes(now);
     }
@@ -78,8 +80,7 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
 
   void updateUiIfMinuteChanged(DateTime now) {
     if (now.minute != tickDateTime.minute) {
-      log.info("updateUiIfMinuteChanged - " +
-          userActionManager.isUserAtHome().toString());
+      log.info("updateUiIfMinuteChanged - ${userActionManager.isUserAtHome()}");
       if (userActionManager.isUserAtHome()) {
         atHomeTime++;
         outHomeTime--;
