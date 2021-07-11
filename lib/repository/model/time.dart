@@ -21,4 +21,9 @@ class Time {
         'exitTime': exitTime,
         'description': description,
       };
+
+  @override
+  String toString() {
+    return "enterTime: ${enterTime} , exitTime: ${exitTime} + description: ${description}";
+  }
 }

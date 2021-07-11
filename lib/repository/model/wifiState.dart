@@ -1,11 +1,8 @@
-import 'package:homg_long/proxy/model/timeData.dart';
-
 abstract class WifiState {
   final String ssid;
   final String bssid;
-  final TimeData timeData;
 
-  const WifiState({this.ssid, this.bssid, this.timeData});
+  const WifiState({this.ssid, this.bssid});
 
   String get _ssid => ssid;
 

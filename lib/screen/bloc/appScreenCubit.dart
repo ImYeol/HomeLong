@@ -7,19 +7,22 @@ import 'package:geofence_service/models/geofence.dart';
 import 'package:geofence_service/models/geofence_radius.dart';
 import 'package:geofence_service/models/geofence_status.dart';
 import 'package:homg_long/db/DBHelper.dart';
-import 'package:homg_long/home/bloc/homeCubit.dart';
-import 'package:homg_long/home/homePage.dart';
+import 'package:homg_long/home/bloc/counterCubit.dart';
+import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/proxy/model/timeData.dart';
 import 'package:homg_long/rank/bloc/rankCubit.dart';
 import 'package:homg_long/rank/rankPage.dart';
+import 'package:homg_long/repository/connectivityServiceWrapper.dart';
+import 'package:homg_long/repository/model/timeData.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
-import 'package:homg_long/repository/wifiConnectionService.dart';
+import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
+import 'package:homg_long/utils/utils.dart';
+import 'package:kakao_flutter_sdk/all.dart';
 import 'package:logging/logging.dart';
 
-class AppScreenCubit extends Cubit<AppScreenState> {
+class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   static const int HOME_PAGE = 0;
   static const int RANK_PAGE = 1;
   static const int SETTING_PAGE = 2;
@@ -30,11 +33,8 @@ class AppScreenCubit extends Cubit<AppScreenState> {
   int _currentPage = 0;
   final period = 5; // second
   UserInfo _userInfo;
-  final _activityStreamController = StreamController<Activity>();
-  final _geofenceStreamController = StreamController<Geofence>();
-  var _atHomeCounterStreamController = StreamController<TimeData>();
 
-  final _geofenceService = GeofenceService.instance.setup(
+  final _geofenceServiceWrapper = GeofenceService.instance.setup(
       interval: 5000,
       accuracy: 100,
       loiteringDelayMs: 60000,
@@ -57,46 +57,59 @@ class AppScreenCubit extends Cubit<AppScreenState> {
         ]),
   ];
 
-  final _pages = [HomePage(), RankPage(), RankPage()];
-  final _wifiConnectionService = WifiConnectionService.instance;
-  bool _userAtHome = false;
-  TimeData timeData = TimeData();
+  final _pages = [CounterPage(), RankPage(), RankPage()];
+  final _connectivityServiceWrapper = ConnectivityServiceWrapper.instance;
+  bool isAtHome = false;
+  TimeData timeData;
   Timer timer;
 
   AppScreenCubit() : super(PageLoading(CircularProgressIndicator()));
 
   int get currentPage => _currentPage;
 
-  GeofenceService get geofenceService => _geofenceService;
-
-  Stream<TimeData> get counterStream => _atHomeCounterStreamController.stream;
+  GeofenceService get geofenceService => _geofenceServiceWrapper;
 
   void init() {
     loadUserInfo();
-    startGeofenceService();
-    startWifiConnectionService();
-    dispatch(currentPage);
+    loadTimeData();
   }
 
-  void startWifiConnectionService() {
+  void loadUserInfo() async {
+    _userInfo = await DBHelper().getUserInfo();
+    if (_userInfo != null) {
+      startGeofenceServiceWrapper();
+      startConnectivityServiceWrapper();
+    }
+  }
+
+  void loadTimeData() async {
+    int today = getDay(DateTime.now());
+    timeData = await DBHelper().getTimeData(today);
+    if (timeData == null) {
+      timeData = TimeData();
+    }
+  }
+
+  void startConnectivityServiceWrapper() {
     if (_userInfo.ssid == null || _userInfo.ssid.isEmpty) return;
 
     log.info("init Wifi service");
-    _wifiConnectionService.listenWifiStateChanged(_onWifiStateChanged);
-    _wifiConnectionService.checkNowConnectionState();
+    _connectivityServiceWrapper.listenWifiStateChanged(_onWifiStateChanged);
+    _connectivityServiceWrapper.checkNowConnectionState();
   }
 
-  void startGeofenceService() {
-    if (_userInfo.latitude == double.infinity ||
-        _userInfo.longitude == double.infinity) return;
+  void startGeofenceServiceWrapper() {
+    if (_userInfo.latitude == null || _userInfo.longitude == null) {
+      return;
+    }
 
     log.info("init geofence service");
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      _geofenceService
+      _geofenceServiceWrapper
           .addGeofenceStatusChangedListener(_onGeofenceStatusChanged);
-      _geofenceService.addActivityChangedListener(_onActivityChanged);
-      _geofenceService.addStreamErrorListener(_onError);
-      _geofenceService.start(_geofenceList).catchError(_onError);
+      _geofenceServiceWrapper.addActivityChangedListener(_onActivityChanged);
+      _geofenceServiceWrapper.addStreamErrorListener(_onError);
+      _geofenceServiceWrapper.start(_geofenceList).catchError(_onError);
     });
   }
 
@@ -111,12 +124,8 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     return false;
   }
 
-  void mockGeofenceMethod() {}
-
   void dispose() {
-    _activityStreamController.close();
-    _geofenceStreamController.close();
-    _atHomeCounterStreamController.close();
+    //_geofenceStreamController.close();
   }
 
   Future<void> _onGeofenceStatusChanged(
@@ -130,37 +139,24 @@ class AppScreenCubit extends Cubit<AppScreenState> {
 
     switch (geofenceStatus) {
       case GeofenceStatus.ENTER:
-        enableCounterIfUserNotAtHome(true);
+        onUserLocationChanged(true);
         break;
       case GeofenceStatus.EXIT:
-        enableCounterIfUserNotAtHome(false);
+        onUserLocationChanged(false);
         break;
       case GeofenceStatus.DWELL:
         break;
     }
-    //_geofenceStreamController.sink.add(geofence);
   }
 
   void _onActivityChanged(Activity prevActivity, Activity currActivity) {
     log.info('prevActivity: ${prevActivity.toMap()}');
     log.info('currActivity: ${currActivity.toMap()}\n');
-    //_activityStreamController.sink.add(currActivity);
-    saveTimeInfo();
   }
 
   void _onWifiStateChanged(WifiState state) {
-    bool enabled = state is WifiConnected;
-    enableCounterIfUserNotAtHome(enabled);
-  }
-
-  void enableCounterIfUserNotAtHome(bool enabled) {
-    // check if Already enabled
-    if (enabled == _userAtHome) return;
-    if (enabled) {
-      startCounter();
-    } else {
-      stopCounter();
-    }
+    bool atHome = state is WifiConnected;
+    onUserLocationChanged(atHome);
   }
 
   void _onError(dynamic error) {
@@ -173,52 +169,18 @@ class AppScreenCubit extends Cubit<AppScreenState> {
     log.info('ErrorCode: $errorCode');
   }
 
-  void startCounter() {
-    log.info("startTimer : ${timeData.timeData == null}");
-    if (timer != null) timer.cancel();
-    timer = Timer.periodic(Duration(seconds: period), (timer) {
-      timeData.updateTime(period);
-      log.info("onMinuteTimeEvent : " + period.toString());
-      _atHomeCounterStreamController.sink.add(timeData);
-    });
-  }
-
-  void stopCounter() {
-    log.info("stopTimer");
-    if (timer != null) timer.cancel();
-  }
-
-  bool loadUserInfo() {
-    // load user info
-    DBHelper().getUserInfo();
-    _userInfo = UserInfo();
-    log.info("user : $_userInfo");
-    timeData.setFromTimeString(UserInfo().timeInfo);
-    log.info("loadUserInfo : " + _userInfo?.toString());
-    return true;
-  }
-
-  bool saveTimeInfo() {
-    // DBHelper().updateTimeInfo(timeData.toTimeInfoString());
-    return true;
-  }
-
-  void dispatch(int tappedIndex) {
+  void dispatchPage(int tappedIndex) {
     _currentPage = tappedIndex;
     Widget widget = Container();
     log.info("counter controller closed : ${tappedIndex}");
     switch (tappedIndex) {
       case HOME_PAGE:
-        _atHomeCounterStreamController.close();
-        _atHomeCounterStreamController = StreamController<TimeData>();
         log.info("counter controller closed");
         widget = BlocProvider(
-          create: (_) => HomeCubit(_atHomeCounterStreamController.hasListener
-              ? null
-              : _atHomeCounterStreamController.stream),
+          create: (_) => CounterCubit(this),
           child: _pages[0],
         );
-        emit(HomePageLoaded(widget));
+        emit(CounterPageLoaded(widget));
         break;
       case RANK_PAGE:
         widget = BlocProvider(
@@ -234,5 +196,82 @@ class AppScreenCubit extends Cubit<AppScreenState> {
         );
         emit(SettingPageLoaded(widget));
     }
+  }
+
+  @override
+  bool isUserAtHome() {
+    return isAtHome;
+  }
+
+  @override
+  void onUserLocationChanged(bool atHome) {
+    // check if Already enabled
+    log.info("onUserLocationChanged - ${atHome} + tihs.isAtHome: ${isAtHome}");
+    if (this.isAtHome == atHome) return;
+    isAtHome = atHome;
+    log.info("onUserLocationChanged - tihs.isAtHome: ${isAtHome}");
+    if (isAtHome) {
+      enterHome();
+    } else {
+      exitHome();
+    }
+  }
+
+  @override
+  void enterHome() {
+    if (timeData == null) {
+      loadTimeData();
+    }
+    log.info("enterTime: ${getTime(DateTime.now())}");
+    timeData.updateEnterTime(getTime(DateTime.now()));
+    DBHelper().setTimeData(timeData);
+  }
+
+  @override
+  void exitHome() {
+    if (timeData == null) {
+      loadTimeData();
+    }
+    log.info(
+        "exitHome: ${getDay(DateTime.now())} - ${getTime(DateTime.now())}");
+    updateTimeData(30, DateTime.now());
+    DBHelper().setTimeData(timeData);
+  }
+
+  void updateTimeData(int maxNumberOfUpdateDay, DateTime targetDate) async {
+    TimeData timeData = await DBHelper().getTimeData(getDay(targetDate));
+    timeData.updateExitTime(getTime(targetDate));
+
+    for (int i = 0; i < maxNumberOfUpdateDay; i++) {
+      DateTime aDayAgo = targetDate.subtract(const Duration(days: 1));
+      timeData = await DBHelper().getTimeData(getDay(aDayAgo));
+
+      if (timeData == null) return;
+
+      if (timeData.timeList.length == 0) {
+        timeData.updateEnterTime(getTime(getOnTime(aDayAgo)));
+        timeData.updateExitTime(getTime(getOnTime(targetDate)));
+      } else {
+        timeData.updateExitTime(getTime(getOnTime(targetDate)));
+        break;
+      }
+    }
+  }
+
+  @override
+  void changeDay() async {
+    DateTime now = DateTime.now();
+    DateTime onTimeToday = getOnTime(now);
+    DateTime aDayAgo = now.subtract(const Duration(days: 1));
+
+    TimeData timeData = await DBHelper().getTimeData(getTime(aDayAgo));
+
+    timeData.updateExitTime(getTime(onTimeToday));
+  }
+
+  @override
+  Future<int> getTotalTime(DateTime date) async {
+    final localTimeData = await DBHelper().getTimeData(getDay(date));
+    return localTimeData == null ? 0 : localTimeData.getTotalTime();
   }
 }

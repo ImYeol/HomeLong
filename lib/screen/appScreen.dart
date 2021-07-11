@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geofence_service/geofence_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
-import 'package:homg_long/home/homePage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/rank/rank.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
@@ -90,7 +90,7 @@ class _AppScreenState extends State<AppScreen>
         listenWhen: (previous, current) =>
             (previous is! PageLoading) && (previous != current),
         listener: (context, state) {
-          if (state == HomePage) {
+          if (state == CounterPageLoaded) {
             log.info("state is homePage");
           }
         },
@@ -176,8 +176,11 @@ class _AppScreenState extends State<AppScreen>
                   ]),
             ),
           ),
-          body:
-              TabBarView(children: [CounterPage(), RankPage(), SettingPage()]),
+          body: TabBarView(children: [
+            CounterPage(cubit: CounterCubit(cubit)),
+            RankPage(),
+            SettingPage()
+          ]),
         ));
   }
 }

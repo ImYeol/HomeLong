@@ -7,7 +7,7 @@ import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/authRepository.dart';
 import 'package:homg_long/repository/gpsService.dart';
-import 'package:homg_long/repository/wifiConnectionService.dart';
+import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
 import 'package:homg_long/screen/appScreen.dart';
 import 'package:homg_long/splashPage.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
@@ -104,8 +104,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         providers: [
           RepositoryProvider<AuthenticationRepository>(
               create: (context) => AuthenticationRepository()),
-          RepositoryProvider<WifiConnectionService>(
-              create: (context) => WifiConnectionService.instance),
+          RepositoryProvider<ConnectivityServiceWrapper>(
+              create: (context) => ConnectivityServiceWrapper.instance),
           RepositoryProvider<GPSService>(create: (context) => GPSService()),
         ],
         child: MaterialApp(

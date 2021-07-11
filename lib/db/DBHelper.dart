@@ -176,6 +176,9 @@ class DBHelper {
     log.info("timeData.toJson()=${timeData.toJson()}");
     log.info("jsonEncode(timeData)=${jsonEncode(timeData)}");
 
+    var delRes = await db.rawDelete(
+        'DELETE FROM $_timeInfoTable WHERE date = ?', [getDay(DateTime.now())]);
+
     var res = await db.rawInsert(
         'INSERT INTO $_timeInfoTable(date, timeList) VALUES (?, ?)',
         [getDay(DateTime.now()).toString(), jsonEncode(timeData)]);

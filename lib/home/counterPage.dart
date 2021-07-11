@@ -1,23 +1,72 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/home/bloc/counterCubit.dart';
+import 'package:homg_long/home/model/counterPageState.dart';
+import 'package:homg_long/screen/model/appScreenState.dart';
+import 'package:logging/logging.dart';
 
 class CounterPage extends StatefulWidget {
-  CounterPage({Key key}) : super(key: key);
+  CounterCubit cubit;
+  CounterPage({Key key, this.cubit}) : super(key: key);
 
   @override
   _CounterPageState createState() => _CounterPageState();
 }
 
-class _CounterPageState extends State<CounterPage> {
+class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
+  final log = Logger("CounterCubit");
   int touchedIndex = -1;
   Color backgroundColor = Colors.grey[150];
   Color subTitleColor = Colors.brown[300];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    widget.cubit.loadPage();
+    log.info('initState');
+  }
+
+  @override
+  void dispose() {
+    log.info('dispose');
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    log.info('didChangeAppLifecycleState = $state');
+    if (state == AppLifecycleState.resumed) {
+      log.info("resumed");
+      widget.cubit.loadPage();
+    } else if (state == AppLifecycleState.paused) {
+      widget.cubit.unloadPage();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     print("counterPage build");
+    return BlocBuilder<CounterCubit, CouterPageState>(
+        cubit: widget.cubit,
+        builder: (context, state) {
+          if (state is CounterPageLoading) {
+            return Center(
+                child: Container(
+                    width: 50, height: 50, child: CircularProgressIndicator()));
+          } else if (state is CounterTickInvoked) {
+            return buildView(context, state);
+          } else {
+            return Container();
+          }
+        });
+  }
+
+  Widget buildView(BuildContext context, CounterTickInvoked tick) {
     return Expanded(
         child: Container(
       color: backgroundColor,
@@ -32,7 +81,7 @@ class _CounterPageState extends State<CounterPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(30))),
                 color: Colors.white,
-                child: buildChart(),
+                child: buildChart(tick),
               )),
           SizedBox(
             height: 10,
@@ -40,8 +89,8 @@ class _CounterPageState extends State<CounterPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              buildInAndOutWidget("In", "15:42"),
-              buildInAndOutWidget("Out", "8:18"),
+              buildInAndOutWidget("In", tick.atHomeTime),
+              buildInAndOutWidget("Out", tick.outHomeTime),
             ],
           )
         ],
@@ -49,7 +98,7 @@ class _CounterPageState extends State<CounterPage> {
     ));
   }
 
-  Widget buildInAndOutWidget(String title, String time) {
+  Widget buildInAndOutWidget(String title, int totalTime) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -61,10 +110,16 @@ class _CounterPageState extends State<CounterPage> {
           child: Container(
               width: 150,
               height: 70,
-              child: Center(child: buildTitle(time, 30, Colors.purple[800]))),
+              child: Center(
+                  child: buildTitle(transformToStringTimeforamt(totalTime), 30,
+                      Colors.purple[800]))),
         )
       ],
     );
+  }
+
+  String transformToStringTimeforamt(int time) {
+    return (time / 60).floor().toString() + ":" + (time % 60).toString();
   }
 
   Widget buildTitle(String title, double size, Color color) {
@@ -84,14 +139,17 @@ class _CounterPageState extends State<CounterPage> {
     );
   }
 
-  Widget buildChart() {
+  Widget buildChart(CounterTickInvoked tick) {
     return AspectRatio(
         aspectRatio: 1.5,
         child: Stack(
           alignment: Alignment.center,
           children: [
             Text(
-              "70%",
+              (tick.atHomeTime / CounterCubit.TOTAL_MINUTE_A_DAY * 100)
+                      .floor()
+                      .toString() +
+                  "%",
               style:
                   GoogleFonts.bebasNeue(color: Colors.brown[400], fontSize: 50),
             ),
@@ -116,7 +174,7 @@ class _CounterPageState extends State<CounterPage> {
                   ),
                   sectionsSpace: 0,
                   centerSpaceRadius: 80,
-                  sections: showingSections()),
+                  sections: showingSections(tick)),
             ),
             Align(
                 alignment: Alignment.bottomRight,
@@ -145,18 +203,22 @@ class _CounterPageState extends State<CounterPage> {
         ));
   }
 
-  List<PieChartSectionData> showingSections() {
+  List<PieChartSectionData> showingSections(CounterTickInvoked tick) {
     return List.generate(2, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
       final radius = isTouched ? 50.0 : 30.0;
+      log.info("showingSections - atHome: " +
+          tick.atHomeTime.toString() +
+          " outHomeTime: " +
+          tick.outHomeTime.toString());
       switch (i) {
         case 0:
           return PieChartSectionData(
             showTitle: false,
             color: Colors.brown[400],
             //const Color(0xff0293ee),
-            value: 70,
+            value: tick.atHomeTime / CounterCubit.TOTAL_MINUTE_A_DAY,
             title: null,
             radius: radius,
             titleStyle: TextStyle(
@@ -169,7 +231,7 @@ class _CounterPageState extends State<CounterPage> {
             showTitle: false,
             color: Colors.cyan[500],
             //const Color(0xfff8b250),
-            value: 30,
+            value: tick.outHomeTime / CounterCubit.TOTAL_MINUTE_A_DAY,
             title: null,
             radius: radius,
             titleStyle: TextStyle(

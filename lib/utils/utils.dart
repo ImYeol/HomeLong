@@ -27,3 +27,27 @@ int getDay(DateTime time) {
 int getTime(DateTime time) {
   return time.hour * 10000 + time.minute * 100 + time.second;
 }
+
+DateTime getOnTime(DateTime time) {
+  DateTime onTime = DateTime(time.year, time.month, time.day);
+  return onTime;
+}
+
+// HHMMSS -> HH
+int getHour(int time) {
+  return (time / 10000).floor();
+}
+
+// HHMMSS -> 00HHMM - 00HH00 = 0000MM
+int getMinute(int time) {
+  return (time / 100).floor() - ((time / 10000).floor() * 100);
+}
+
+// HHMMSS -> HHMMSS - HHMM00 = 0000SS
+int getSecond(int time) {
+  return time - ((time / 100).floor() * 100);
+}
+
+int toSeconds(int time) {
+  return getHour(time) * 3600 + getMinute(time) * 60 + time;
+}

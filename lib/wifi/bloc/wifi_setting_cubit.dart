@@ -4,15 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/proxy/wifiApDataProxy.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
-import 'package:homg_long/repository/wifiConnectionService.dart';
+import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
 
 class WifiSettingCubit extends Cubit<WifiState> {
   LogUtil logUtil = LogUtil();
   String url = 'http://{{ endpoint }}:{{ port }}/register/user/ap';
-  WifiConnectionService connectionService;
+  ConnectivityServiceWrapper connectionService;
   StreamSubscription<WifiState> connectionSubscription;
 
-  WifiSettingCubit(WifiConnectionService connectionService)
+  WifiSettingCubit(ConnectivityServiceWrapper connectionService)
       : super(WifiDisConnected("Unknonw", "Unknown")) {
     this.connectionService = connectionService;
     this.subscribeWifiEvent();

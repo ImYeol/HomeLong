@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:homg_long/proxy/model/timeData.dart';
+import 'package:homg_long/repository/model/timeData.dart';
 import 'package:http/http.dart' as http;
 
 class TimeDataProxy {
@@ -12,8 +12,7 @@ class TimeDataProxy {
 
   static final String prefixUrl = "http://testserver/time/";
 
-  static Future<bool> uploadTimeData(
-      String id, int date, String dataType) async {
+  Future<bool> uploadTimeData(String id, int date, String dataType) async {
     http.Response response = await http.post(
       Uri.parse(prefixUrl + dataType + "/set"),
       headers: <String, String>{
@@ -24,7 +23,7 @@ class TimeDataProxy {
     return (response.statusCode == 200);
   }
 
-  static Future<TimeData> fetchAllTimeData(String id, String dataType) async {
+  Future<TimeData> fetchAllTimeData(String id, String dataType) async {
     final response = await http.get(Uri.parse(
         prefixUrl + dataType + "/get" + "/" + id + "/" + getNowTime()));
 
@@ -36,7 +35,7 @@ class TimeDataProxy {
     }
   }
 
-  static String getNowTime() {
+  String getNowTime() {
     var now = DateTime.now();
 
     return now.year.toString().substring(2, 4) +
@@ -44,8 +43,10 @@ class TimeDataProxy {
         now.day.toString();
   }
 
-  static TimeData parseTimeData(String responseBody) {
-    List<dynamic> parsed = json.decode(responseBody);
-    return TimeData.fromJson(parsed);
+  TimeData parseTimeData(String responseBody) {
+    List<Map<String, dynamic>> parsed = jsonDecode(responseBody);
+    TimeData timeData = TimeData();
+    timeData.fromJson(parsed);
+    return timeData;
   }
 }
