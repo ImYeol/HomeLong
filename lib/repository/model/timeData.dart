@@ -14,7 +14,7 @@ class TimeData {
     return localList;
   }
 
-  void fromJson(List<Map<String, dynamic>> json) {
+  TimeData.fromJson(List<Map<String, dynamic>> json) {
     for (int i = 0; i < json.length; i++) {
       Time t = Time.fromJson(json[i]);
       this.timeList.add(t);

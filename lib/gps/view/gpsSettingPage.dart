@@ -7,10 +7,10 @@ import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/gps/cubit/gpsCubit.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/gpsService.dart';
+import 'package:homg_long/repository/user.dart';
 import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
@@ -471,7 +471,7 @@ class _AddressInputState extends State<AddressInput> {
                           this.permitted = await _permissionCheck();
                           if (this.permitted == true) {
                             await _getLatLngFromAddress(addressController.text);
-                            await DBHelper().updateLocationInfo(
+                            await UserRepository().updateLocationInfo(
                                 this.currentLocation.latitude,
                                 this.currentLocation.longitude,
                                 addressController.text);

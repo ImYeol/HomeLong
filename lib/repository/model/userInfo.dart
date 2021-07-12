@@ -8,7 +8,26 @@ class UserInfo {
   double latitude = double.infinity; // as initial value
   double longitude = double.infinity; // as initial value
 
-  fromJson(Map<String, dynamic> json) {
+  UserInfo(
+      {String id,
+      String name,
+      String image,
+      String ssid,
+      String bssid,
+      String street,
+      double latitude,
+      double longitude}) {
+    this.id = id;
+    this.name = name;
+    this.image = image;
+    this.ssid = ssid;
+    this.bssid = bssid;
+    this.street = street;
+    this.latitude = latitude;
+    this.longitude = longitude;
+  }
+
+  UserInfo.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     image = json['image'];
