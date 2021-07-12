@@ -239,20 +239,21 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   }
 
   void updateTimeData(int maxNumberOfUpdateDay, DateTime targetDate) async {
-    TimeData timeData = await DBHelper().getTimeData(getDay(targetDate));
     timeData.updateExitTime(getTime(targetDate));
 
     for (int i = 0; i < maxNumberOfUpdateDay; i++) {
       DateTime aDayAgo = targetDate.subtract(const Duration(days: 1));
-      timeData = await DBHelper().getTimeData(getDay(aDayAgo));
+      TimeData pastTimeData = await DBHelper().getTimeData(getDay(aDayAgo));
 
-      if (timeData == null) return;
+      if (pastTimeData == null) return;
 
-      if (timeData.timeList.length == 0) {
-        timeData.updateEnterTime(getTime(getOnTime(aDayAgo)));
-        timeData.updateExitTime(getTime(getOnTime(targetDate)));
+      if (pastTimeData.timeList.length == 0) {
+        pastTimeData.updateEnterTime(getTime(getOnTime(aDayAgo)));
+        pastTimeData.updateExitTime(getTime(getOnTime(targetDate)));
+        DBHelper().setTimeData(pastTimeData);
       } else {
-        timeData.updateExitTime(getTime(getOnTime(targetDate)));
+        pastTimeData.updateExitTime(getTime(getOnTime(targetDate)));
+        DBHelper().setTimeData(pastTimeData);
         break;
       }
     }

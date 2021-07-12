@@ -166,7 +166,7 @@ class DBHelper {
   }
 
   Future<bool> setTimeData(TimeData timeData) async {
-    log.info("setTimeInfo");
+    log.info("setTimeData");
     final db = await getDatabase;
 
     Map<String, String> timeDataMap = {
@@ -176,23 +176,21 @@ class DBHelper {
     log.info("timeData.toJson()=${timeData.toJson()}");
     log.info("jsonEncode(timeData)=${jsonEncode(timeData)}");
 
-    var delRes = await db.rawDelete(
-        'DELETE FROM $_timeInfoTable WHERE date = ?', [getDay(DateTime.now())]);
-
     var res = await db.rawInsert(
-        'INSERT INTO $_timeInfoTable(date, timeList) VALUES (?, ?)',
+        "INSERT OR REPLACE INTO $_timeInfoTable(date, timeList) VALUES(?,?)",
         [getDay(DateTime.now()).toString(), jsonEncode(timeData)]);
-    if (res == 1) {
-      log.info("setTimeInfo success");
+
+    if (res > 0) {
+      log.info("setTimeInfo success + $res");
       return true;
     }
 
-    log.info("setTimeInfo failed");
+    log.info("setTimeInfo failed + $res");
     return false;
   }
 
   Future<TimeData> getTimeData(int date) async {
-    log.info("getTimeInfo");
+    log.info("getTimeData");
     var db = await getDatabase;
 
     TimeData _timeData = TimeData();
