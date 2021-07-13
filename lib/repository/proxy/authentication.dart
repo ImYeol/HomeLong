@@ -66,7 +66,7 @@ class AuthenticationProxy implements Authentication {
     log.info("setUserInfo");
 
     final response = await http.post(
-      Uri.parse(URL.kakaoLoginURL),
+      Uri.parse(URL.setUserInfoURL),
       body: userInfo.toJson(),
     );
 
