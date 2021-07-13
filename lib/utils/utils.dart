@@ -68,3 +68,19 @@ int getTimeDiffInSeconds(int time1, int time2) {
   // log.info("toSeconds: time2 seconds - ${getSecond(time2)}");
   return (toSeconds(time1) - toSeconds(time2)).abs();
 }
+
+// enterTime ex) 14(h):10(m) = 1410
+// exitTime ex) 24(h):00(m) = 2400
+int getMinuteBetweenTimes(int enterTime, int exitTime) {
+  if (exitTime == 0) {
+    return 0;
+  }
+
+  int enterHour = (enterTime / 100).floor();
+  int enterMinute = (enterTime % 100);
+
+  int exitHour = (exitTime / 100).floor();
+  int exitMinute = (exitTime % 100);
+
+  return (exitHour * 60) + exitMinute - (enterHour * 60) - enterMinute;
+}

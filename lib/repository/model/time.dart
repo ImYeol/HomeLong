@@ -3,8 +3,8 @@ class Time {
   static const int INIT_TIME_OF_A_DAY = 0;
   static const int LAST_TIME_OF_A_DAY = 240000;
 
-  int enterTime; // ex) 14(h):10(m):1(s) = 141001
-  int exitTime; // ex) 24(h):00(m):00(s) = 240000
+  int enterTime; // ex) 14(h):10(m) = 1410
+  int exitTime; // ex) 24(h):00(m) = 2400
   String description;
 
   Time({int enterTime = 0, int exitTime = 0, String description = HOME}) {
