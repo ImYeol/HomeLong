@@ -5,6 +5,7 @@ class UserInfo {
   String ssid;
   String bssid;
   String street;
+  int initDate;
   double latitude = double.infinity; // as initial value
   double longitude = double.infinity; // as initial value
 
@@ -15,6 +16,7 @@ class UserInfo {
       String ssid,
       String bssid,
       String street,
+      int initDate,
       double latitude,
       double longitude}) {
     this.id = id;
@@ -23,6 +25,7 @@ class UserInfo {
     this.ssid = ssid;
     this.bssid = bssid;
     this.street = street;
+    this.initDate = initDate;
     this.latitude = latitude;
     this.longitude = longitude;
   }
@@ -34,6 +37,7 @@ class UserInfo {
     ssid = json['ssid'];
     bssid = json['bssid'];
     street = json['street'];
+    initDate = json['initDate'];
     latitude = json['latitude'];
     longitude = json['longitude'];
   }
@@ -46,6 +50,7 @@ class UserInfo {
       "ssid": this.ssid,
       "bssid": this.bssid,
       "street": this.street,
+      "initDate": this.initDate,
       "latitude": this.latitude,
       "longitude": this.longitude,
     };
