@@ -45,8 +45,6 @@ class TimeDataProxy {
 
   TimeData parseTimeData(String responseBody) {
     List<Map<String, dynamic>> parsed = jsonDecode(responseBody);
-    TimeData timeData = TimeData();
-    timeData.fromJson(parsed);
-    return timeData;
+    return TimeData.fromJson(parsed);
   }
 }

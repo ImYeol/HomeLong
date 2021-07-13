@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
-import 'package:homg_long/repository/authRepository.dart';
 import 'package:logging/logging.dart' as logging;
 
 enum LoginState { LOGIN, UNLOGIN }
@@ -35,8 +34,7 @@ class LoginPage extends StatelessWidget {
           ),
           child: Center(
             child: BlocProvider(
-              create: (_) =>
-                  LoginCubit(context.read<AuthenticationRepository>()),
+              create: (_) => LoginCubit(),
               child: LoginForm(),
             ),
           ),
