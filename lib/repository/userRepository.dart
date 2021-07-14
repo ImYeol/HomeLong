@@ -1,9 +1,9 @@
-import 'package:homg_long/repository/db/user.dart';
-import 'package:homg_long/repository/proxy/user.dart';
+import 'package:homg_long/repository/db/userDB.dart';
+import 'package:homg_long/repository/proxy/userProxy.dart';
 
 import 'model/userInfo.dart';
 
-abstract class User {
+abstract class UserAPI {
   Future<bool> setUserInfo(UserInfo userInfo);
   Future<UserInfo> getUserInfo();
   Future<bool> deleteUserInfo();
@@ -12,7 +12,7 @@ abstract class User {
   Future<bool> updateWifiInfo(String ssid, String bssid);
 }
 
-class UserRepository implements User {
+class UserRepository implements UserAPI {
   UserDB _db;
   UserProxy _proxy;
 

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/repository/user.dart';
+import 'package:homg_long/repository/userRepository.dart';
 
 class SettingCubit extends Cubit<UserInfo> {
   SettingCubit() : super(null) {

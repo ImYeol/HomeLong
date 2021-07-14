@@ -1,7 +1,7 @@
 import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/repository/user.dart';
+import 'package:homg_long/repository/userRepository.dart';
 
-class UserProxy implements User {
+class UserProxy implements UserAPI {
   @override
   Future<UserInfo> getUserInfo() async {
     // TODO: implement getUserInfo

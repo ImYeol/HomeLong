@@ -9,7 +9,7 @@ import 'package:logging/logging.dart';
 class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   final log = Logger("CounterCubit");
   static final int period = 1; // 1 second;
-  static final int TOTAL_MINUTE_A_DAY = 60 * 24;
+  static final int TOTAL_MINUTE_A_DAY = 60 * 60 * 24;
 
   UserActionManager userActionManager;
   Timer timer;
@@ -49,8 +49,8 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   }
 
   void stopCounter() {
-    log.info("stopTimer");
-    if (timer != null) timer.cancel();
+    log.info("stopTimer ${timer.isActive}");
+    if (timer != null && timer.isActive) timer.cancel();
   }
 
   void updateUI() {
@@ -59,8 +59,8 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   }
 
   void updateTimes(DateTime now) async {
-    DateTime onTimeToday = DateTime(now.year, now.month, now.day);
-    atHomeTime = await userActionManager.getTotalTime(DateTime.now());
+    log.info("updateTimes : ${now}");
+    atHomeTime = await userActionManager.getTotalTime(now);
     outHomeTime = TOTAL_MINUTE_A_DAY - atHomeTime;
     updateUI();
     log.info("updateTimes - atHomeTime: " +
@@ -79,13 +79,13 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   }
 
   void updateUiIfMinuteChanged(DateTime now) {
-    if (now.minute != tickDateTime.minute) {
-      log.info("updateUiIfMinuteChanged - ${userActionManager.isUserAtHome()}");
+    if (now.second != tickDateTime.second) {
+      //log.info("updateUiIfMinuteChanged - ${userActionManager.isUserAtHome()}");
       if (userActionManager.isUserAtHome()) {
         atHomeTime++;
         outHomeTime--;
+        updateUI();
       }
-      updateUI();
     }
   }
 }

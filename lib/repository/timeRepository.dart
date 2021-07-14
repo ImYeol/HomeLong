@@ -1,14 +1,14 @@
-import 'package:homg_long/repository/db/time.dart';
-import 'package:homg_long/repository/proxy/time.dart';
+import 'package:homg_long/repository/db/timeDB.dart';
+import 'package:homg_long/repository/proxy/timeProxy.dart';
 
 import 'model/timeData.dart';
 
-abstract class Time {
+abstract class TimeAPI {
   Future<bool> setTimeData(TimeData timeData);
   Future<TimeData> getTimeData(int date);
 }
 
-class TimeRepository extends Time {
+class TimeRepository extends TimeAPI {
   TimeDB _db;
   TimeProxy _proxy;
 

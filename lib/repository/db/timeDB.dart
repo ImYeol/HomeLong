@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db/DBHelper.dart';
 import 'package:homg_long/repository/model/timeData.dart';
-import 'package:homg_long/repository/time.dart';
+import 'package:homg_long/repository/timeRepository.dart';
 import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
-class TimeDB implements Time {
+class TimeDB implements TimeAPI {
   final logUtil = LogUtil();
   final log = Logger("TimeDB");
 
@@ -52,7 +52,7 @@ class TimeDB implements Time {
     log.info("jsonEncode(timeData)=${jsonEncode(timeData)}");
 
     var res = await db.rawInsert(
-        "INSERT OR REPLACE INTO $DBHelper.timeInfoTable(date, timeList) VALUES(?,?)",
+        "INSERT OR REPLACE INTO ${DBHelper.timeInfoTable}(date, timeList) VALUES(?,?)",
         [getDay(DateTime.now()).toString(), jsonEncode(timeData)]);
 
     if (res > 0) {

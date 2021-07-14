@@ -6,7 +6,7 @@ import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/repository/user.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/setting/bloc/settingCubit.dart';
 import 'package:logging/logging.dart';
 

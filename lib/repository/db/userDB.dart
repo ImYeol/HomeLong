@@ -1,11 +1,11 @@
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/db/DBHelper.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/repository/user.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:logging/logging.dart';
 import 'package:sqflite/sqflite.dart';
 
-class UserDB implements User {
+class UserDB implements UserAPI {
   final logUtil = LogUtil();
   final log = Logger("UserDB");
 

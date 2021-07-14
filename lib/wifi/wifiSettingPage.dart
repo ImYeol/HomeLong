@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
-import 'package:homg_long/repository/user.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:logging/logging.dart';
 
 import 'bloc/wifi_setting_cubit.dart';
@@ -125,7 +125,7 @@ class HomeWifiSelector extends StatelessWidget {
     return BlocListener<WifiSettingCubit, WifiState>(
         listener: (context, state) {
           if (state is WifiInfoSaved) {
-            Navigator.pushNamed(context, '/Main');
+            Navigator.pushReplacementNamed(context, '/Main');
           }
         },
         child: Center(

@@ -1,7 +1,7 @@
 import 'package:homg_long/repository/model/timeData.dart';
-import 'package:homg_long/repository/time.dart';
+import 'package:homg_long/repository/timeRepository.dart';
 
-class TimeProxy implements Time {
+class TimeProxy implements TimeAPI {
   @override
   Future<TimeData> getTimeData(int date) async {
     // TODO: implement getTimeData

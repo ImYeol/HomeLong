@@ -10,7 +10,7 @@ import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/gps/cubit/gpsCubit.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/gpsService.dart';
-import 'package:homg_long/repository/user.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
@@ -475,7 +475,7 @@ class _AddressInputState extends State<AddressInput> {
                                 this.currentLocation.latitude,
                                 this.currentLocation.longitude,
                                 addressController.text);
-                            Navigator.pushNamed(context, '/Wifi');
+                            Navigator.pushReplacementNamed(context, '/Wifi');
                           }
                         },
                         child: Text('save'),

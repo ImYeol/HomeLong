@@ -3,7 +3,7 @@ import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/view/loginPage.dart';
 import 'package:homg_long/repository/authentication.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/repository/user.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:logging/logging.dart';
 
 class LoginCubit extends Cubit<LoginState> {
