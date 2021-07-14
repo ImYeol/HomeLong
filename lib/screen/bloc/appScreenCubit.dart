@@ -6,7 +6,6 @@ import 'package:geofence_service/geofence_service.dart';
 import 'package:geofence_service/models/geofence.dart';
 import 'package:geofence_service/models/geofence_radius.dart';
 import 'package:geofence_service/models/geofence_status.dart';
-import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
@@ -16,10 +15,12 @@ import 'package:homg_long/repository/connectivityServiceWrapper.dart';
 import 'package:homg_long/repository/model/timeData.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
+import 'package:homg_long/repository/timeRepository.dart';
+import 'package:homg_long/repository/model/time.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
 import 'package:homg_long/utils/utils.dart';
-import 'package:kakao_flutter_sdk/all.dart';
 import 'package:logging/logging.dart';
 
 class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
@@ -75,7 +76,7 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   }
 
   void loadUserInfo() async {
-    _userInfo = await DBHelper().getUserInfo();
+    _userInfo = await UserRepository().getUserInfo();
     if (_userInfo != null) {
       startGeofenceServiceWrapper();
       startConnectivityServiceWrapper();
@@ -84,7 +85,7 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
 
   void loadTimeData() async {
     int today = getDay(DateTime.now());
-    timeData = await DBHelper().getTimeData(today);
+    timeData = await TimeRepository().getTimeData(today);
     if (timeData == null) {
       timeData = TimeData();
     }
@@ -114,12 +115,30 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   }
 
   bool needForegroundTask() {
-    DBHelper().getUserInfo();
-    _userInfo = UserInfo();
+    Future<UserInfo> _userInfo = UserRepository().getUserInfo();
+    _userInfo.then((value) {
+      if (value != null) {
+        if (value.ssid != null && value.ssid.isNotEmpty) {
+          return true;
+        }
 
-    if (_userInfo.ssid != null && _userInfo.ssid.isNotEmpty) return true;
-    if (_userInfo.latitude.isFinite || _userInfo.longitude.isFinite)
-      return true;
+        if (value.bssid != null && value.bssid.isNotEmpty) {
+          return true;
+        }
+
+        if (value.latitude.isFinite || value.longitude.isFinite) {
+          return true;
+        }
+
+        return false;
+      } else {
+        logUtil.logger.e("user repository get user info fail");
+        return false;
+      }
+    }).catchError((onError) {
+      logUtil.logger.e("user repository get user info return error:$onError");
+      return false;
+    });
 
     return false;
   }
@@ -196,7 +215,7 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
     log.info("enterTime: ${getTime(now)}");
 
     if (timeData.updateEnterTime(getTime(now))) {
-      DBHelper().setTimeData(timeData);
+      TimeRepository().setTimeData(timeData);
     }
   }
 
@@ -208,7 +227,7 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
     DateTime now = DateTime.now();
     log.info("exitHome: ${getDay(now)} - ${getTime(now)}");
     if (timeData.updateExitTime(getTime(now))) {
-      DBHelper().setTimeData(timeData);
+      TimeRepository().setTimeData(timeData);
     }
     updatePastTimeData(30, now);
   }
@@ -216,18 +235,16 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   void updatePastTimeData(int maxNumberOfUpdateDay, DateTime targetDate) async {
     for (int i = 0; i < maxNumberOfUpdateDay; i++) {
       DateTime aDayAgo = targetDate.subtract(const Duration(days: 1));
-      TimeData pastTimeData = await DBHelper().getTimeData(getDay(aDayAgo));
+      TimeData pastTimeData =
+          await TimeRepository().getTimeData(getDay(aDayAgo));
 
-      // TODO: 초기가입 날짜 추가 및 아래 라인 삭제
-      if (pastTimeData == null) return;
-
-      if (pastTimeData.timeList.length == 0) {
-        pastTimeData.updateEnterTime(getTime(getOnTime(aDayAgo)));
-        pastTimeData.updateExitTime(getTime(getOnTime(targetDate)));
-        DBHelper().setTimeData(pastTimeData);
+      if (pastTimeData == null || pastTimeData.timeList.length == 0) {
+        pastTimeData.updateEnterTime(Time.INIT_TIME_OF_A_DAY);
+        pastTimeData.updateExitTime(Time.LAST_TIME_OF_A_DAY);
+        TimeRepository().setTimeData(pastTimeData);
       } else {
-        pastTimeData.updateExitTime(getTime(getOnTime(targetDate)));
-        DBHelper().setTimeData(pastTimeData);
+        pastTimeData.updateExitTime(Time.LAST_TIME_OF_A_DAY);
+        TimeRepository().setTimeData(pastTimeData);
         break;
       }
     }
@@ -239,14 +256,14 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
     DateTime onTimeToday = getOnTime(now);
     DateTime aDayAgo = now.subtract(const Duration(days: 1));
 
-    TimeData timeData = await DBHelper().getTimeData(getTime(aDayAgo));
+    TimeData timeData = await TimeRepository().getTimeData(getTime(aDayAgo));
 
     timeData.updateExitTime(getTime(onTimeToday));
   }
 
   @override
   Future<int> getTotalTime(DateTime date) async {
-    final localTimeData = await DBHelper().getTimeData(getDay(date));
+    final localTimeData = await TimeRepository().getTimeData(getDay(date));
     return localTimeData == null
         ? 0
         : localTimeData.getTotalTime(date, isAtHome);

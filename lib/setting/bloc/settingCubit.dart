@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
+import 'package:homg_long/repository/userRepository.dart';
 
 class SettingCubit extends Cubit<UserInfo> {
   SettingCubit() : super(null) {
@@ -8,7 +8,7 @@ class SettingCubit extends Cubit<UserInfo> {
   }
 
   getUserInfo() async {
-    UserInfo _user = await DBHelper().getUserInfo();
+    UserInfo _user = await UserRepository().getUserInfo();
     if (_user != null) {
       emit(_user);
     }

@@ -6,6 +6,8 @@ class TimeData {
   List<Time> timeList = List<Time>();
   final log = Logger("TimeData");
 
+  TimeData();
+
   List<Map<String, dynamic>> toJson() {
     List<Map<String, dynamic>> localList = List();
     for (int i = 0; i < this.timeList.length; i++) {
@@ -14,7 +16,7 @@ class TimeData {
     return localList;
   }
 
-  void fromJson(List<Map<String, dynamic>> json) {
+  TimeData.fromJson(List<Map<String, dynamic>> json) {
     for (int i = 0; i < json.length; i++) {
       Time t = Time.fromJson(json[i]);
       this.timeList.add(t);
@@ -33,8 +35,8 @@ class TimeData {
 
   bool updateExitTime(int exitTime) {
     if (timeList.length == 0 || timeList.last.enterTime == 0) {
-      log.info("updateExitTime : failed add ${exitTime}");
-      return false;
+      log.info("updateExitTime : empty list - ${exitTime}");
+      updateEnterTime(Time.INIT_TIME_OF_A_DAY);
     }
     log.info("updateExitTime : add ${exitTime}");
     this.timeList.last.exitTime = exitTime;

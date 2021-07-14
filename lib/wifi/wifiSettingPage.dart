@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homg_long/db/DBHelper.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
+import 'package:homg_long/repository/model/wifiState.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:logging/logging.dart';
 
 import 'bloc/wifi_setting_cubit.dart';
@@ -192,7 +192,7 @@ class HomeWifiSelector extends StatelessWidget {
   Widget buildSaveWifiButton(BuildContext context) {
     return TextButton(
         onPressed: () {
-          DBHelper().updateWifiInfo(connInfo.ssid, connInfo.bssid);
+          UserRepository().updateWifiInfo(connInfo.ssid, connInfo.bssid);
           // context.read<WifiSettingCubit>().postWifiAPInfo(
           //     userInfo.id, connInfo.ssid, connInfo.bssid);
           Navigator.pushNamed(context, "/Main");

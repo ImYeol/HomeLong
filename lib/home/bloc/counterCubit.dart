@@ -50,7 +50,7 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
 
   void stopCounter() {
     log.info("stopTimer ${timer.isActive}");
-    if (timer != null || timer.isActive) timer.cancel();
+    if (timer != null && timer.isActive) timer.cancel();
   }
 
   void updateUI() {
@@ -80,7 +80,7 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
 
   void updateUiIfMinuteChanged(DateTime now) {
     if (now.second != tickDateTime.second) {
-      log.info("updateUiIfMinuteChanged - ${userActionManager.isUserAtHome()}");
+      //log.info("updateUiIfMinuteChanged - ${userActionManager.isUserAtHome()}");
       if (userActionManager.isUserAtHome()) {
         atHomeTime++;
         outHomeTime--;
