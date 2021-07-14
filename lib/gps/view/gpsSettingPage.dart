@@ -475,7 +475,7 @@ class _AddressInputState extends State<AddressInput> {
                                 this.currentLocation.latitude,
                                 this.currentLocation.longitude,
                                 addressController.text);
-                            Navigator.pushNamed(context, '/Wifi');
+                            Navigator.pushReplacementNamed(context, '/Wifi');
                           }
                         },
                         child: Text('save'),

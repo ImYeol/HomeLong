@@ -21,26 +21,41 @@ class TimeData {
     }
   }
 
-  void updateEnterTime(int enterTime) {
-    this.timeList.add(Time(enterTime: enterTime));
+  bool updateEnterTime(int enterTime) {
+    if (timeList.length == 0 || timeList.last.exitTime > 0) {
+      log.info("updateEnterTime: add ${enterTime}");
+      this.timeList.add(Time(enterTime: enterTime));
+      return true;
+    }
+    log.info("updateEnterTime: failed to add ${enterTime}");
+    return false;
   }
 
-  void updateExitTime(int exitTime) {
-    int lastEnterTime =
-        this.timeList.isEmpty ? "000000" : this.timeList.last.enterTime;
-    log.info(
-        "lastEnterTime: ${lastEnterTime} - timeList.last : ${timeList.last}");
+  bool updateExitTime(int exitTime) {
+    if (timeList.length == 0 || timeList.last.enterTime == 0) {
+      log.info("updateExitTime : failed add ${exitTime}");
+      return false;
+    }
+    log.info("updateExitTime : add ${exitTime}");
     this.timeList.last.exitTime = exitTime;
+    return true;
   }
 
-  int getTotalTime() {
+  int getTotalTime(DateTime now, bool isAtHome) {
     int totalTime = 0;
+    int diff = 0;
     this.timeList.forEach((time) {
-      log.info("getTotalTime: " + time.toString());
-      if (time.exitTime <= 0) return;
-      int diff =
-          ((toSeconds(time.exitTime) - toSeconds(time.enterTime)) / 60).floor();
-      totalTime += diff;
+      log.fine(
+          "getTotalTime: ${time} - now: ${getTime(now)} - isAtHome: ${isAtHome}");
+      if (time.exitTime <= 0) {
+        diff = getTimeDiffInSeconds(getTime(now), time.enterTime);
+        totalTime += isAtHome ? diff : 0;
+        log.fine("getTotalTime exit=0 : diff - ${diff}");
+      } else {
+        diff = getTimeDiffInSeconds(time.exitTime, time.enterTime);
+        log.fine("getTotalTime: diff - ${diff}");
+        totalTime += diff;
+      }
     });
     return totalTime;
   }

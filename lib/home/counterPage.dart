@@ -34,6 +34,7 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
   void dispose() {
     log.info('dispose');
     WidgetsBinding.instance.removeObserver(this);
+    widget.cubit.unloadPage();
     super.dispose();
   }
 

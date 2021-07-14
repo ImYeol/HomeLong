@@ -125,7 +125,7 @@ class HomeWifiSelector extends StatelessWidget {
     return BlocListener<WifiSettingCubit, WifiState>(
         listener: (context, state) {
           if (state is WifiInfoSaved) {
-            Navigator.pushNamed(context, '/Main');
+            Navigator.pushReplacementNamed(context, '/Main');
           }
         },
         child: Center(

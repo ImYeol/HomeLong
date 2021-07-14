@@ -169,35 +169,6 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
     log.info('ErrorCode: $errorCode');
   }
 
-  void dispatchPage(int tappedIndex) {
-    _currentPage = tappedIndex;
-    Widget widget = Container();
-    log.info("counter controller closed : ${tappedIndex}");
-    switch (tappedIndex) {
-      case HOME_PAGE:
-        log.info("counter controller closed");
-        widget = BlocProvider(
-          create: (_) => CounterCubit(this),
-          child: _pages[0],
-        );
-        emit(CounterPageLoaded(widget));
-        break;
-      case RANK_PAGE:
-        widget = BlocProvider(
-          create: (_) => RankCubit(),
-          child: _pages[1],
-        );
-        emit(RankPageLoaded(widget));
-        break;
-      case SETTING_PAGE:
-        widget = BlocProvider(
-          create: (_) => RankCubit(),
-          child: _pages[1],
-        );
-        emit(SettingPageLoaded(widget));
-    }
-  }
-
   @override
   bool isUserAtHome() {
     return isAtHome;
@@ -209,7 +180,6 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
     log.info("onUserLocationChanged - ${atHome} + tihs.isAtHome: ${isAtHome}");
     if (this.isAtHome == atHome) return;
     isAtHome = atHome;
-    log.info("onUserLocationChanged - tihs.isAtHome: ${isAtHome}");
     if (isAtHome) {
       enterHome();
     } else {
@@ -222,9 +192,12 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
     if (timeData == null) {
       loadTimeData();
     }
-    log.info("enterTime: ${getTime(DateTime.now())}");
-    timeData.updateEnterTime(getTime(DateTime.now()));
-    DBHelper().setTimeData(timeData);
+    DateTime now = DateTime.now();
+    log.info("enterTime: ${getTime(now)}");
+
+    if (timeData.updateEnterTime(getTime(now))) {
+      DBHelper().setTimeData(timeData);
+    }
   }
 
   @override
@@ -232,19 +205,20 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
     if (timeData == null) {
       loadTimeData();
     }
-    log.info(
-        "exitHome: ${getDay(DateTime.now())} - ${getTime(DateTime.now())}");
-    updateTimeData(30, DateTime.now());
-    DBHelper().setTimeData(timeData);
+    DateTime now = DateTime.now();
+    log.info("exitHome: ${getDay(now)} - ${getTime(now)}");
+    if (timeData.updateExitTime(getTime(now))) {
+      DBHelper().setTimeData(timeData);
+    }
+    updatePastTimeData(30, now);
   }
 
-  void updateTimeData(int maxNumberOfUpdateDay, DateTime targetDate) async {
-    timeData.updateExitTime(getTime(targetDate));
-
+  void updatePastTimeData(int maxNumberOfUpdateDay, DateTime targetDate) async {
     for (int i = 0; i < maxNumberOfUpdateDay; i++) {
       DateTime aDayAgo = targetDate.subtract(const Duration(days: 1));
       TimeData pastTimeData = await DBHelper().getTimeData(getDay(aDayAgo));
 
+      // TODO: 초기가입 날짜 추가 및 아래 라인 삭제
       if (pastTimeData == null) return;
 
       if (pastTimeData.timeList.length == 0) {
@@ -273,6 +247,8 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   @override
   Future<int> getTotalTime(DateTime date) async {
     final localTimeData = await DBHelper().getTimeData(getDay(date));
-    return localTimeData == null ? 0 : localTimeData.getTotalTime();
+    return localTimeData == null
+        ? 0
+        : localTimeData.getTotalTime(date, isAtHome);
   }
 }

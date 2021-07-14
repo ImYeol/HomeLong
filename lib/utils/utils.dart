@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logging/logging.dart';
 
 const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 Random _rnd = Random();
@@ -49,5 +50,21 @@ int getSecond(int time) {
 }
 
 int toSeconds(int time) {
-  return getHour(time) * 3600 + getMinute(time) * 60 + time;
+  // var log = Logger("utils");
+  // log.info("toSeconds: time - ${time}");
+  // log.info("toSeconds: hour - ${getHour(time)}");
+  // log.info("toSeconds: minute - ${getMinute(time)}");
+  // log.info("toSeconds: seconds - ${getSecond(time)}");
+  return getHour(time) * 3600 + getMinute(time) * 60 + getSecond(time);
+}
+
+int getTimeDiffInMinute(int time1, int time2) {
+  return ((toSeconds(time1) - toSeconds(time2)) / 60).floor().abs();
+}
+
+int getTimeDiffInSeconds(int time1, int time2) {
+  // var log = Logger("utils");
+  // log.info("toSeconds: time1 seconds - ${getSecond(time1)}");
+  // log.info("toSeconds: time2 seconds - ${getSecond(time2)}");
+  return (toSeconds(time1) - toSeconds(time2)).abs();
 }

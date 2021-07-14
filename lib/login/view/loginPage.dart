@@ -57,7 +57,7 @@ class LoginForm extends StatelessWidget {
       listener: (context, state) {
         if (state == LoginState.LOGIN) {
           _log.info("LoginState=$state");
-          Navigator.pushNamed(context, "/GPS");
+          Navigator.pushReplacementNamed(context, "/GPS");
         } else if (state == LoginState.UNLOGIN) {
           _log.info("LoginState=$state");
         }
