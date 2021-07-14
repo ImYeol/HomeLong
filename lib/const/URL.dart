@@ -3,8 +3,8 @@ class URL {
   static String serverPort = ":8083";
 
   // login
-  static String kakaoLoginURL = serverHost + serverPort + "/login/kakao";
-  static String facebookLoginURL = serverHost + serverPort + "/login/facebook";
+  static String setUserInfoURL = serverHost + serverPort + "/account/set";
+  static String getUserInfoURL = serverHost + serverPort + "/account/get";
 
   // time
   static String getDayTimeURL = serverHost + serverPort + "/time/day/get";
