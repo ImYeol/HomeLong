@@ -5,6 +5,7 @@ import 'package:homg_long/const/URL.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/authentication.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
+import 'package:homg_long/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
 import 'package:logging/logging.dart';
@@ -29,7 +30,10 @@ class AuthenticationProxy implements Authentication {
          Declined permissions: ${accessToken.declinedPermissions}
          ''');
 
-        return UserInfo(id: accessToken.userId);
+        return UserInfo(
+          id: accessToken.userId,
+          initDate: getDay(DateTime.now()),
+        );
       case FacebookLoginStatus.cancelledByUser:
         log.warning('Login cancelled by the user.');
         return null;
@@ -136,9 +140,11 @@ class AuthenticationProxy implements Authentication {
       log.info("user info:$user");
 
       return UserInfo(
-          id: user.id.toString(),
-          name: user.properties["nickname"],
-          image: user.properties["profile_image"]);
+        id: user.id.toString(),
+        name: user.properties["nickname"],
+        image: user.properties["profile_image"],
+        initDate: getDay(DateTime.now()),
+      );
     } catch (e) {
       logUtil.logger.e(e);
       return null;

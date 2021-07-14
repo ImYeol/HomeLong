@@ -35,7 +35,7 @@ class DBHelper {
 
     return openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute('''
-        create table $userInfoTable(id TEXT PRIMARY KEY, name TEXT, image TEXT, ssid TEXT, bssid TEXT, week TEXT, timeInfo TEXT, street TEXT, latitude REAL, longitude REAL)
+        create table $userInfoTable(id TEXT PRIMARY KEY, name TEXT, image TEXT, ssid TEXT, bssid TEXT, street TEXT, initDate TEXT, latitude REAL, longitude REAL)
         ''');
       await db.execute('''
           CREATE TABLE $timeInfoTable(date TEXT PRIMARY KEY, timeList TEXT)

@@ -53,7 +53,6 @@ class LoginCubit extends Cubit<LoginState> {
     _userInfo.then((value) {
       if (value != null) {
         log.info("auto login success(${value.toJson()}");
-        setUserInfo(value);
         emit(LoginState.LOGIN);
       } else {
         log.info("auto login fail");
