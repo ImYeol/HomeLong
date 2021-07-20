@@ -52,8 +52,12 @@ class TimeDB implements TimeAPI {
     log.info("jsonEncode(timeData)=${jsonEncode(timeData)}");
 
     var res = await db.rawInsert(
-        "INSERT OR REPLACE INTO ${DBHelper.timeInfoTable}(date, timeList) VALUES(?,?)",
-        [getDay(DateTime.now()).toString(), jsonEncode(timeData)]);
+        "INSERT OR REPLACE INTO ${DBHelper.timeInfoTable}(date, timeList, totalMinute) VALUES(?,?,?)",
+        [
+          getDay(DateTime.now()).toString(),
+          jsonEncode(timeData),
+          getTotalMinute(timeData)
+        ]);
 
     if (res > 0) {
       log.info("setTimeInfo success + $res");
@@ -62,5 +66,13 @@ class TimeDB implements TimeAPI {
 
     log.info("setTimeInfo failed + $res");
     return false;
+  }
+
+  int getTotalMinute(TimeData timeData) {
+    int totalMinuter = 0;
+    for (var time in timeData.timeList) {
+      totalMinuter += getMinuteBetweenTimes(time.enterTime, time.exitTime);
+    }
+    return totalMinuter;
   }
 }

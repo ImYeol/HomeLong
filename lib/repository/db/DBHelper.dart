@@ -38,7 +38,7 @@ class DBHelper {
         create table $userInfoTable(id TEXT PRIMARY KEY, name TEXT, image TEXT, ssid TEXT, bssid TEXT, street TEXT, initDate TEXT, latitude REAL, longitude REAL)
         ''');
       await db.execute('''
-          CREATE TABLE $timeInfoTable(date TEXT PRIMARY KEY, timeList TEXT)
+          CREATE TABLE $timeInfoTable(date TEXT PRIMARY KEY, timeList TEXT, totalMinute INTEGER)
           ''');
     }, onUpgrade: (db, oldVersion, newVersion) {});
   }
