@@ -3,6 +3,7 @@ import 'package:homg_long/repository/db/DBHelper.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/userRepository.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UserDB implements UserAPI {
@@ -29,6 +30,8 @@ class UserDB implements UserAPI {
   Future<bool> setUserInfo(UserInfo userInfo) async {
     log.info("setUserInfo($userInfo)");
 
+    final prefs = await SharedPreferences.getInstance();
+
     final database = await DBHelper().getDatabase;
 
     var res = await database.insert(DBHelper.userInfoTable, userInfo.toJson(),
@@ -36,6 +39,7 @@ class UserDB implements UserAPI {
 
     if (res == 1) {
       log.info("setUserInfo success(id:${userInfo.id})");
+      prefs.setString('id', userInfo.id);
       return true;
     }
 
