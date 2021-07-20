@@ -1,12 +1,9 @@
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:homg_long/const/AppKey.dart';
-import 'package:homg_long/const/StatusCode.dart';
-import 'package:homg_long/const/URL.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/authentication.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/utils/utils.dart';
-import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk/all.dart';
 import 'package:logging/logging.dart';
 
@@ -56,30 +53,6 @@ class AuthenticationProxy implements Authentication {
       return await _loginWithKakao();
     } else {
       return await _loginWithKakaoWebview();
-    }
-  }
-
-  @override
-  Future<UserInfo> getUserInfo() {
-    // TODO: implement getUserInfo
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> setUserInfo(UserInfo userInfo) async {
-    log.info("setUserInfo");
-
-    final response = await http.post(
-      Uri.parse(URL.setUserInfoURL),
-      body: userInfo.toJson(),
-    );
-
-    if (response.statusCode == StatusCode.statusOK) {
-      log.info("login success");
-      return true;
-    } else {
-      log.info("login fail(${response.statusCode})");
-      return false;
     }
   }
 

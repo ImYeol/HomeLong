@@ -2,17 +2,23 @@ class URL {
   static String serverHost = "http://61.98.89.97";
   static String serverPort = ":8083";
 
+  // for test
+  // static String serverPort = ":8084";
+
   // login
-  static String setUserInfoURL = serverHost + serverPort + "/account/set";
-  static String getUserInfoURL = serverHost + serverPort + "/account/get";
+  static Uri setUserInfoURL =
+      Uri.parse(serverHost + serverPort + "/account/set");
+  static Uri getUserInfoURL =
+      Uri.parse(serverHost + serverPort + "/account/get");
 
   // time
-  static String getDayTimeURL = serverHost + serverPort + "/time/day/get";
-  static String getWeekTimeRUL = serverHost + serverPort + "/time/week/get";
-  static String getMonthTimeRUL = serverHost + serverPort + "/time/month/get";
+  static Uri getDayTimeURL =
+      Uri.parse(serverHost + serverPort + "/time/day/get");
+  static Uri getWeekTimeRUL =
+      Uri.parse(serverHost + serverPort + "/time/week/get");
+  static Uri getMonthTimeRUL =
+      Uri.parse(serverHost + serverPort + "/time/month/get");
 
-  static String setDayTimeURL = serverHost + serverPort + "/time/day/set";
-
-// friend
-
+  static Uri setDayTimeURL =
+      Uri.parse(serverHost + serverPort + "/time/day/set");
 }
