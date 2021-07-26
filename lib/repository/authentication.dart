@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:homg_long/repository/db/authentication.dart';
+import 'package:homg_long/repository/db/authenticationDB.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 
-import 'proxy/authentication.dart';
+import 'proxy/authenticationProxy.dart';
 
 abstract class Authentication {
   Future<UserInfo> facebookLogin();

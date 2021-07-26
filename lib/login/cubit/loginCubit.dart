@@ -15,6 +15,7 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void kakaoLogin() async {
+    log.info("kakaoLogin");
     Future<UserInfo> _userInfo = AuthenticationRepository().kakaoLogin();
     _userInfo.then((value) {
       if (value != null) {
@@ -31,6 +32,7 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void facebookLogin() {
+    log.info("facebookLogin");
     Future<UserInfo> _userInfo = AuthenticationRepository().facebookLogin();
     _userInfo.then((value) {
       if (value != null) {
@@ -65,6 +67,7 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   setUserInfo(UserInfo userInfo) {
+    log.info("serUserInfo");
     Future<bool> success = UserRepository().setUserInfo(userInfo);
     success.then((value) {
       if (value != true) {

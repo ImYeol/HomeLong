@@ -10,15 +10,15 @@ class UserInfo {
   double longitude = double.infinity; // as initial value
 
   UserInfo(
-      {String id,
-      String name,
-      String image,
-      String ssid,
-      String bssid,
-      String street,
-      int initDate,
-      double latitude,
-      double longitude}) {
+      {String id = "",
+      String name = "",
+      String image = "",
+      String ssid = "",
+      String bssid = "",
+      String street = "",
+      int initDate = 0,
+      double latitude = 0.0,
+      double longitude = 0.0}) {
     this.id = id;
     this.name = name;
     this.image = image;
