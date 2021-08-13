@@ -25,4 +25,7 @@ class AppTheme {
   // button
   static Color alertButtonTextColor = Colors.white;
   static Color alertButtonBackgroundColor = Colors.blueAccent;
+
+  //
+  static const double cardViewRadius = 30;
 }

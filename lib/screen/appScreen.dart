@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/rank/rank.dart';
+import 'package:homg_long/chart/chart.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
 import 'package:homg_long/screen/model/appScreenState.dart';
 import 'package:homg_long/setting/setting.dart';
@@ -178,7 +178,9 @@ class _AppScreenState extends State<AppScreen>
           ),
           body: TabBarView(children: [
             CounterPage(cubit: CounterCubit(cubit)),
-            RankPage(),
+            ChartPage(
+              cubit: ChartPageCubit(cubit),
+            ),
             SettingPage()
           ]),
         ));

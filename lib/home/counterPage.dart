@@ -17,7 +17,7 @@ class CounterPage extends StatefulWidget {
 }
 
 class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
-  final log = Logger("CounterCubit");
+  final log = Logger("CounterPage");
   int touchedIndex = -1;
   Color backgroundColor = Colors.grey[150];
   Color subTitleColor = Colors.brown[300];

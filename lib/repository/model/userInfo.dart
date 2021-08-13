@@ -37,7 +37,7 @@ class UserInfo {
     ssid = json['ssid'];
     bssid = json['bssid'];
     street = json['street'];
-    initDate = json['initDate'];
+    initDate = int.parse(json['initDate']);
     latitude = json['latitude'];
     longitude = json['longitude'];
   }
