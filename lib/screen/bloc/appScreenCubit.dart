@@ -6,11 +6,10 @@ import 'package:geofence_service/geofence_service.dart';
 import 'package:geofence_service/models/geofence.dart';
 import 'package:geofence_service/models/geofence_radius.dart';
 import 'package:geofence_service/models/geofence_status.dart';
-import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/rank/bloc/rankCubit.dart';
-import 'package:homg_long/rank/rankPage.dart';
+import 'package:homg_long/chart/bloc/chartPageCubit.dart';
+import 'package:homg_long/chart/chartPage.dart';
 import 'package:homg_long/repository/connectivityServiceWrapper.dart';
 import 'package:homg_long/repository/model/timeData.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
@@ -58,7 +57,6 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
         ]),
   ];
 
-  final _pages = [CounterPage(), RankPage(), RankPage()];
   final _connectivityServiceWrapper = ConnectivityServiceWrapper.instance;
   bool isAtHome = false;
   TimeData timeData;
