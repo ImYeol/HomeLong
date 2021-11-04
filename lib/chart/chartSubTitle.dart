@@ -5,7 +5,11 @@ class ChartSubTitle extends StatelessWidget {
   final String title;
   final Color fontColor;
   final double fontSize;
-  const ChartSubTitle({Key key, this.title, this.fontColor, this.fontSize})
+  const ChartSubTitle(
+      {Key? key,
+      required this.title,
+      required this.fontColor,
+      required this.fontSize})
       : super(key: key);
 
   @override

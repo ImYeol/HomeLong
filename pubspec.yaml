@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.9.0 <3.0.0"
+  sdk: ">=2.14.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -62,6 +62,8 @@ dependencies:
   sqflite: ^1.1.6
   path_provider: ^2.0.0
   path: ^1.6.2
+  hive: ^2.0.4
+  hive_flutter: ^1.1.0
 
   # location
   geolocator:
@@ -79,7 +81,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  # hive
+  hive_generator: ^1.1.1
+  build_runner: ^2.1.4
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

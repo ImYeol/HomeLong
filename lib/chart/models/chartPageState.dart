@@ -11,5 +11,5 @@ class ChartPageLoading extends ChartPageState {}
 class ChartPageLoaded extends ChartPageState {
   final ChartInfo chartInfo;
 
-  ChartPageLoaded({this.chartInfo});
+  ChartPageLoaded({required this.chartInfo});
 }

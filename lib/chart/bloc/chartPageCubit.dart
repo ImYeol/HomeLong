@@ -20,10 +20,7 @@ class ChartPageCubit extends Cubit<ChartPageState> with AbstractPageCubit {
 
   get isSelected => buttonSelected;
 
-  ChartPageCubit(UserActionManager useractionManager)
-      : super(ChartPageLoading()) {
-    this.userActionManager = useractionManager;
-  }
+  ChartPageCubit(this.userActionManager) : super(ChartPageLoading());
 
   BarChartGroupData makeGroupData(
     int x,

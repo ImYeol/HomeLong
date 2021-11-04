@@ -5,7 +5,7 @@ class TimeProxy implements TimeAPI {
   @override
   Future<TimeData> getTimeData(int date) async {
     // TODO: implement getTimeData
-    return null;
+    return TimeData();
   }
 
   @override

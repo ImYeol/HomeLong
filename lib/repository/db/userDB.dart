@@ -16,12 +16,21 @@ class UserDB implements UserAPI {
 
     final db = await DBHelper().getDatabase;
 
-    var res = await db.query(DBHelper.userInfoTable);
-    if (res.length == 0) {
-      log.warning("getUserInfo fail(table($DBHelper.userInfoTable) is empty)");
-      return null;
+    var res = await db?.query(DBHelper.userInfoTable);
+    if (res == null || res.length == 0) {
+      log.warning("getUserInfo fail(table($res) is empty)");
+      await db?.execute('''
+        create table ${DBHelper.userInfoTable}(id TEXT PRIMARY KEY, name TEXT, image TEXT, ssid TEXT, bssid TEXT, street TEXT, initDate INTEGER, latitude REAL, longitude REAL)
+        ''');
+      await db?.execute('''
+          CREATE TABLE ${DBHelper.userInfoTable}(date TEXT PRIMARY KEY, timeList TEXT, totalMinute INTEGER)
+          ''');
+      //return UserInfo();
+      res = await db?.query(DBHelper.userInfoTable);
     }
-
+    if (res == null) {
+      return UserInfo();
+    }
     log.info("getUserInfo success(${res.first})");
     return UserInfo.fromJson(res.first);
   }
@@ -34,7 +43,7 @@ class UserDB implements UserAPI {
 
     final db = await DBHelper().getDatabase;
 
-    var res = await db.insert(DBHelper.userInfoTable, userInfo.toJson(),
+    var res = await db?.insert(DBHelper.userInfoTable, userInfo.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
 
     if (res == 1) {
@@ -59,9 +68,9 @@ class UserDB implements UserAPI {
     userInfo.longitude = longitude;
     userInfo.street = street;
 
-    var res = db.update(DBHelper.userInfoTable, userInfo.toJson(),
+    var res = db?.update(DBHelper.userInfoTable, userInfo.toJson(),
         where: "id = ?", whereArgs: [userInfo.id]);
-    res.then((value) {
+    res?.then((value) {
       if (value == 1) {
         log.info("updateLocationInfo success(id:${userInfo.id}):$userInfo");
         return true;
@@ -87,9 +96,9 @@ class UserDB implements UserAPI {
     userInfo.ssid = ssid;
     userInfo.bssid = bssid;
 
-    var res = db.update(DBHelper.userInfoTable, userInfo.toJson(),
+    var res = db?.update(DBHelper.userInfoTable, userInfo.toJson(),
         where: "id = ?", whereArgs: [userInfo.id]);
-    res.then((value) {
+    res?.then((value) {
       if (value == 1) {
         log.info("updateWifiInfo success(id:${userInfo.id}):$userInfo");
         return true;
@@ -117,9 +126,9 @@ class UserDB implements UserAPI {
       return true;
     }
 
-    var res = db.delete(DBHelper.userInfoTable,
+    var res = db?.delete(DBHelper.userInfoTable,
         where: "id = ?", whereArgs: [userInfo.id]);
-    res.then((value) {
+    res?.then((value) {
       if (value == 1) {
         log.info("deleteUserInfo success(id:${userInfo.id})");
         return true;

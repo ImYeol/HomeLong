@@ -2,7 +2,7 @@ abstract class WifiState {
   final String ssid;
   final String bssid;
 
-  const WifiState({this.ssid, this.bssid});
+  const WifiState({required this.ssid, required this.bssid});
 
   String get _ssid => ssid;
 

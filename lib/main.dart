@@ -15,7 +15,10 @@ import 'package:logging/logging.dart' as logging;
 
 import 'gps/view/gpsSettingPage.dart';
 import 'login/view/loginPage.dart';
+import 'repository/db/DBHelper.dart';
 import 'simple_bloc_observer.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 //https://fkkmemi.github.io/ff/
 void main() async {
@@ -24,15 +27,17 @@ void main() async {
 
   // initalize custom bloc observer to print log.
   Bloc.observer = SimpleBlocObserver();
-
+  print("main started");
+  // initialize hive
+  // await Hive.initFlutter();
+  DBHelper.initDB();
+  print("main started2");
   // run myapp with auth repository.
   runApp(MyApp());
-
-  LogUtil logUtil = LogUtil();
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({Key key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -43,7 +48,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
   final log = logging.Logger("Main");
 
-  NavigatorState get _navigator => _navigatorKey.currentState;
+  NavigatorState? get _navigator => _navigatorKey.currentState;
 
   final routes = {
     '/Login': (BuildContext context) => LoginPage(),
@@ -113,8 +118,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             // font : google popsins font
             textTheme:
                 GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
-            primarySwatch: AppTheme.primarySwatch,
             primaryColor: AppTheme.primaryColor,
+            //primarySwatch: AppTheme.primarySwatch,
             // primary color
             accentColor: AppTheme.accentColor,
             backgroundColor: AppTheme.backgroundColor,

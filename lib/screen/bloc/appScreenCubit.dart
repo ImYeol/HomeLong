@@ -32,7 +32,7 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
 
   int _currentPage = 0;
   final period = 5; // second
-  UserInfo _userInfo;
+  late UserInfo _userInfo;
 
   final _geofenceServiceWrapper = GeofenceService.instance.setup(
       interval: 5000,
@@ -59,8 +59,8 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
 
   final _connectivityServiceWrapper = ConnectivityServiceWrapper.instance;
   bool isAtHome = false;
-  TimeData timeData;
-  Timer timer;
+  late TimeData timeData;
+  late Timer timer;
 
   AppScreenCubit() : super(PageLoading(CircularProgressIndicator()));
 

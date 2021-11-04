@@ -11,7 +11,7 @@ import 'package:homg_long/setting/bloc/settingCubit.dart';
 import 'package:logging/logging.dart';
 
 class SettingPage extends StatelessWidget {
-  const SettingPage({Key key}) : super(key: key);
+  const SettingPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

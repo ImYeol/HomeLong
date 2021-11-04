@@ -19,9 +19,9 @@ class ChartInfo {
       this.maxX = 10,
       this.intervalX = 1,
       this.intervalY = 8,
-      this.title,
-      this.chartType,
-      this.chartGroupData});
+      required this.title,
+      required this.chartType,
+      required this.chartGroupData});
 }
 
 class WeekChartInfo extends ChartInfo {

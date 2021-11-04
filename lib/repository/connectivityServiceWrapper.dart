@@ -23,13 +23,13 @@ class ConnectivityServiceWrapper {
   final WifiInfo _wifiInfo = WifiInfo();
 
   String _connectionStatus = 'Unknown';
-  StreamSubscription<ConnectivityResult> _connectivitySubscription = null;
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription = null;
   ConnectivityResult currentConnectivityState = ConnectivityResult.none;
 
   String ssid = "Unknonw";
   String bssid = "Unknonw";
 
-  void Function(WifiState) callback;
+  void Function(WifiState)? callback;
 
   void listenWifiStateChanged(Function(WifiState) callback) {
     log.info("registerWifiStateCallback");
@@ -41,13 +41,13 @@ class ConnectivityServiceWrapper {
   void unlistenWifiStateChanged() {
     log.info("unRegisterWifiStateCallback");
     this.callback = null;
-    _connectivitySubscription.cancel();
+    _connectivitySubscription?.cancel();
     _connectivitySubscription = null;
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> checkNowConnectionState() async {
-    ConnectivityResult result;
+    ConnectivityResult? result;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       result = await _connectivity.checkConnectivity();
@@ -84,8 +84,8 @@ class ConnectivityServiceWrapper {
     return onConnectionStatusChanged(result);
   }
 
-  Future<void> onConnectionStatusChanged(ConnectivityResult result) async {
-    currentConnectivityState = result;
+  Future<void> onConnectionStatusChanged(ConnectivityResult? result) async {
+    currentConnectivityState = result ?? ConnectivityResult.none;
 
     switch (result) {
       case ConnectivityResult.wifi:
@@ -124,12 +124,12 @@ class ConnectivityServiceWrapper {
         }
         if (status == LocationAuthorizationStatus.authorizedAlways ||
             status == LocationAuthorizationStatus.authorizedWhenInUse) {
-          wifiName = await _wifiInfo.getWifiName();
+          wifiName = await _wifiInfo.getWifiName() ?? "Unknonw";
         } else {
-          wifiName = await _wifiInfo.getWifiName();
+          wifiName = await _wifiInfo.getWifiName() ?? "Unknonw";
         }
       } else {
-        wifiName = await _wifiInfo.getWifiName();
+        wifiName = await _wifiInfo.getWifiName() ?? "Unknonw";
       }
     } on PlatformException catch (e) {
       logUtil.logger.e(e);
@@ -149,12 +149,12 @@ class ConnectivityServiceWrapper {
         }
         if (status == LocationAuthorizationStatus.authorizedAlways ||
             status == LocationAuthorizationStatus.authorizedWhenInUse) {
-          wifiBSSID = await _wifiInfo.getWifiBSSID();
+          wifiBSSID = await _wifiInfo.getWifiBSSID() ?? "Unknonw";
         } else {
-          wifiBSSID = await _wifiInfo.getWifiBSSID();
+          wifiBSSID = await _wifiInfo.getWifiBSSID() ?? "Unknonw";
         }
       } else {
-        wifiBSSID = await _wifiInfo.getWifiBSSID();
+        wifiBSSID = await _wifiInfo.getWifiBSSID() ?? "Unknonw";
       }
     } on PlatformException catch (e) {
       logUtil.logger.e(e);

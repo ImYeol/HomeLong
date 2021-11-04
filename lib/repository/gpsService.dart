@@ -20,7 +20,7 @@ class Suggestion {
 }
 
 class PlaceApiProvider {
-  String sessionToken;
+  late String sessionToken;
   var apiKey;
   final client = Client();
   final log = Logger("PlaceApiProvider");
@@ -29,7 +29,7 @@ class PlaceApiProvider {
   static final String iosKey = 'AIzaSyD0Palsyb5Wtg5_0uFHm6E6uFfCw0OD7W8';
   static final String other = 'AIzaSyDJlAkU9g2IFIyhfgx1xv_oke1hk1w2nKQ';
 
-  PlaceApiProvider({String sessionToken}) {
+  PlaceApiProvider({required String sessionToken}) {
     this.sessionToken = sessionToken;
     log.info("Platform:${Platform.operatingSystem}");
 

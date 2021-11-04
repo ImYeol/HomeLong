@@ -9,8 +9,22 @@ class AppTheme {
   static Color bottom_menu_icon_color = Color(0xff2c3e50);
   static Color backgroundColor = Color(0xff2c3e50);
   static Color primaryColor = Colors.white;
-  static Color primarySwatch = Colors.grey;
-  static Color accentColor = Colors.deepPurple[900];
+  static MaterialColor primarySwatch = MaterialColor(
+    0xFFFFFFFF, // primary color
+    <int, Color>{
+      50: Color(0xFFFFFFFF),
+      100: Color(0xFFFFFFFF),
+      200: Color(0xFFFFFFFF),
+      300: Color(0xFFFFFFFF),
+      400: Color(0xFFFFFFFF),
+      500: Color(0xFFFFFFFF),
+      600: Color(0xFFFFFFFF),
+      700: Color(0xFFFFFFFF),
+      800: Color(0xFFFFFFFF),
+      900: Color(0xFFFFFFFF),
+    },
+  );
+  static Color accentColor = Colors.deepPurple.shade900;
   static Color focusColor = Color(0xff2c3e50);
   static Color disabledColor = Colors.grey;
 

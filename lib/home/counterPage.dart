@@ -10,7 +10,7 @@ import 'package:logging/logging.dart';
 
 class CounterPage extends StatefulWidget {
   CounterCubit cubit;
-  CounterPage({Key key, this.cubit}) : super(key: key);
+  CounterPage({Key? key, required this.cubit}) : super(key: key);
 
   @override
   _CounterPageState createState() => _CounterPageState();
@@ -19,21 +19,21 @@ class CounterPage extends StatefulWidget {
 class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
   final log = Logger("CounterPage");
   int touchedIndex = -1;
-  Color backgroundColor = Colors.grey[150];
-  Color subTitleColor = Colors.brown[300];
+  Color backgroundColor = Colors.grey.shade200;
+  Color subTitleColor = Colors.brown.shade300;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    widget.cubit.loadPage();
+    WidgetsBinding.instance?.addObserver(this);
+    //widget.cubit.loadPage();
     log.info('initState');
   }
 
   @override
   void dispose() {
     log.info('dispose');
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     widget.cubit.unloadPage();
     super.dispose();
   }
@@ -52,14 +52,17 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     print("counterPage build");
+    widget.cubit.loadPage();
     return BlocBuilder<CounterCubit, CouterPageState>(
         cubit: widget.cubit,
         builder: (context, state) {
           if (state is CounterPageLoading) {
+            print("counterPage CounterPageLoading");
             return Center(
                 child: Container(
                     width: 50, height: 50, child: CircularProgressIndicator()));
           } else if (state is CounterTickInvoked) {
+            print("counterPage CounterTickInvoked");
             return buildView(context, state);
           } else {
             return Container();
@@ -68,15 +71,13 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
   }
 
   Widget buildView(BuildContext context, CounterTickInvoked tick) {
-    return Expanded(
-        child: Container(
-      color: backgroundColor,
+    return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           buildSubTitle("Today In & Out", subTitleColor),
           Padding(
-              padding: EdgeInsets.only(left: 15, right: 15),
+              padding: EdgeInsets.only(left: 20, right: 20),
               child: Card(
                 elevation: 10,
                 shape: RoundedRectangleBorder(
@@ -96,14 +97,14 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
           )
         ],
       ),
-    ));
+    );
   }
 
   Widget buildInAndOutWidget(String title, int totalTime) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buildTitle(title, 30, Colors.brown[500]),
+        buildTitle(title, 30, Colors.brown.shade500),
         Card(
           elevation: 10,
           shape: RoundedRectangleBorder(
@@ -113,7 +114,7 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
               height: 70,
               child: Center(
                   child: buildTitle(transformToStringTimeforamt(totalTime), 30,
-                      Colors.purple[800]))),
+                      Colors.purple.shade800))),
         )
       ],
     );
@@ -164,7 +165,7 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
                       if (desiredTouch &&
                           pieTouchResponse.touchedSection != null) {
                         touchedIndex = pieTouchResponse
-                            .touchedSection?.touchedSectionIndex;
+                            .touchedSection!.touchedSectionIndex;
                       } else {
                         touchedIndex = -1;
                       }
@@ -186,18 +187,18 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Indicator(
-                            color: Colors.brown[500],
+                            color: Colors.brown.shade500,
                             isSquare: true,
                             size: 16,
                             text: "In",
-                            textColor: Colors.brown[500],
+                            textColor: Colors.brown.shade500,
                           ),
                           Indicator(
-                            color: Colors.cyan[500],
+                            color: Colors.brown.shade500,
                             isSquare: true,
                             size: 16,
                             text: "out",
-                            textColor: Colors.brown[500],
+                            textColor: Colors.brown.shade500,
                           )
                         ])))
           ],
@@ -255,12 +256,12 @@ class Indicator extends StatelessWidget {
   final Color textColor;
 
   const Indicator(
-      {Key key,
-      this.color,
-      this.text,
-      this.isSquare,
+      {Key? key,
+      required this.color,
+      required this.text,
+      required this.isSquare,
       this.size = 16,
-      this.textColor})
+      required this.textColor})
       : super(key: key);
 
   @override

@@ -9,8 +9,8 @@ import 'package:homg_long/repository/proxy/wifiApDataProxy.dart';
 class WifiSettingCubit extends Cubit<WifiState> {
   LogUtil logUtil = LogUtil();
   String url = 'http://{{ endpoint }}:{{ port }}/register/user/ap';
-  ConnectivityServiceWrapper connectionService;
-  StreamSubscription<WifiState> connectionSubscription;
+  late ConnectivityServiceWrapper connectionService;
+  late StreamSubscription<WifiState> connectionSubscription;
 
   WifiSettingCubit(ConnectivityServiceWrapper connectionService)
       : super(WifiDisConnected("Unknonw", "Unknown")) {

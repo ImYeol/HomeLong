@@ -33,14 +33,14 @@ class AuthenticationProxy implements Authentication {
         );
       case FacebookLoginStatus.cancelledByUser:
         log.warning('Login cancelled by the user.');
-        return null;
+        return UserInfo();
       case FacebookLoginStatus.error:
         log.warning('Something went wrong with the login process.\n'
             'Here\'s the error Facebook gave us: ${result.errorMessage}');
-        return null;
+        return UserInfo();
       default:
         log.warning('Login error:${result.errorMessage}');
-        return null;
+        return UserInfo();
     }
   }
 
@@ -71,7 +71,7 @@ class AuthenticationProxy implements Authentication {
       return await _issueAccessToken(authCode);
     } catch (e) {
       logUtil.logger.e(e);
-      return null;
+      return UserInfo();
     }
   }
 
@@ -85,7 +85,7 @@ class AuthenticationProxy implements Authentication {
       return await _issueAccessToken(authCode);
     } catch (e) {
       logUtil.logger.e(e);
-      return null;
+      return UserInfo();
     }
   }
 
@@ -101,7 +101,7 @@ class AuthenticationProxy implements Authentication {
       return await _getKakaoInfo();
     } catch (e) {
       log.info("error on issuing access token: $e");
-      return null;
+      return UserInfo();
     }
   }
 
@@ -114,13 +114,13 @@ class AuthenticationProxy implements Authentication {
 
       return UserInfo(
         id: user.id.toString(),
-        name: user.properties["nickname"],
-        image: user.properties["profile_image"],
+        name: user.properties?["nickname"] ?? '',
+        image: user.properties?["profile_image"] ?? '',
         initDate: getDay(DateTime.now()),
       );
     } catch (e) {
       logUtil.logger.e(e);
-      return null;
+      return UserInfo();
     }
   }
 }

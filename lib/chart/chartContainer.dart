@@ -7,10 +7,10 @@ class ChartContainer extends StatelessWidget {
   final Widget chart;
 
   const ChartContainer({
-    Key key,
-    this.title,
-    this.color,
-    this.chart,
+    Key? key,
+    required this.title,
+    required this.color,
+    required this.chart,
   }) : super(key: key);
 
   @override
@@ -25,7 +25,7 @@ class ChartContainer extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                  color: Colors.grey[600],
+                  color: Colors.grey.shade600,
                   offset: Offset(0.0, 2.0),
                   blurRadius: 5.0)
             ]),

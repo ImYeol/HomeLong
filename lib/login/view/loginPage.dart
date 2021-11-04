@@ -11,7 +11,7 @@ class LoginPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
   final log = logging.Logger('LoginPage');
 
-  LoginPage({Key key}) : super(key: key);
+  LoginPage({Key? key}) : super(key: key);
 
   static Route route() {
     return MaterialPageRoute<void>(builder: (_) => LoginPage());
@@ -46,7 +46,7 @@ class LoginForm extends StatelessWidget {
   LogUtil log = LogUtil();
   final _log = logging.Logger('LoginForm');
 
-  LoginForm({Key key}) : super(key: key);
+  LoginForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
