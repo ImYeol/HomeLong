@@ -8,6 +8,8 @@ import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
 import 'package:homg_long/repository/authentication.dart';
 import 'package:homg_long/repository/gpsService.dart';
+import 'package:homg_long/repository/timeRepository.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/screen/appScreen.dart';
 import 'package:homg_long/splashPage.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
@@ -15,7 +17,6 @@ import 'package:logging/logging.dart' as logging;
 
 import 'gps/view/gpsSettingPage.dart';
 import 'login/view/loginPage.dart';
-import 'repository/db/DBHelper.dart';
 import 'simple_bloc_observer.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -29,9 +30,9 @@ void main() async {
   Bloc.observer = SimpleBlocObserver();
   print("main started");
   // initialize hive
-  // await Hive.initFlutter();
-  DBHelper.initDB();
-  print("main started2");
+  await Hive.initFlutter();
+  UserRepository().init();
+  TimeRepository().init();
   // run myapp with auth repository.
   runApp(MyApp());
 }
@@ -68,7 +69,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       print(
           '[${record.loggerName}] ${record.level.name}: ${record.time}: ${record.message}');
     });
-
     log.info("initialize app");
   }
 
@@ -79,6 +79,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     log.info("dispose app");
 
     WidgetsBinding.instance?.removeObserver(this);
+    // Hive close
+    Hive.close();
   }
 
   @override
@@ -113,29 +115,63 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               create: (context) => ConnectivityServiceWrapper.instance),
           RepositoryProvider<GPSService>(create: (context) => GPSService()),
         ],
-        child: MaterialApp(
-          theme: ThemeData(
-            // font : google popsins font
-            textTheme:
-                GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
-            primaryColor: AppTheme.primaryColor,
-            //primarySwatch: AppTheme.primarySwatch,
-            // primary color
-            accentColor: AppTheme.accentColor,
-            backgroundColor: AppTheme.backgroundColor,
-            // background color
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-            bottomAppBarColor: AppTheme.bottomAppBarColor,
-            textSelectionColor: AppTheme.primaryColor,
-            focusColor: AppTheme.focusColor,
-            disabledColor: AppTheme.disabledColor,
-          ),
-          initialRoute: '/Login',
-          routes: routes,
-          navigatorKey: _navigatorKey,
+        child: FutureBuilder(
+          future: Future.wait([
+            UserRepository().openDatabase(),
+            TimeRepository().openDatabase()
+          ]),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                // getUserInfo has not completed yet
+                // show splash screen
+                return buildMainApp(context, SplashPage());
+              default:
+                if (snapshot.hasData) {
+                  //Box box = snapshot.data as Box;
+                  //UserInfo userInfo = box.get(UserDB.USER_INFO, defaultValue: InvalidUserInfo());
+                  final isDBOpened = snapshot.data as List<bool>;
+                  final allDBOpened =
+                      isDBOpened.reduce((value, element) => value && element);
 
-          //The SplashPage is shown while the application determines the authentication state of the user
-          onGenerateRoute: (_) => SplashPage.route(),
+                  if (allDBOpened == false) {
+                    log.severe("Not All of DB is opened");
+                    break;
+                  }
+
+                  return UserRepository().isLoginSessionValid()
+                      ? buildMainApp(context, AppScreen())
+                      : buildMainApp(context, LoginPage());
+                } else if (snapshot.hasError) {
+                  log.warning("main app got error while page loading");
+                  break;
+                }
+            }
+            return buildMainApp(context, SplashPage());
+          },
         ));
+  }
+
+  Widget buildMainApp(BuildContext context, Widget initialScreen) {
+    return MaterialApp(
+      theme: ThemeData(
+        // font : google popsins font
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+        primaryColor: AppTheme.primaryColor,
+        //primarySwatch: AppTheme.primarySwatch,
+        // primary color
+        accentColor: AppTheme.accentColor,
+        backgroundColor: AppTheme.backgroundColor,
+        // background color
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        bottomAppBarColor: AppTheme.bottomAppBarColor,
+        textSelectionColor: AppTheme.primaryColor,
+        focusColor: AppTheme.focusColor,
+        disabledColor: AppTheme.disabledColor,
+      ),
+      home: initialScreen,
+      routes: routes,
+      navigatorKey: _navigatorKey,
+    );
   }
 }

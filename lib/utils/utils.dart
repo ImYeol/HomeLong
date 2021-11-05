@@ -21,17 +21,12 @@ showToast(String msg) {
   );
 }
 
-int getDay(DateTime time) {
-  return time.year * 10000 + time.month * 100 + time.day;
+DateTime getDateTimeAsSameDay(DateTime time) {
+  return DateTime(time.year, time.month, time.day);
 }
 
 int getTime(DateTime time) {
   return time.hour * 10000 + time.minute * 100 + time.second;
-}
-
-DateTime getOnTime(DateTime time) {
-  DateTime onTime = DateTime(time.year, time.month, time.day);
-  return onTime;
 }
 
 // HHMMSS -> HH

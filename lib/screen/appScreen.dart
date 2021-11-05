@@ -6,8 +6,8 @@ import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/chart/chart.dart';
+import 'package:homg_long/repository/timeRepository.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
-import 'package:homg_long/screen/model/appScreenState.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:logging/logging.dart';
 
@@ -80,21 +80,8 @@ class _AppScreenState extends State<AppScreen>
         notificationTitle: 'Geofence Service is running',
         notificationText: 'Tap to return to the app',
         child: Scaffold(
-          body: BlocProvider<AppScreenCubit>.value(
-              value: cubit, child: _buildMainContents(context)),
+          body: _buildTabController(context),
         ));
-  }
-
-  Widget _buildMainContents(BuildContext context) {
-    return BlocConsumer<AppScreenCubit, AppScreenState>(
-        listenWhen: (previous, current) =>
-            (previous is! PageLoading) && (previous != current),
-        listener: (context, state) {
-          if (state == CounterPageLoaded) {
-            log.info("state is homePage");
-          }
-        },
-        builder: (context, state) => _buildTabController(context));
   }
 
   Widget _buildTabController(BuildContext context) {
@@ -176,13 +163,17 @@ class _AppScreenState extends State<AppScreen>
                   ]),
             ),
           ),
-          body: TabBarView(children: [
-            CounterPage(cubit: CounterCubit(cubit)),
-            ChartPage(
-              cubit: ChartPageCubit(cubit),
-            ),
-            SettingPage()
-          ]),
+          body: buildTabBarViews(),
         ));
+  }
+
+  Widget buildTabBarViews() {
+    return TabBarView(children: [
+      CounterPage(cubit: CounterCubit(cubit)),
+      ChartPage(
+        cubit: ChartPageCubit(cubit),
+      ),
+      SettingPage()
+    ]);
   }
 }

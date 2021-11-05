@@ -75,7 +75,7 @@ class _ChartPageState extends State<ChartPage> with WidgetsBindingObserver {
       child: ListView(
         children: <Widget>[
           ChartSubTitle(
-              title: "Time to stay at home",
+              title: "Duration at home",
               fontColor: subTitleColor,
               fontSize: 20),
           const SizedBox(
