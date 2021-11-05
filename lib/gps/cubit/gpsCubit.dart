@@ -6,8 +6,7 @@ import '../view/gpsSettingPage.dart';
 class GPSSettingCubit extends Cubit<gpsState> {
   GPSService _GPSService;
 
-  GPSSettingCubit(GPSService gpsService) : super(null) {
-    this._GPSService = gpsService;
+  GPSSettingCubit(this._GPSService) : super(null) {
     init();
   }
 

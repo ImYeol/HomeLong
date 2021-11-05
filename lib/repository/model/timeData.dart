@@ -3,13 +3,13 @@ import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
 class TimeData {
-  List<Time> timeList = List<Time>();
+  List<Time> timeList = <Time>[];
   final log = Logger("TimeData");
 
   TimeData();
 
   List<Map<String, dynamic>> toJson() {
-    List<Map<String, dynamic>> localList = List();
+    List<Map<String, dynamic>> localList = [];
     for (int i = 0; i < this.timeList.length; i++) {
       localList.add(this.timeList[i].toJson());
     }

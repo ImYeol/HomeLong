@@ -1,11 +1,11 @@
 class UserInfo {
-  String id;
-  String name;
-  String image;
-  String ssid;
-  String bssid;
-  String street;
-  int initDate;
+  late String id;
+  late String name;
+  late String image;
+  late String ssid;
+  late String bssid;
+  late String street;
+  late int initDate;
   double latitude = double.infinity; // as initial value
   double longitude = double.infinity; // as initial value
 

@@ -12,22 +12,19 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   static final int TOTAL_MINUTE_A_DAY = 60 * 60 * 24;
 
   UserActionManager userActionManager;
-  Timer timer;
-  DateTime tickDateTime;
+  Timer? timer;
+  DateTime? tickDateTime;
 
   int atHomeTime = 0;
   int outHomeTime = 0;
 
-  CounterCubit(UserActionManager userActionManager)
-      : super(CounterPageLoading()) {
-    this.userActionManager = userActionManager;
-  }
+  CounterCubit(this.userActionManager) : super(CounterPageLoading());
 
   @override
   void loadPage() {
     log.info("loadPage");
     tickDateTime = DateTime.now();
-    updateTimes(tickDateTime);
+    updateTimes(tickDateTime!);
     startCounter();
   }
 
@@ -39,8 +36,9 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
 
   void startCounter() {
     log.info("starTimer");
-    if (timer != null) timer.cancel();
-    timer = Timer.periodic(Duration(seconds: period), (timer) {
+    if (timer != null) timer!.cancel();
+    log.info("starTimer222");
+    timer = Timer.periodic(Duration(seconds: 5), (timer) {
       DateTime now = DateTime.now();
       updateTimesIfdayChanged(now);
       updateUiIfMinuteChanged(now);
@@ -49,8 +47,8 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   }
 
   void stopCounter() {
-    log.info("stopTimer ${timer.isActive}");
-    if (timer != null && timer.isActive) timer.cancel();
+    log.info("stopTimer ${timer?.isActive}");
+    if (timer != null && timer!.isActive) timer?.cancel();
   }
 
   void updateUI() {
@@ -70,7 +68,7 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   }
 
   void updateTimesIfdayChanged(DateTime now) {
-    if (now.day != tickDateTime.day) {
+    if (now.day != tickDateTime?.day) {
       log.info(
           "updateTimesIfdayChanged - atHomeTime: ${atHomeTime}, outHomeTime: ${outHomeTime}");
       userActionManager.changeDay();
@@ -79,7 +77,7 @@ class CounterCubit extends Cubit<CouterPageState> with AbstractPageCubit {
   }
 
   void updateUiIfMinuteChanged(DateTime now) {
-    if (now.second != tickDateTime.second) {
+    if (now.second != tickDateTime?.second) {
       //log.info("updateUiIfMinuteChanged - ${userActionManager.isUserAtHome()}");
       if (userActionManager.isUserAtHome()) {
         atHomeTime++;

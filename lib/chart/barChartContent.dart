@@ -9,14 +9,13 @@ class BarChartContent extends StatelessWidget {
   final log = Logger("BarChartContent");
   ChartInfo chartInfo;
 
-  BarChartContent({Key key, this.chartInfo});
+  BarChartContent({Key? key, required this.chartInfo});
   @override
   Widget build(BuildContext context) {
     log.info("min Y: ${chartInfo.minY}, max Y: ${chartInfo.maxY}");
     return BarChart(BarChartData(
       minY: chartInfo.minY,
       maxY: chartInfo.maxY,
-      barTouchData: getBarTouchData(),
       // bottom data titles
       titlesData: getTitlesData(),
       barGroups: chartInfo.chartGroupData,
@@ -35,10 +34,6 @@ class BarChartContent extends StatelessWidget {
           ? BarChartAlignment.end
           : BarChartAlignment.spaceEvenly,
     ));
-  }
-
-  BarTouchData getBarTouchData() {
-    return null;
   }
 
   SideTitles getBottomTitles() {

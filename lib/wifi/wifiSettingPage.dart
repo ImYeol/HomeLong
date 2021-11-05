@@ -49,7 +49,8 @@ class MessageTextView extends StatelessWidget {
   final double fontSize;
   final Color fontColor;
 
-  MessageTextView({this.message, this.fontSize, this.fontColor});
+  MessageTextView(
+      {required this.message, required this.fontSize, required this.fontColor});
 
   @override
   Widget build(BuildContext context) {

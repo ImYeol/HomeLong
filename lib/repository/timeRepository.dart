@@ -9,8 +9,8 @@ abstract class TimeAPI {
 }
 
 class TimeRepository extends TimeAPI {
-  TimeDB _db;
-  TimeProxy _proxy;
+  late TimeDB _db;
+  late TimeProxy _proxy;
 
   static final TimeRepository _instance = TimeRepository._internal();
 

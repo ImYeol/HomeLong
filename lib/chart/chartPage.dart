@@ -14,7 +14,7 @@ import 'package:logging/logging.dart';
 
 class ChartPage extends StatefulWidget {
   ChartPageCubit cubit;
-  ChartPage({Key key, this.cubit}) : super(key: key);
+  ChartPage({Key? key, required this.cubit}) : super(key: key);
 
   @override
   _ChartPageState createState() => _ChartPageState();
@@ -24,13 +24,13 @@ class _ChartPageState extends State<ChartPage> with WidgetsBindingObserver {
   final log = Logger("ChartPage");
   static const double contentPadding = 20.0;
 
-  Color backgroundColor = Colors.grey[150];
-  Color subTitleColor = Colors.brown[300];
+  Color backgroundColor = Colors.grey.shade200;
+  Color subTitleColor = Colors.brown.shade300;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     //widget.cubit.loadPage();
     log.info('initState');
   }
@@ -38,7 +38,7 @@ class _ChartPageState extends State<ChartPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     log.info('dispose');
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     widget.cubit.unloadPage();
     super.dispose();
   }

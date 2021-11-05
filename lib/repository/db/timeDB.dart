@@ -18,10 +18,10 @@ class TimeDB implements TimeAPI {
     final db = await DBHelper().getDatabase;
 
     var res = await db
-        .query(DBHelper.timeInfoTable, where: 'date = ?', whereArgs: [date]);
-    if (res.isEmpty) {
+        ?.query(DBHelper.timeInfoTable, where: 'date = ?', whereArgs: [date]);
+    if (res == null || res.isEmpty) {
       log.info("getTimeData fail(date:$date):has no timeData");
-      return null;
+      return TimeData();
     }
 
     log.info("res.first=${res.first}");
@@ -33,7 +33,7 @@ class TimeDB implements TimeAPI {
         "jsonDecode(res.first['timeList'])=${jsonDecode(res.first['timeList'])}");
 
     List<Map<String, dynamic>> tags =
-        tagsJson != null ? List.from(tagsJson) : null;
+        tagsJson != null ? List.from(tagsJson) : [];
     log.info("getTimeData success(date:$date)");
 
     TimeData _timeData = TimeData.fromJson(tags);
@@ -51,7 +51,7 @@ class TimeDB implements TimeAPI {
     log.info("timeData.toJson()=${timeData.toJson()}");
     log.info("jsonEncode(timeData)=${jsonEncode(timeData)}");
 
-    var res = await db.rawInsert(
+    var res = await db?.rawInsert(
         "INSERT OR REPLACE INTO ${DBHelper.timeInfoTable}(date, timeList, totalMinute) VALUES(?,?,?)",
         [
           getDay(DateTime.now()).toString(),
@@ -59,7 +59,7 @@ class TimeDB implements TimeAPI {
           getTotalMinute(timeData)
         ]);
 
-    if (res > 0) {
+    if (res != null && res > 0) {
       log.info("setTimeInfo success + $res");
       return true;
     }

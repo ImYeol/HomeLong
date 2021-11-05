@@ -12,7 +12,7 @@ import 'package:homg_long/setting/setting.dart';
 import 'package:logging/logging.dart';
 
 class AppScreen extends StatefulWidget {
-  AppScreen({Key key}) : super(key: key);
+  AppScreen({Key? key}) : super(key: key);
 
   @override
   _AppScreenState createState() => _AppScreenState();
@@ -98,7 +98,7 @@ class _AppScreenState extends State<AppScreen>
   }
 
   Widget _buildTabController(BuildContext context) {
-    double appBarheight = MediaQuery.of(context).size.height / 4;
+    double appBarheight = MediaQuery.of(context).size.height / 5;
     return DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -117,8 +117,8 @@ class _AppScreenState extends State<AppScreen>
                           begin: Alignment.bottomLeft,
                           end: Alignment.topRight,
                           colors: <Color>[
-                            Colors.brown[900],
-                            Colors.brown[200]
+                            Colors.brown.shade900,
+                            Colors.brown.shade200
                           ])),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 50),

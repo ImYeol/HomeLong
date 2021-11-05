@@ -21,7 +21,7 @@ class UserProxy implements UserAPI {
 
     var response = await http.get(
       URL.getUserInfoURL,
-      headers: {'id': prefs.getString('id')},
+      headers: {'id': prefs.getString('id') ?? 'invalid'},
     );
 
     if (response.statusCode == StatusCode.statusOK) {
@@ -29,7 +29,7 @@ class UserProxy implements UserAPI {
       return UserInfo.fromJson(json.decode(response.body));
     } else {
       log.info("get user info fail(${response.statusCode}, ${response.body})");
-      return null;
+      return UserInfo();
     }
   }
 

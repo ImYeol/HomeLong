@@ -11,8 +11,8 @@ abstract class Authentication {
 }
 
 class AuthenticationRepository implements Authentication {
-  AuthenticationProxy _proxy;
-  AuthenticationDB _db;
+  late AuthenticationProxy _proxy;
+  late AuthenticationDB _db;
 
   static final AuthenticationRepository _instance =
       AuthenticationRepository._internal();

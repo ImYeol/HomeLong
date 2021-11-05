@@ -1,5 +1,5 @@
 class Setting {
   String setting = "Setting";
 
-  Setting({this.setting});
+  Setting({required this.setting});
 }

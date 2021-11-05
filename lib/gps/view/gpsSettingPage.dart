@@ -40,14 +40,14 @@ class GPSSettingPage extends StatelessWidget {
 
 class GPSSettingForm extends StatelessWidget {
   // permission
-  bool _serviceEnabled;
-  LocationPermission _permission;
+  bool _serviceEnabled = false;
+  LocationPermission? _permission;
   bool _permitted = false;
 
   // location
   LatLng _currentLocation = new LatLng(0.0, 0.0);
-  Position _currentPosition;
-  Placemark _currentPlaceMark;
+  Position? _currentPosition;
+  Placemark? _currentPlaceMark;
 
   // log
   LogUtil logUtil = LogUtil();
@@ -55,7 +55,7 @@ class GPSSettingForm extends StatelessWidget {
 
   // google map
   CameraPosition _initialLocation = CameraPosition(target: LatLng(0.0, 0.0));
-  GoogleMapController _mapController;
+  GoogleMapController? _mapController;
 
   // ui
   final _addressController = TextEditingController();
@@ -114,7 +114,7 @@ class GPSSettingForm extends StatelessWidget {
       onTap: (LatLng latLng) async {
         _updateCurrentLocation(latLng.latitude, latLng.longitude);
 
-        _mapController.animateCamera(CameraUpdate.newCameraPosition(
+        _mapController!.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(
               _currentLocation.latitude,
@@ -124,12 +124,12 @@ class GPSSettingForm extends StatelessWidget {
           ),
         ));
 
-        Placemark placeMark = await _getPlaceMark(latLng);
+        Placemark? placeMark = await _getPlaceMark(latLng);
 
         _updateCurrentPlaceMark(placeMark);
-        await _updateAddressController(placeMark.street);
+        await _updateAddressController(placeMark?.street);
 
-        showToast("${placeMark.street}");
+        showToast("${placeMark?.street}");
       },
     );
   }
@@ -152,7 +152,7 @@ class GPSSettingForm extends StatelessWidget {
                     child: Icon(Icons.add),
                   ),
                   onTap: () {
-                    _mapController.animateCamera(
+                    _mapController?.animateCamera(
                       CameraUpdate.zoomIn(),
                     );
                   },
@@ -171,7 +171,7 @@ class GPSSettingForm extends StatelessWidget {
                     child: Icon(Icons.remove),
                   ),
                   onTap: () {
-                    _mapController.animateCamera(
+                    _mapController?.animateCamera(
                       CameraUpdate.zoomOut(),
                     );
                   },
@@ -254,18 +254,18 @@ class GPSSettingForm extends StatelessWidget {
       }
 
       log.info('_currentPosition:$_currentPosition');
-      Placemark placeMark = await _getPlaceMark(
+      Placemark? placeMark = await _getPlaceMark(
           new LatLng(position.latitude, position.longitude));
 
       if (placeMark != null) {
         _updateCurrentPlaceMark(placeMark);
       }
 
-      if (placeMark.name != null) {
-        await _updateAddressController(placeMark.street);
+      if (placeMark?.name != null) {
+        await _updateAddressController(placeMark?.street);
       }
 
-      _mapController.animateCamera(CameraUpdate.newCameraPosition(
+      _mapController?.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
           target: LatLng(
             _currentLocation.latitude,
@@ -303,7 +303,7 @@ class GPSSettingForm extends StatelessWidget {
   }
 
   // Method for retrieving the address
-  Future<Placemark> _getPlaceMark(LatLng latLng) async {
+  Future<Placemark?> _getPlaceMark(LatLng latLng) async {
     try {
       // get PlaceMark from latitude, longitude.
       List<Placemark> p =
@@ -315,7 +315,7 @@ class GPSSettingForm extends StatelessWidget {
     }
   }
 
-  _updateCurrentPlaceMark(Placemark placeMark) {
+  _updateCurrentPlaceMark(Placemark? placeMark) {
     _currentPlaceMark = placeMark;
   }
 
@@ -323,8 +323,10 @@ class GPSSettingForm extends StatelessWidget {
     _currentLocation = new LatLng(latitude, longitude);
   }
 
-  _updateAddressController(String address) async {
-    _addressController.text = address;
+  _updateAddressController(String? address) async {
+    if (address != null) {
+      _addressController.text = address;
+    }
   }
 }
 
@@ -334,13 +336,9 @@ class AddressInput extends StatefulWidget {
   LatLng currentLocation;
 
   AddressInput(
-      {double width,
-      TextEditingController addressController,
-      LatLng currentLocation}) {
-    this.width = width;
-    this.addressController = addressController;
-    this.currentLocation = currentLocation;
-  }
+      {required this.width,
+      required this.addressController,
+      required this.currentLocation});
 
   @override
   _AddressInputState createState() => _AddressInputState(
@@ -354,16 +352,12 @@ class _AddressInputState extends State<AddressInput> {
   double width;
   TextEditingController addressController;
   LatLng currentLocation;
-  bool permitted;
+  bool permitted = false;
 
   _AddressInputState(
-      {double width,
-      TextEditingController addressController,
-      LatLng currentLocation}) {
-    this.width = width;
-    this.addressController = addressController;
-    this.currentLocation = currentLocation;
-  }
+      {required this.width,
+      required this.addressController,
+      required this.currentLocation});
 
   @override
   Widget build(BuildContext context) {
@@ -400,7 +394,7 @@ class _AddressInputState extends State<AddressInput> {
                             Radius.circular(10.0),
                           ),
                           borderSide: BorderSide(
-                            color: Colors.grey[400],
+                            color: Colors.grey.shade400,
                             width: 2,
                           ),
                         ),
@@ -409,7 +403,7 @@ class _AddressInputState extends State<AddressInput> {
                             Radius.circular(10.0),
                           ),
                           borderSide: BorderSide(
-                            color: Colors.blue[300],
+                            color: Colors.blue.shade300,
                             width: 2,
                           ),
                         ),
@@ -434,7 +428,7 @@ class _AddressInputState extends State<AddressInput> {
                       child: ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.yellow[100]),
+                              Colors.yellow.shade100),
                         ),
                         onPressed: () async {
                           this.permitted = await _permissionCheck();
@@ -522,9 +516,7 @@ class AddressSearch extends SearchDelegate<String> {
 
   TextEditingController addressController;
 
-  AddressSearch(TextEditingController addressController) {
-    this.addressController = addressController;
-  }
+  AddressSearch(this.addressController);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -545,7 +537,7 @@ class AddressSearch extends SearchDelegate<String> {
       tooltip: 'Back',
       icon: Icon(Icons.arrow_back),
       onPressed: () {
-        close(context, null);
+        close(context, '');
       },
     );
   }
@@ -563,7 +555,7 @@ class AddressSearch extends SearchDelegate<String> {
             )
           ]);
     }
-    return null;
+    return Container();
   }
 
   @override
@@ -580,13 +572,14 @@ class AddressSearch extends SearchDelegate<String> {
               ? ListView.builder(
                   itemBuilder: (context, index) => ListTile(
                     // we will display the data returned from our future here
-                    title: Text(snapshot.data[index]),
+                    title: Text((snapshot.data as List<String>)[index]),
                     onTap: () {
-                      close(context, snapshot.data[index]);
-                      addressController.text = snapshot.data[index];
+                      close(context, (snapshot.data as List<String>)[index]);
+                      addressController.text =
+                          (snapshot.data as List<String>)[index];
                     },
                   ),
-                  itemCount: snapshot.data.length,
+                  itemCount: (snapshot.data as List<String>).length,
                 )
               : Container(child: Text('Loading...')),
     );
@@ -597,7 +590,7 @@ class AddressSearch extends SearchDelegate<String> {
     List<Suggestion> suggestions =
         await PlaceApiProvider(sessionToken: _sessionString)
             .fetchSuggestions(query, "ko");
-    List<String> addressList = new List<String>();
+    List<String> addressList = <String>[];
 
     // places.PlacesSearchResponse response = await googlePlace.searchByText(query);
     for (int i = 0; i < suggestions.length; i++) {

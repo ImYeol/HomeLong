@@ -8,12 +8,12 @@ class AuthenticationDB implements Authentication {
   final log = Logger("DBHelper");
 
   @override
-  Future<UserInfo> facebookLogin() {
-    return null;
+  Future<UserInfo> facebookLogin() async {
+    return UserInfo();
   }
 
   @override
-  Future<UserInfo> kakaoLogin() {
-    return null;
+  Future<UserInfo> kakaoLogin() async {
+    return UserInfo();
   }
 }

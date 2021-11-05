@@ -13,8 +13,8 @@ abstract class UserAPI {
 }
 
 class UserRepository implements UserAPI {
-  UserDB _db;
-  UserProxy _proxy;
+  late UserDB _db;
+  late UserProxy _proxy;
 
   static final UserRepository _instance = UserRepository._internal();
 
