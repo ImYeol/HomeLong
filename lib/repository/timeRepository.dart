@@ -4,7 +4,7 @@ import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
 class TimeRepository {
-  static const String INVALID_DATE_TIME = "9999-12-31 24:00:00.000";
+  static const String INVALID_DATE_TIME = "9999-12-31 00:00:00.000";
 
   late TimeDB _db;
   late TimeProxy _proxy;
@@ -67,11 +67,12 @@ class TimeRepository {
     if (enterTime.day == exitTime.day) {
       _db.updateHomeTime(enterTime, exitTime, getDateTimeAsSameDay(exitTime));
     } else {
-      _db.updateHomeTime(enterTime, getDateTimeAsSameDay(exitTime),
-          getDateTimeAsSameDay(enterTime));
+      DateTime midNightOfEnterTime =
+          getDateTimeAsSameDay(enterTime.add(Duration(days: 1)));
+      _db.updateHomeTime(
+          enterTime, midNightOfEnterTime, getDateTimeAsSameDay(enterTime));
       // start at 00:00 a day after enterTime
-      for (DateTime date =
-              getDateTimeAsSameDay(enterTime.add(Duration(days: 1)));
+      for (DateTime date = midNightOfEnterTime;
           date.isBefore(exitTime);
           date = date.add(Duration(days: 1))) {
         if (date.day == exitTime.day) {
