@@ -27,9 +27,22 @@ class UserRepository implements UserAPI {
     this._proxy = UserProxy();
   }
 
+  void init() {
+    _db.init();
+  }
+
+  Future<bool> openDatabase() async {
+    return _db.openDatabase();
+  }
+
+  bool isLoginSessionValid() {
+    return _db.isLoginSessionValid();
+  }
+
   @override
   Future<UserInfo> getUserInfo() async {
     UserInfo userInfo = await _db.getUserInfo();
+    // userInfo is always true
     if (userInfo != null) {
       return userInfo;
     }

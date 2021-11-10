@@ -1,12 +1,26 @@
+import 'package:hive/hive.dart';
+
+part 'userInfo.g.dart';
+
+@HiveType(typeId: 1)
 class UserInfo {
+  @HiveField(0)
   late String id;
+  @HiveField(1)
   late String name;
+  @HiveField(2)
   late String image;
+  @HiveField(3)
   late String ssid;
+  @HiveField(4)
   late String bssid;
+  @HiveField(5)
   late String street;
-  late int initDate;
+  @HiveField(6)
+  late String initDate;
+  @HiveField(7)
   double latitude = double.infinity; // as initial value
+  @HiveField(8)
   double longitude = double.infinity; // as initial value
 
   UserInfo(
@@ -16,7 +30,7 @@ class UserInfo {
       String ssid = "",
       String bssid = "",
       String street = "",
-      int initDate = 0,
+      String initDate = "9999-99-99 99:99:99.999",
       double latitude = 0.0,
       double longitude = 0.0}) {
     this.id = id;
@@ -37,7 +51,7 @@ class UserInfo {
     ssid = json['ssid'];
     bssid = json['bssid'];
     street = json['street'];
-    initDate = int.parse(json['initDate']);
+    initDate = json['initDate'];
     latitude = json['latitude'];
     longitude = json['longitude'];
   }
@@ -55,4 +69,9 @@ class UserInfo {
       "longitude": this.longitude,
     };
   }
+}
+
+class InvalidUserInfo extends UserInfo {
+  static final String INVALID_ID = "0";
+  InvalidUserInfo() : super(id: INVALID_ID);
 }

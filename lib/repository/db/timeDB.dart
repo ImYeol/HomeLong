@@ -1,78 +1,111 @@
-import 'dart:convert';
-
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/repository/db/DBHelper.dart';
-import 'package:homg_long/repository/model/timeData.dart';
+import 'package:homg_long/repository/model/homeTime.dart';
 import 'package:homg_long/repository/timeRepository.dart';
-import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
-class TimeDB implements TimeAPI {
+class TimeDB {
+  static final String TIME_DB_NAME = "TimeDB";
+  static final String IN_OUT_DB_NAME = "InOutDB";
+  static final String ENTER_TIME = "enterTime";
+  static final String EXIT_TIME = "exitTime";
+
   final logUtil = LogUtil();
   final log = Logger("TimeDB");
 
-  @override
-  Future<TimeData> getTimeData(int date) async {
-    log.info("getTimeData");
+  void init() {
+    Hive.registerAdapter(HomeTimeAdapter());
+  }
 
-    final db = await DBHelper().getDatabase;
+  Future<bool> openDatabase() async {
+    final timeDbBox = Hive.isBoxOpen(TIME_DB_NAME)
+        ? Hive.box(TIME_DB_NAME)
+        : await Hive.openBox(TIME_DB_NAME);
+    final inOutDbBox = Hive.isBoxOpen(IN_OUT_DB_NAME)
+        ? Hive.box(IN_OUT_DB_NAME)
+        : await Hive.openBox(IN_OUT_DB_NAME);
+    return timeDbBox.isOpen && inOutDbBox.isOpen;
+  }
 
-    var res = await db
-        ?.query(DBHelper.timeInfoTable, where: 'date = ?', whereArgs: [date]);
-    if (res == null || res.isEmpty) {
-      log.info("getTimeData fail(date:$date):has no timeData");
-      return TimeData();
+  bool registerEnterExitStateChangedListener(void Function() onStateChanged) {
+    if (Hive.box(IN_OUT_DB_NAME).isOpen == false) {
+      log.info("registerEnterExitStateChangedListener - DB is not opened");
+      return false;
     }
+    Hive.box(IN_OUT_DB_NAME)
+        .listenable(keys: [ENTER_TIME, EXIT_TIME]).addListener(onStateChanged);
+    return true;
+  }
 
-    log.info("res.first=${res.first}");
-    log.info("res.first['date']=${res.first['date']}");
-    log.info("res.first['timeList']=${res.first['timeList']}");
+  void _checkIfDBOpenedOrOpenDB(String db) async {
+    if (Hive.box(db).isOpen == false) {
+      log.warning("saveEnterTime - box is not opened");
+      await Hive.openBox(db);
+    }
+  }
 
-    var tagsJson = jsonDecode(res.first['timeList']);
+  void saveEnterTime(DateTime enterTime) async {
+    _checkIfDBOpenedOrOpenDB(IN_OUT_DB_NAME);
+    await Hive.box(IN_OUT_DB_NAME).put(ENTER_TIME, enterTime.toString());
+  }
+
+  void saveExitTime(DateTime exitTime) async {
+    _checkIfDBOpenedOrOpenDB(IN_OUT_DB_NAME);
+    log.info("saveExitTime - ${exitTime}");
+    await Hive.box(IN_OUT_DB_NAME).put(EXIT_TIME, exitTime.toString());
+  }
+
+  DateTime getEnterTime() {
+    _checkIfDBOpenedOrOpenDB(IN_OUT_DB_NAME);
+    final enterTimeString = Hive.box(IN_OUT_DB_NAME).get(ENTER_TIME,
+        defaultValue: TimeRepository.INVALID_DATE_TIME) as String;
+    return DateTime.parse(enterTimeString);
+  }
+
+  DateTime getExitTime() {
+    _checkIfDBOpenedOrOpenDB(IN_OUT_DB_NAME);
+    final exitTimeString = Hive.box(IN_OUT_DB_NAME).get(EXIT_TIME,
+        defaultValue: TimeRepository.INVALID_DATE_TIME) as String;
+    return DateTime.parse(exitTimeString);
+  }
+
+  void clearEnterAndExitTime() {
+    _checkIfDBOpenedOrOpenDB(IN_OUT_DB_NAME);
+    Hive.box(IN_OUT_DB_NAME).deleteAll([ENTER_TIME, EXIT_TIME]);
     log.info(
-        "jsonDecode(res.first['timeList'])=${jsonDecode(res.first['timeList'])}");
-
-    List<Map<String, dynamic>> tags =
-        tagsJson != null ? List.from(tagsJson) : [];
-    log.info("getTimeData success(date:$date)");
-
-    TimeData _timeData = TimeData.fromJson(tags);
-    log.info("timeData.toJson()=${_timeData.toJson()}");
-
-    return _timeData;
+        "clearEnterAndExitTime - enterTime: ${Hive.box(IN_OUT_DB_NAME).get(ENTER_TIME)}");
   }
 
-  @override
-  Future<bool> setTimeData(TimeData timeData) async {
-    log.info("setTimeData");
+  void updateHomeTime(
+      DateTime enterTime, DateTime exitTime, DateTime targetDay) {
+    final homeTime = HomeTime(
+        enterTime: enterTime.toString(),
+        exitTime: exitTime.toString(),
+        description: "home");
 
-    final db = await DBHelper().getDatabase;
-
-    log.info("timeData.toJson()=${timeData.toJson()}");
-    log.info("jsonEncode(timeData)=${jsonEncode(timeData)}");
-
-    var res = await db?.rawInsert(
-        "INSERT OR REPLACE INTO ${DBHelper.timeInfoTable}(date, timeList, totalMinute) VALUES(?,?,?)",
-        [
-          getDay(DateTime.now()).toString(),
-          jsonEncode(timeData),
-          getTotalMinute(timeData)
-        ]);
-
-    if (res != null && res > 0) {
-      log.info("setTimeInfo success + $res");
-      return true;
-    }
-
-    log.info("setTimeInfo failed + $res");
-    return false;
+    _checkIfDBOpenedOrOpenDB(TIME_DB_NAME);
+    log.info("updateHomeTime - targetDay : ${targetDay}");
+    List<dynamic> homeTimeList = Hive.box(TIME_DB_NAME)
+        .get(targetDay.toString(), defaultValue: <HomeTime>[]);
+    log.info("updateHomeTime - list : ${homeTimeList}");
+    homeTimeList.add(homeTime);
+    Hive.box(TIME_DB_NAME).put(targetDay.toString(), homeTimeList);
   }
 
-  int getTotalMinute(TimeData timeData) {
-    int totalMinuter = 0;
-    for (var time in timeData.timeList) {
-      totalMinuter += getMinuteBetweenTimes(time.enterTime, time.exitTime);
-    }
-    return totalMinuter;
+  int getTotalMinuteADay(DateTime targetDay) {
+    _checkIfDBOpenedOrOpenDB(TIME_DB_NAME);
+    int totalMinute = 0;
+    final homeTimeList = Hive.box(TIME_DB_NAME)
+        .get(targetDay.toString(), defaultValue: <HomeTime>[]);
+    homeTimeList.forEach((element) {
+      DateTime enterTime = DateTime.parse(element.enterTime);
+      DateTime exitTime = DateTime.parse(element.exitTime);
+      // inSeconds for debug
+      totalMinute += exitTime.difference(enterTime).inSeconds;
+    });
+    log.info(
+        "getTotalMinuteADay - total= ${totalMinute} key = ${targetDay}, list : ${homeTimeList}");
+    return totalMinute;
   }
 }

@@ -5,7 +5,6 @@ import 'package:homg_long/chart/chart.dart';
 import 'package:homg_long/chart/chartContainer.dart';
 import 'package:homg_long/chart/models/chartInfo.dart';
 import 'package:homg_long/chart/models/chartPageState.dart';
-import 'package:homg_long/repository/model/timeData.dart';
 import 'package:homg_long/repository/timeRepository.dart';
 import 'package:homg_long/screen/bloc/abstractPageCubit.dart';
 import 'package:homg_long/screen/bloc/userActionManager.dart';
@@ -54,7 +53,7 @@ class ChartPageCubit extends Cubit<ChartPageState> with AbstractPageCubit {
     List<BarChartGroupData> weekTimeDataGroup = <BarChartGroupData>[];
     for (int offset = DateTime.daysPerWeek - 1; offset >= 0; offset--) {
       DateTime date = today.subtract(Duration(days: offset));
-      int totalTime = await userActionManager.getTotalTime(date);
+      int totalTime = TimeRepository().getTotalMinuteADay(date);
       log.info("loadWeekTimeData : " +
           "date=" +
           (date.month * 100 + date.day).toString() +
@@ -71,7 +70,7 @@ class ChartPageCubit extends Cubit<ChartPageState> with AbstractPageCubit {
     List<BarChartGroupData> monthTimeDataGroup = <BarChartGroupData>[];
     for (int offset = daysPerMonth - 1; offset >= 0; offset--) {
       DateTime date = today.subtract(Duration(days: offset));
-      int totalTime = await userActionManager.getTotalTime(date);
+      int totalTime = TimeRepository().getTotalMinuteADay(date);
       log.info("loadWeekTimeData : " +
           "date=" +
           (date.month * 100 + date.day).toString() +

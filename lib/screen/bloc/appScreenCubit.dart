@@ -1,38 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geofence_service/geofence_service.dart';
 import 'package:geofence_service/models/geofence.dart';
 import 'package:geofence_service/models/geofence_radius.dart';
 import 'package:geofence_service/models/geofence_status.dart';
-import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/chart/bloc/chartPageCubit.dart';
-import 'package:homg_long/chart/chartPage.dart';
 import 'package:homg_long/repository/connectivityServiceWrapper.dart';
-import 'package:homg_long/repository/model/timeData.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/timeRepository.dart';
-import 'package:homg_long/repository/model/time.dart';
 import 'package:homg_long/repository/userRepository.dart';
+import 'package:homg_long/screen/bloc/userActionEventObserver.dart';
 import 'package:homg_long/screen/bloc/userActionManager.dart';
-import 'package:homg_long/screen/model/appScreenState.dart';
-import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
-class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
+class AppScreenCubit with UserActionManager {
   static const int HOME_PAGE = 0;
   static const int RANK_PAGE = 1;
   static const int SETTING_PAGE = 2;
 
   final LogUtil logUtil = LogUtil();
   final log = Logger("AppScreenCubit");
-
-  int _currentPage = 0;
-  final period = 5; // second
-  late UserInfo _userInfo;
 
   final _geofenceServiceWrapper = GeofenceService.instance.setup(
       interval: 5000,
@@ -59,49 +48,24 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
 
   final _connectivityServiceWrapper = ConnectivityServiceWrapper.instance;
   bool isAtHome = false;
-  late TimeData timeData;
-  late Timer timer;
+  UserActionEventObserver? _actionEventObserver;
 
-  AppScreenCubit() : super(PageLoading(CircularProgressIndicator()));
-
-  int get currentPage => _currentPage;
+  AppScreenCubit();
 
   GeofenceService get geofenceService => _geofenceServiceWrapper;
 
   void init() {
-    loadUserInfo();
-    loadTimeData();
-  }
-
-  void loadUserInfo() async {
-    _userInfo = await UserRepository().getUserInfo();
-    if (_userInfo != null) {
-      startGeofenceServiceWrapper();
-      startConnectivityServiceWrapper();
-    }
-  }
-
-  void loadTimeData() async {
-    int today = getDay(DateTime.now());
-    timeData = await TimeRepository().getTimeData(today);
-    if (timeData == null) {
-      timeData = TimeData();
-    }
+    startGeofenceServiceWrapper();
+    startConnectivityServiceWrapper();
   }
 
   void startConnectivityServiceWrapper() {
-    if (_userInfo.ssid == null || _userInfo.ssid.isEmpty) return;
-
     log.info("init Wifi service");
     _connectivityServiceWrapper.listenWifiStateChanged(_onWifiStateChanged);
     _connectivityServiceWrapper.checkNowConnectionState();
   }
 
   void startGeofenceServiceWrapper() {
-    if (_userInfo.latitude == null || _userInfo.longitude == null) {
-      return;
-    }
-
     log.info("init geofence service");
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _geofenceServiceWrapper
@@ -194,7 +158,7 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
   @override
   void onUserLocationChanged(bool atHome) {
     // check if Already enabled
-    log.info("onUserLocationChanged - ${atHome} + tihs.isAtHome: ${isAtHome}");
+    log.info("onUserLocationChanged - ${atHome} + this.isAtHome: ${isAtHome}");
     if (this.isAtHome == atHome) return;
     isAtHome = atHome;
     if (isAtHome) {
@@ -206,64 +170,20 @@ class AppScreenCubit extends Cubit<AppScreenState> with UserActionManager {
 
   @override
   void enterHome() {
-    if (timeData == null) {
-      loadTimeData();
-    }
     DateTime now = DateTime.now();
-    log.info("enterTime: ${getTime(now)}");
-
-    if (timeData.updateEnterTime(getTime(now))) {
-      TimeRepository().setTimeData(timeData);
-    }
+    TimeRepository().saveEnterTime(now);
+    _actionEventObserver?.onUserActionChanged(UserActionType.ENTER_HOME, now);
   }
 
   @override
   void exitHome() {
-    if (timeData == null) {
-      loadTimeData();
-    }
     DateTime now = DateTime.now();
-    log.info("exitHome: ${getDay(now)} - ${getTime(now)}");
-    if (timeData.updateExitTime(getTime(now))) {
-      TimeRepository().setTimeData(timeData);
-    }
-    updatePastTimeData(30, now);
-  }
-
-  void updatePastTimeData(int maxNumberOfUpdateDay, DateTime targetDate) async {
-    for (int i = 0; i < maxNumberOfUpdateDay; i++) {
-      DateTime aDayAgo = targetDate.subtract(const Duration(days: 1));
-      TimeData pastTimeData =
-          await TimeRepository().getTimeData(getDay(aDayAgo));
-
-      if (pastTimeData == null || pastTimeData.timeList.length == 0) {
-        pastTimeData.updateEnterTime(Time.INIT_TIME_OF_A_DAY);
-        pastTimeData.updateExitTime(Time.LAST_TIME_OF_A_DAY);
-        TimeRepository().setTimeData(pastTimeData);
-      } else {
-        pastTimeData.updateExitTime(Time.LAST_TIME_OF_A_DAY);
-        TimeRepository().setTimeData(pastTimeData);
-        break;
-      }
-    }
+    TimeRepository().saveExitTime(DateTime.now());
+    _actionEventObserver?.onUserActionChanged(UserActionType.EXIT_HOME, now);
   }
 
   @override
-  void changeDay() async {
-    DateTime now = DateTime.now();
-    DateTime onTimeToday = getOnTime(now);
-    DateTime aDayAgo = now.subtract(const Duration(days: 1));
-
-    TimeData timeData = await TimeRepository().getTimeData(getTime(aDayAgo));
-
-    timeData.updateExitTime(getTime(onTimeToday));
-  }
-
-  @override
-  Future<int> getTotalTime(DateTime date) async {
-    final localTimeData = await TimeRepository().getTimeData(getDay(date));
-    return localTimeData == null
-        ? 0
-        : localTimeData.getTotalTime(date, isAtHome);
+  void registerUserActionEventObserver(UserActionEventObserver observer) {
+    _actionEventObserver = observer;
   }
 }

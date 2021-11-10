@@ -29,7 +29,7 @@ class AuthenticationProxy implements Authentication {
 
         return UserInfo(
           id: accessToken.userId,
-          initDate: getDay(DateTime.now()),
+          initDate: DateTime.now().toString(),
         );
       case FacebookLoginStatus.cancelledByUser:
         log.warning('Login cancelled by the user.');
@@ -116,7 +116,7 @@ class AuthenticationProxy implements Authentication {
         id: user.id.toString(),
         name: user.properties?["nickname"] ?? '',
         image: user.properties?["profile_image"] ?? '',
-        initDate: getDay(DateTime.now()),
+        initDate: DateTime.now().toString(),
       );
     } catch (e) {
       logUtil.logger.e(e);

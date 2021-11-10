@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/model/counterPageState.dart';
-import 'package:homg_long/screen/model/appScreenState.dart';
 import 'package:logging/logging.dart';
 
 class CounterPage extends StatefulWidget {

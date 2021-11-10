@@ -10,9 +10,7 @@ class LoginCubit extends Cubit<LoginState> {
   LogUtil logUtil = LogUtil();
   final log = Logger('LoginCubit');
 
-  LoginCubit() : super(null) {
-    this.autoLogin();
-  }
+  LoginCubit() : super(null);
 
   void kakaoLogin() async {
     log.info("kakaoLogin");
@@ -45,23 +43,6 @@ class LoginCubit extends Cubit<LoginState> {
     }).catchError((onError) {
       log.info(
           "authentication repository facebook login return error:$onError");
-      emit(LoginState.UNLOGIN);
-    });
-  }
-
-  autoLogin() async {
-    log.info("autoLogin");
-    Future<UserInfo> _userInfo = UserRepository().getUserInfo();
-    _userInfo.then((value) {
-      if (value != null) {
-        log.info("auto login success(${value.toJson()}");
-        emit(LoginState.LOGIN);
-      } else {
-        log.info("auto login fail");
-        emit(LoginState.UNLOGIN);
-      }
-    }).catchError((onError) {
-      log.info("auto login return error:$onError");
       emit(LoginState.UNLOGIN);
     });
   }
