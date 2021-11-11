@@ -78,12 +78,15 @@ dependencies:
   background_fetch: ^0.7.2
   geofence_service: ^3.0.3
 
+  # unit test
+  mockito: ^5.0.16
+
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   # hive
   hive_generator: ^1.1.1
   build_runner: ^2.1.4
+  # unit test
+  test: ^1.19.3
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
