@@ -1,8 +1,9 @@
 import 'package:hive/hive.dart';
+import 'package:homg_long/const/HiveTypeId.dart';
 
 part 'homeTime.g.dart';
 
-@HiveType(typeId: 2)
+@HiveType(typeId: HiveTypeId.HIVE_HOME_TIME_ID)
 class HomeTime {
   static const int INIT_TIME_OF_A_DAY = 0;
   static const int LAST_TIME_OF_A_DAY = 240000;

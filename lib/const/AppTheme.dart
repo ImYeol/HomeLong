@@ -9,6 +9,8 @@ class AppTheme {
 
   static double icon_size = 35.0;
   static Color icon_color = Colors.white;
+  static Color icon_unselected_color = Colors.grey;
+  static Color icon_selected_color = Color(0xff251970);
   static Color bottomAppBarColor = Colors.white;
   static Color bottom_menu_icon_color = Color(0xff2c3e50);
   static Color primaryColor = Colors.white;
@@ -32,7 +34,7 @@ class AppTheme {
   static Color disabledColor = Colors.grey;
 
   // about font
-  static Color font_color = Colors.white;
+  static Color font_color = Color(0xff251970);
   static Color reverse_font_color = Colors.black;
   static double header_font_size = 35.0;
   static double subtitle_font_size_small = 15.0;
@@ -45,4 +47,6 @@ class AppTheme {
 
   //
   static const double cardViewRadius = 30;
+
+  static const String emptyUserImage = "images/lover.png";
 }

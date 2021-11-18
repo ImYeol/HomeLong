@@ -1,8 +1,9 @@
 import 'package:hive/hive.dart';
+import 'package:homg_long/const/HiveTypeId.dart';
 
 part 'userInfo.g.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: HiveTypeId.HIVE_USER_INFO_ID)
 class UserInfo {
   @HiveField(0)
   late String id;
