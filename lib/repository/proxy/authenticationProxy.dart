@@ -1,9 +1,10 @@
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:homg_long/const/AppKey.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/authentication.dart';
-import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/utils/utils.dart';
+import 'package:homg_long/repository/model/userInfo.dart' as model;
 import 'package:kakao_flutter_sdk/all.dart';
 import 'package:logging/logging.dart';
 
@@ -12,40 +13,36 @@ class AuthenticationProxy implements Authentication {
   final log = Logger("AuthenticationProxy");
 
   @override
-  Future<UserInfo> facebookLogin() async {
-    final FacebookLogin facebookSignIn = new FacebookLogin();
-    final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
-    switch (result.status) {
-      case FacebookLoginStatus.loggedIn:
-        final FacebookAccessToken accessToken = result.accessToken;
-        log.info('''
-         Logged in!
-         Token: ${accessToken.token}
-         User id: ${accessToken.userId}
-         Expires: ${accessToken.expires}
-         Permissions: ${accessToken.permissions}
-         Declined permissions: ${accessToken.declinedPermissions}
-         ''');
+  Future<model.UserInfo> facebookLogin() async {
+    try {
+      // Trigger the sign-in flow
+      final LoginResult result = await FacebookAuth.instance.login();
 
-        return UserInfo(
-          id: accessToken.userId,
-          initDate: DateTime.now().toString(),
-        );
-      case FacebookLoginStatus.cancelledByUser:
-        log.warning('Login cancelled by the user.');
-        return UserInfo();
-      case FacebookLoginStatus.error:
-        log.warning('Something went wrong with the login process.\n'
-            'Here\'s the error Facebook gave us: ${result.errorMessage}');
-        return UserInfo();
-      default:
-        log.warning('Login error:${result.errorMessage}');
-        return UserInfo();
+      // Create a credential from the access token
+      final auth.AuthCredential credential =
+          auth.FacebookAuthProvider.credential(result.accessToken!.token);
+
+      // Once signed in, return the UserCredential
+      auth.UserCredential userCredential =
+          await auth.FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (userCredential.user == null) {
+        return model.InvalidUserInfo();
+      }
+
+      return model.UserInfo(
+          id: userCredential.user!.uid,
+          name: userCredential.user!.displayName ?? '',
+          image: userCredential.user!.photoURL ?? '',
+          initDate: DateTime.now().toString());
+    } catch (e) {
+      logUtil.logger.e(e);
+      return model.InvalidUserInfo();
     }
   }
 
   @override
-  Future<UserInfo> kakaoLogin() async {
+  Future<model.UserInfo> kakaoLogin() async {
     _setAppKey();
 
     final kakaoTalkInstalled = await isKakaoTalkInstalled();
@@ -61,7 +58,7 @@ class AuthenticationProxy implements Authentication {
     KakaoContext.javascriptClientId = AppKey.KakaoJavaScriptKey;
   }
 
-  Future<UserInfo> _loginWithKakao() async {
+  Future<model.UserInfo> _loginWithKakao() async {
     try {
       log.info("_loginWithKakao");
 
@@ -71,11 +68,11 @@ class AuthenticationProxy implements Authentication {
       return await _issueAccessToken(authCode);
     } catch (e) {
       logUtil.logger.e(e);
-      return UserInfo();
+      return model.InvalidUserInfo();
     }
   }
 
-  Future<UserInfo> _loginWithKakaoWebview() async {
+  Future<model.UserInfo> _loginWithKakaoWebview() async {
     try {
       log.info("_loginWithKakaoWebview");
 
@@ -85,11 +82,11 @@ class AuthenticationProxy implements Authentication {
       return await _issueAccessToken(authCode);
     } catch (e) {
       logUtil.logger.e(e);
-      return UserInfo();
+      return model.InvalidUserInfo();
     }
   }
 
-  Future<UserInfo> _issueAccessToken(String authCode) async {
+  Future<model.UserInfo> _issueAccessToken(String authCode) async {
     try {
       log.info("_issueAccessToken");
 
@@ -101,18 +98,18 @@ class AuthenticationProxy implements Authentication {
       return await _getKakaoInfo();
     } catch (e) {
       log.info("error on issuing access token: $e");
-      return UserInfo();
+      return model.InvalidUserInfo();
     }
   }
 
-  Future<UserInfo> _getKakaoInfo() async {
+  Future<model.UserInfo> _getKakaoInfo() async {
     try {
       log.info("_getKakaoInfo");
 
       User user = await UserApi.instance.me();
       log.info("user info:$user");
 
-      return UserInfo(
+      return model.UserInfo(
         id: user.id.toString(),
         name: user.properties?["nickname"] ?? '',
         image: user.properties?["profile_image"] ?? '',
@@ -120,7 +117,36 @@ class AuthenticationProxy implements Authentication {
       );
     } catch (e) {
       logUtil.logger.e(e);
-      return UserInfo();
+      return model.InvalidUserInfo();
+    }
+  }
+
+  Future<model.UserInfo> googleLogin() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser!.authentication;
+      final auth.AuthCredential credential = auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      auth.UserCredential userCredential =
+          await auth.FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (userCredential.user == null) {
+        return model.InvalidUserInfo();
+      }
+
+      return model.UserInfo(
+        id: userCredential.user!.uid,
+        name: userCredential.user!.displayName ?? '',
+        image: userCredential.user!.photoURL ?? '',
+        initDate: DateTime.now().toString(),
+      );
+    } catch (e) {
+      logUtil.logger.e(e);
+      return model.InvalidUserInfo();
     }
   }
 }

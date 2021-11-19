@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:homg_long/chart/dateTimeConverter.dart';
 import 'package:homg_long/chart/models/chartInfo.dart';
 import 'package:logging/logging.dart';
 
@@ -40,7 +39,7 @@ class BarChartContent extends StatelessWidget {
     return SideTitles(
       interval: chartInfo.intervalX,
       showTitles: true,
-      getTextStyles: (value) => const TextStyle(
+      getTextStyles: (context, value) => const TextStyle(
           color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),
       getTitles: (double value) {
         int month = (value / 100).toInt();
@@ -55,7 +54,7 @@ class BarChartContent extends StatelessWidget {
       // show Y value with interval 4
       interval: chartInfo.intervalY,
       showTitles: true,
-      getTextStyles: (value) => const TextStyle(
+      getTextStyles: (context, value) => const TextStyle(
           color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),
       getTitles: (double value) {
         return value.toInt().toString();

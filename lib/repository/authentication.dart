@@ -35,4 +35,9 @@ class AuthenticationRepository implements Authentication {
   Future<UserInfo> kakaoLogin() async {
     return _proxy.kakaoLogin();
   }
+
+  @override
+  Future<UserInfo> googleLogin() async {
+    return _proxy.googleLogin();
+  }
 }

@@ -69,6 +69,13 @@ class UserInfo {
       "longitude": this.longitude,
     };
   }
+
+  bool isValid() {
+    if (this is InvalidUserInfo) {
+      return false;
+    }
+    return true;
+  }
 }
 
 class InvalidUserInfo extends UserInfo {

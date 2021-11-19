@@ -69,14 +69,14 @@ class AppScreenCubit with UserActionManager {
     log.info("init geofence service");
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _geofenceServiceWrapper
-          .addGeofenceStatusChangedListener(_onGeofenceStatusChanged);
-      _geofenceServiceWrapper.addActivityChangedListener(_onActivityChanged);
+          .addGeofenceStatusChangeListener(_onGeofenceStatusChanged);
+      _geofenceServiceWrapper.addActivityChangeListener(_onActivityChanged);
       _geofenceServiceWrapper.addStreamErrorListener(_onError);
       _geofenceServiceWrapper.start(_geofenceList).catchError(_onError);
     });
   }
 
-  bool needForegroundTask() {
+  Future<bool> needForegroundTask() async {
     Future<UserInfo> _userInfo = UserRepository().getUserInfo();
     _userInfo.then((value) {
       if (value != null) {
@@ -113,9 +113,9 @@ class AppScreenCubit with UserActionManager {
       Geofence geofence,
       GeofenceRadius geofenceRadius,
       GeofenceStatus geofenceStatus,
-      Position position) async {
-    log.info('geofence: ${geofence.toMap()}');
-    log.info('geofenceRadius: ${geofenceRadius.toMap()}');
+      dynamic position) async {
+    log.info('geofence: ${geofence.toString()}');
+    log.info('geofenceRadius: ${geofenceRadius.toString()}');
     log.info('geofenceStatus: ${geofenceStatus.toString()}\n');
 
     switch (geofenceStatus) {
@@ -131,8 +131,8 @@ class AppScreenCubit with UserActionManager {
   }
 
   void _onActivityChanged(Activity prevActivity, Activity currActivity) {
-    log.info('prevActivity: ${prevActivity.toMap()}');
-    log.info('currActivity: ${currActivity.toMap()}\n');
+    log.info('prevActivity: ${prevActivity.toString()}');
+    log.info('currActivity: ${currActivity.toString()}\n');
   }
 
   void _onWifiStateChanged(WifiState state) {

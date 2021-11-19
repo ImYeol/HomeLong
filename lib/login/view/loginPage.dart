@@ -1,6 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:homg_long/const/appTheme.dart';
+import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
 import 'package:logging/logging.dart' as logging;
@@ -21,24 +22,37 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     log.info("build login page");
     // log.logger.d("build login page");
-    return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.7), BlendMode.dstATop),
-              image: AssetImage("images/login_background.jpg"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Center(
-            child: BlocProvider(
-              create: (_) => LoginCubit(),
-              child: LoginForm(),
-            ),
-          ),
-        ));
+    Firebase.initializeApp();
+    return FutureBuilder(
+        future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("firebase load fail"),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Scaffold(
+                backgroundColor: Theme.of(context).backgroundColor,
+                body: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      colorFilter: ColorFilter.mode(
+                          Colors.white.withOpacity(0.7), BlendMode.dstATop),
+                      image: AssetImage("images/login_background.jpg"),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Center(
+                    child: BlocProvider(
+                      create: (_) => LoginCubit(),
+                      child: LoginForm(),
+                    ),
+                  ),
+                ));
+          }
+          return CircularProgressIndicator();
+        });
   }
 }
 
@@ -96,6 +110,11 @@ class LoginForm extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: [_facebookLogin()],
             ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [_googleLogin()],
+            ),
           ],
         ),
       ),
@@ -125,7 +144,7 @@ class _kakaoLogin extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      width: 300.0,
+      width: 270.0,
       height: 60.0,
       child: FlatButton(
           // key: const Key('loginForm_createAccount_flatButton'),
@@ -148,7 +167,7 @@ class _facebookLogin extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      width: 300.0,
+      width: 270.0,
       height: 60.0,
       child: FlatButton(
           // key: const Key('loginForm_createAccount_flatButton'),
@@ -160,6 +179,29 @@ class _facebookLogin extends StatelessWidget {
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(
               'images/facebook_account_login.png',
+            ),
+          )),
+    );
+  }
+}
+
+class _googleLogin extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: 270.0,
+      height: 60.0,
+      child: FlatButton(
+          // key: const Key('loginForm_createAccount_flatButton'),
+          // color: Theme.of(context).accentColor,
+          disabledColor: Theme.of(context).accentColor,
+          splashColor: Colors.grey,
+          onPressed: () => context.read<LoginCubit>().googleLogin(),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 0),
+            child: Image.asset(
+              'images/btn_google_signin_light_normal_web.png',
             ),
           )),
     );

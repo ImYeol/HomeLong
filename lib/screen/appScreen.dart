@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geofence_service/geofence_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/chart/chart.dart';
 import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/chart/chart.dart';
-import 'package:homg_long/repository/timeRepository.dart';
 import 'package:homg_long/screen/bloc/appScreenCubit.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:logging/logging.dart';
@@ -70,7 +68,7 @@ class _AppScreenState extends State<AppScreen>
           //return cubit.geofenceService.isRunningService;
           return cubit.needForegroundTask();
         },
-        notificationOptions: NotificationOptions(
+        androidNotificationOptions: AndroidNotificationOptions(
             channelId: 'geofence_service_notification_channel',
             channelName: 'Geofence Service Notification',
             channelDescription:
