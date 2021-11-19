@@ -16,12 +16,12 @@ class LoginCubit extends Cubit<LoginState> {
     log.info("kakaoLogin");
     Future<UserInfo> _userInfo = AuthenticationRepository().kakaoLogin();
     _userInfo.then((value) {
-      if (value != null) {
-        setUserInfo(value);
-        emit(LoginState.LOGIN);
-      } else {
+      if (value.isValid() != true) {
         log.info("authentication repository kakao login fail");
         emit(LoginState.UNLOGIN);
+      } else {
+        setUserInfo(value);
+        emit(LoginState.LOGIN);
       }
     }).catchError((onError) {
       log.info("authentication repository kakao login return error:$onError");
@@ -33,12 +33,12 @@ class LoginCubit extends Cubit<LoginState> {
     log.info("facebookLogin");
     Future<UserInfo> _userInfo = AuthenticationRepository().facebookLogin();
     _userInfo.then((value) {
-      if (value != null) {
-        setUserInfo(value);
-        emit(LoginState.LOGIN);
-      } else {
+      if (value.isValid() != true) {
         log.info("authentication repository facebook login fail");
         emit(LoginState.UNLOGIN);
+      } else {
+        setUserInfo(value);
+        emit(LoginState.LOGIN);
       }
     }).catchError((onError) {
       log.info(
@@ -56,6 +56,23 @@ class LoginCubit extends Cubit<LoginState> {
       }
     }).catchError((onError) {
       logUtil.logger.e("user repository set user return error:$onError");
+    });
+  }
+
+  void googleLogin() {
+    log.info("google login");
+    Future<UserInfo> _userInfo = AuthenticationRepository().googleLogin();
+    _userInfo.then((value) {
+      if (value.isValid() != true) {
+        log.info("authentication repository google login fail");
+        emit(LoginState.UNLOGIN);
+      } else {
+        setUserInfo(value);
+        emit(LoginState.LOGIN);
+      }
+    }).catchError((onError) {
+      log.info("authentication repository google login return error:$onError");
+      emit(LoginState.UNLOGIN);
     });
   }
 }
