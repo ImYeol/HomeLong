@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginCubit.dart';
+import 'package:homg_long/utils/ui.dart';
 import 'package:logging/logging.dart' as logging;
 
 enum LoginState { LOGIN, UNLOGIN }
@@ -28,28 +29,20 @@ class LoginPage extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
+              //TODO: handle firebase init failed.
               child: Text("firebase load fail"),
             );
           }
           if (snapshot.connectionState == ConnectionState.done) {
             return Scaffold(
-                backgroundColor: Theme.of(context).backgroundColor,
-                body: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      colorFilter: ColorFilter.mode(
-                          Colors.white.withOpacity(0.7), BlendMode.dstATop),
-                      image: AssetImage("images/login_background.jpg"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Center(
-                    child: BlocProvider(
-                      create: (_) => LoginCubit(),
-                      child: LoginForm(),
-                    ),
-                  ),
-                ));
+              backgroundColor: AppTheme.backgroundColor,
+              body: Center(
+                child: BlocProvider(
+                  create: (_) => LoginCubit(),
+                  child: LoginForm(),
+                ),
+              ),
+            );
           }
           return CircularProgressIndicator();
         });
@@ -83,38 +76,15 @@ class LoginForm extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  // _MainIcon(),
+                  headerTextBox("Welcome"),
+                  headerTextBox("HomeBody"),
                   SizedBox(
                     height: 50.0,
                   ),
-                  _MainIcon(),
-                  Text(
-                    "HomeBody",
-                    style: TextStyle(
-                        fontSize: AppTheme.header_font_size,
-                        color: AppTheme.font_color,
-                        fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  _facebookLogin(),
+                  _googleLogin()
                 ]),
-            SizedBox(
-              height: 30.0,
-            ),
-            // Column(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   mainAxisSize: MainAxisSize.max,
-            //   children: [_kakaoLogin()],
-            // ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [_facebookLogin()],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [_googleLogin()],
-            ),
           ],
         ),
       ),
@@ -169,16 +139,12 @@ class _facebookLogin extends StatelessWidget {
     return Container(
       width: 270.0,
       height: 60.0,
-      child: FlatButton(
-          // key: const Key('loginForm_createAccount_flatButton'),
-          // color: Theme.of(context).accentColor,
-          disabledColor: Theme.of(context).accentColor,
-          splashColor: Colors.grey,
+      child: TextButton(
           onPressed: () => context.read<LoginCubit>().facebookLogin(),
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(
-              'images/facebook_account_login.png',
+              'images/facebook_login_ori.png',
             ),
           )),
     );
@@ -192,16 +158,12 @@ class _googleLogin extends StatelessWidget {
     return Container(
       width: 270.0,
       height: 60.0,
-      child: FlatButton(
-          // key: const Key('loginForm_createAccount_flatButton'),
-          // color: Theme.of(context).accentColor,
-          disabledColor: Theme.of(context).accentColor,
-          splashColor: Colors.grey,
+      child: TextButton(
           onPressed: () => context.read<LoginCubit>().googleLogin(),
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(
-              'images/btn_google_signin_light_normal_web.png',
+              'images/google_login.png',
             ),
           )),
     );

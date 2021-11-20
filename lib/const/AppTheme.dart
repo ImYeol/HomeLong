@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static String appName = "HomeLong";
+  static String appName = "HomeBody";
+
+  static Color backgroundColor = Color(0xffeeeeee);
+  static Color headerColor = Color(0xff005b96);
+  static double headerSize = 40.0;
 
   static double icon_size = 35.0;
   static Color icon_color = Colors.white;
   static Color bottomAppBarColor = Colors.white;
   static Color bottom_menu_icon_color = Color(0xff2c3e50);
-  static Color backgroundColor = Color(0xff2c3e50);
   static Color primaryColor = Colors.white;
   static MaterialColor primarySwatch = MaterialColor(
     0xFFFFFFFF, // primary color
