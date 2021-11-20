@@ -100,11 +100,11 @@ class LoginForm extends StatelessWidget {
             SizedBox(
               height: 30.0,
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [_kakaoLogin()],
-            ),
+            // Column(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   mainAxisSize: MainAxisSize.max,
+            //   children: [_kakaoLogin()],
+            // ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
