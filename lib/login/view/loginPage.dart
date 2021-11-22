@@ -35,7 +35,7 @@ class LoginPage extends StatelessWidget {
           }
           if (snapshot.connectionState == ConnectionState.done) {
             return Scaffold(
-              backgroundColor: AppTheme.backgroundColor,
+              backgroundColor: AppTheme.LoginBackgroundColor,
               body: Center(
                 child: BlocProvider(
                   create: (_) => LoginCubit(),
@@ -135,7 +135,6 @@ class _kakaoLogin extends StatelessWidget {
 class _facebookLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       width: 270.0,
       height: 60.0,
@@ -154,7 +153,6 @@ class _facebookLogin extends StatelessWidget {
 class _googleLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       width: 270.0,
       height: 60.0,

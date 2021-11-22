@@ -3,9 +3,15 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static String appName = "HomeBody";
 
-  static Color backgroundColor = Color(0xffeeeeee);
-  static Color headerColor = Color(0xff005b96);
+  static Color backgroundColor = Color(0xffffffff);
+  static Color LoginBackgroundColor = Color(0xffeeeeee);
+  static Color headerColor = Color(0xff251970);
+  static Color textColor = Color(0xff1B1A57);
+  static Color smallTextColor = Color(0xff4F5E7B);
+
   static double headerSize = 40.0;
+  static double textSize = 18.0;
+  static double smallTextSize = 14.0;
 
   static double icon_size = 35.0;
   static Color icon_color = Colors.white;
