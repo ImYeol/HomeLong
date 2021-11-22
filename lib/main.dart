@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/friends/friendsPage.dart';
 import 'package:homg_long/const/appTheme.dart';
+import 'package:homg_long/friends/friendsPage.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
 import 'package:homg_long/repository/authentication.dart';
@@ -138,10 +140,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                     log.severe("Not All of DB is opened");
                     break;
                   }
+                  return buildMainApp(context, AppScreen());
 
-                  return UserRepository().isLoginSessionValid()
-                      ? buildMainApp(context, AppScreen())
-                      : buildMainApp(context, LoginPage());
+                  // return UserRepository().isLoginSessionValid()
+                  //     ? buildMainApp(context, AppScreen())
+                  //     : buildMainApp(context, LoginPage());
                 } else if (snapshot.hasError) {
                   log.warning("main app got error while page loading");
                   break;

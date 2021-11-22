@@ -1,6 +1,10 @@
 import 'dart:async';
 
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:homg_long/home/model/chartInfo.dart';
 import 'package:homg_long/home/model/counterPageState.dart';
 import 'package:homg_long/repository/timeRepository.dart';
 import 'package:homg_long/repository/userRepository.dart';
@@ -106,5 +110,39 @@ class CounterCubit extends Cubit<CouterPageState>
         stopCounter();
         break;
     }
+  }
+
+  BarChartGroupData makeGroupData(
+    int x,
+    int y, {
+    bool isTouched = false,
+    Color barColor = Colors.red,
+    double width = 10,
+    List<int> showTooltips = const [],
+  }) {
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          y: y.toDouble() % 10,
+          colors: isTouched ? [Colors.yellow] : [barColor],
+          width: width,
+        ),
+      ],
+      showingTooltipIndicators: showTooltips,
+    );
+  }
+
+  ChartInfo loadWeekTimeData(DateTime today) {
+    List<BarChartGroupData> weekTimeDataGroup = <BarChartGroupData>[];
+    int month = 5;
+    int day = 21;
+    int totalTime = 20;
+    for (int offset = DateTime.daysPerWeek - 1; offset >= 0; offset--) {
+      day -= offset;
+      totalTime += 10;
+      weekTimeDataGroup.add(makeGroupData(month * 100 + day, totalTime));
+    }
+    return WeekChartInfo(weekTimeDataGroup);
   }
 }

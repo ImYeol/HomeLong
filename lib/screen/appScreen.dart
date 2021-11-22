@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geofence_service/geofence_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:homg_long/chart/chart.dart';
+import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/feed/feedPage.dart';
+import 'package:homg_long/friends/friendsPage.dart';
 import 'package:homg_long/home/bloc/counterCubit.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
@@ -19,6 +21,7 @@ class AppScreen extends StatefulWidget {
 class _AppScreenState extends State<AppScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   LogUtil logUtil = LogUtil();
+  int _selectedIndex = 0;
   final log = Logger("AppScreen");
 
   final AppScreenCubit cubit = AppScreenCubit();
@@ -27,14 +30,14 @@ class _AppScreenState extends State<AppScreen>
   void initState() {
     super.initState();
     //WidgetsBinding.instance?.addObserver(this);
-    cubit.init();
+    //cubit.init();
     log.info("initialize app");
   }
 
   @override
   void dispose() {
     super.dispose();
-    cubit.dispose();
+    //cubit.dispose();
     log.info("dispose app");
     //WidgetsBinding.instance?.removeObserver(this);
   }
@@ -78,100 +81,61 @@ class _AppScreenState extends State<AppScreen>
         notificationTitle: 'Geofence Service is running',
         notificationText: 'Tap to return to the app',
         child: Scaffold(
-          body: _buildTabController(context),
+          // set SafeArea for top padding
+          body: SafeArea(child: tabPages(_selectedIndex)),
+          bottomNavigationBar: buildBottomNavigationBar(),
         ));
   }
 
-  Widget _buildTabController(BuildContext context) {
-    double appBarheight = MediaQuery.of(context).size.height / 5;
-    return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(appBarheight),
-            child: AppBar(
-              // empty leading
-              leading: Container(),
-              // show Graient background
-              flexibleSpace: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(35),
-                          bottomRight: Radius.circular(35)),
-                      gradient: LinearGradient(
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          colors: <Color>[
-                            Colors.brown.shade900,
-                            Colors.brown.shade200
-                          ])),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 50),
-                    child: Align(
-                        alignment: Alignment.centerRight,
-                        widthFactor: 0.5,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("HomeBody",
-                                style: GoogleFonts.workSans(
-                                    color: Colors.white,
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold)),
-                            Text("Check your life style",
-                                style: GoogleFonts.workSans(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold))
-                          ],
-                        )),
-                  )),
-              elevation: 0,
-              bottom: TabBar(
-                  labelColor: Colors.brown[600],
-                  // tab icon color
-                  unselectedLabelColor: Colors.white,
-                  // unselected tab icon color
-                  indicatorSize: TabBarIndicatorSize.label,
-                  indicator: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(45), // for tab border shape
-                          topRight: Radius.circular(45)),
-                      color: Colors.white),
-                  tabs: [
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Icon(Icons.access_time_sharp),
-                      ),
-                    ),
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Icon(Icons.stacked_bar_chart),
-                      ),
-                    ),
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Icon(Icons.settings),
-                      ),
-                    ),
-                  ]),
-            ),
+  Widget tabPages(int index) {
+    switch (index) {
+      case 0:
+        return CounterPage(cubit: CounterCubit(cubit));
+      case 1:
+        return FriendsPage();
+      case 2:
+        return FeedPage();
+      case 3:
+        return SettingPage();
+      default:
+        return Container();
+    }
+  }
+
+  Widget buildBottomNavigationBar() {
+    return BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        backgroundColor: Colors.white,
+        selectedItemColor: AppTheme.icon_selected_color,
+        unselectedItemColor: AppTheme.icon_unselected_color,
+        currentIndex: _selectedIndex, //현재 선택된 Index
+        onTap: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+            label: "timer",
+            icon: Icon(Icons.timer),
           ),
-          body: buildTabBarViews(),
-        ));
-  }
-
-  Widget buildTabBarViews() {
-    return TabBarView(children: [
-      CounterPage(cubit: CounterCubit(cubit)),
-      ChartPage(
-        cubit: ChartPageCubit(cubit),
-      ),
-      SettingPage()
-    ]);
+          BottomNavigationBarItem(
+            label: "friends",
+            icon: Icon(Icons.people),
+          ),
+          BottomNavigationBarItem(
+              label: "knock",
+              icon: SizedBox(
+                width: 25,
+                height: 25,
+                child: Image.asset("images/fist.png"),
+              )),
+          BottomNavigationBarItem(
+            label: "settings",
+            icon: Icon(Icons.settings),
+          ),
+        ]);
   }
 }
