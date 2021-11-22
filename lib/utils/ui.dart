@@ -15,3 +15,31 @@ headerTextBox(String text) {
     overflow: TextOverflow.ellipsis,
   );
 }
+
+normalTextBox(String text) {
+  return Text(
+    text,
+    style: GoogleFonts.ptSans(
+      fontSize: AppTheme.textSize,
+      color: AppTheme.textColor,
+      fontWeight: FontWeight.bold,
+      // letterSpacing: 1.0,
+    ),
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+  );
+}
+
+smallTextBox(String text) {
+  return Text(
+    text,
+    style: GoogleFonts.ptSans(
+      fontSize: AppTheme.smallTextSize,
+      color: AppTheme.smallTextColor,
+      fontWeight: FontWeight.normal,
+      // letterSpacing: 1.0,
+    ),
+    maxLines: 2,
+    overflow: TextOverflow.ellipsis,
+  );
+}

@@ -1,13 +1,11 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:getwidget/components/avatar/gf_avatar.dart';
-import 'package:getwidget/components/button/gf_button.dart';
-import 'package:getwidget/components/list_tile/gf_list_tile.dart';
-import 'package:getwidget/getwidget.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/setting/bloc/settingCubit.dart';
+import 'package:homg_long/utils/ui.dart';
 import 'package:logging/logging.dart';
 
 class SettingPage extends StatelessWidget {
@@ -41,66 +39,129 @@ class _SettingPageState extends StatelessWidget {
         children: [Text("Has no user Info")],
       );
     }
-
     log.info("profile:$user");
 
-    int latSubIdx = user.latitude.toString().indexOf(".");
-    String latitude;
-    if (user.latitude.toString().length < latSubIdx + 3) {
-      latitude = "";
-    } else {
-      latitude = user.latitude.toString().substring(0, latSubIdx + 3);
-    }
-
-    int lngSubIdx = user.longitude.toString().indexOf(".");
-    String longitude;
-    if (user.longitude.toString().length < lngSubIdx + 3) {
-      longitude = "";
-    } else {
-      longitude = user.longitude.toString().substring(0, lngSubIdx + 3);
-    }
-
-    return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          GFListTile(
-            avatar: GFAvatar(
-              backgroundImage: NetworkImage(user.image),
-              size: 60,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Container(
+            width: 64,
+            height: 64,
+            child: ExtendedImage.network(
+              user.image,
+              fit: BoxFit.fill,
+              cache: true,
+              shape: BoxShape.circle,
             ),
-            titleText: user.name,
-            color: Colors.white10,
-            focusColor: Colors.yellow,
           ),
-          GFListTile(
-            titleText: "Location",
-            subTitleText: "latitude:$latitude, longitude:$longitude",
+          Container(
+            margin: const EdgeInsets.all(20.0),
+            width: 200,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  normalTextBox(user.name),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  Container(
+                    width: 150,
+                    child: smallTextBox(user.street),
+                  ),
+                ]),
           ),
-          GFListTile(
-            titleText: "Address",
-            subTitleText: "${user.street}",
-          ),
-          GFListTile(
-            titleText: "Wifi",
-            subTitleText: "${user.ssid}, ${user.bssid}",
-          ),
-          GFButton(
+        ]),
+        // Container(
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: [
+        //       Container(
+        //         margin: const EdgeInsets.only(left: 30.0, top: 30.0),
+        //         width: 24,
+        //         height: 24,
+        //         child: Image(image: AssetImage('images/dark_mode.png')),
+        //       ),
+        //       Container(
+        //         margin: const EdgeInsets.only(left: 20.0, top: 30.0),
+        //         alignment: Alignment.center,
+        //         child: smallTextBox("Dark mode"),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        Container(
+          child: TextButton(
             onPressed: () {
               Navigator.pushNamed(context, '/GPS');
             },
-            text: "Change location Info",
-            shape: GFButtonShape.pills,
-            fullWidthButton: true,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 30.0, top: 30.0),
+                  width: 24,
+                  height: 24,
+                  child: Image(image: AssetImage('images/gps_setting.png')),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 20.0, top: 30.0),
+                  alignment: Alignment.center,
+                  child: smallTextBox("GPS setting"),
+                ),
+              ],
+            ),
           ),
-          GFButton(
+        ),
+        Container(
+          child: TextButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/Wifi');
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 30.0, top: 30.0),
+                  width: 24,
+                  height: 24,
+                  child: Image(image: AssetImage('images/wifi_setting.png')),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 20.0, top: 30.0),
+                  alignment: Alignment.center,
+                  child: smallTextBox("WIFI setting"),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          child: TextButton(
             onPressed: () async {
               await UserRepository().deleteUserInfo();
               Navigator.pushNamed(context, '/Login');
             },
-            text: "Logout",
-            shape: GFButtonShape.pills,
-            fullWidthButton: true,
-          )
-        ]));
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 30.0, top: 30.0),
+                  width: 24,
+                  height: 24,
+                  child: Image(image: AssetImage('images/logout.png')),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 20.0, top: 30.0),
+                  alignment: Alignment.center,
+                  child: smallTextBox("Logout"),
+                ),
+              ],
+            ),
+          ),
+        )
+      ]),
+    );
   }
 }
