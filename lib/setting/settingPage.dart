@@ -45,10 +45,20 @@ class _SettingPageState extends StatelessWidget {
     log.info("profile:$user");
 
     int latSubIdx = user.latitude.toString().indexOf(".");
-    String latitude = user.latitude.toString().substring(0, latSubIdx + 3);
+    String latitude;
+    if (user.latitude.toString().length < latSubIdx + 3) {
+      latitude = "";
+    } else {
+      latitude = user.latitude.toString().substring(0, latSubIdx + 3);
+    }
 
     int lngSubIdx = user.longitude.toString().indexOf(".");
-    String longitude = user.longitude.toString().substring(0, lngSubIdx + 3);
+    String longitude;
+    if (user.longitude.toString().length < lngSubIdx + 3) {
+      longitude = "";
+    } else {
+      longitude = user.longitude.toString().substring(0, lngSubIdx + 3);
+    }
 
     return Padding(
         padding: const EdgeInsets.all(10.0),
