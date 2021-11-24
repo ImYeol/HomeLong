@@ -58,6 +58,7 @@ class _PieChartSectionState extends State<PieChartSection> {
           borderData: FlBorderData(
             show: false,
           ),
+          startDegreeOffset: 270,
           sectionsSpace: 0,
           centerSpaceRadius: _height / 3,
           sections: showingSections()),

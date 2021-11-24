@@ -13,7 +13,7 @@ class AppTheme {
   static double textSize = 18.0;
   static double smallTextSize = 14.0;
 
-  static double icon_size = 35.0;
+  static double icon_size = 50.0;
   static Color icon_color = Colors.white;
   static Color icon_unselected_color = Colors.grey;
   static Color icon_selected_color = Color(0xff251970);

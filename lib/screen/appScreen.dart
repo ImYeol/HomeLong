@@ -21,7 +21,7 @@ class AppScreen extends StatefulWidget {
 class _AppScreenState extends State<AppScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   LogUtil logUtil = LogUtil();
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
   final log = Logger("AppScreen");
 
   final AppScreenCubit cubit = AppScreenCubit();
@@ -130,7 +130,18 @@ class _AppScreenState extends State<AppScreen>
               icon: SizedBox(
                 width: 25,
                 height: 25,
-                child: Image.asset("images/fist.png"),
+                child: Image.asset(
+                  "images/fist.png",
+                  color: AppTheme.icon_unselected_color,
+                ),
+              ),
+              activeIcon: SizedBox(
+                width: 25,
+                height: 25,
+                child: Image.asset(
+                  "images/fist.png",
+                  color: AppTheme.icon_selected_color,
+                ),
               )),
           BottomNavigationBarItem(
             label: "settings",
