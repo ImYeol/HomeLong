@@ -28,7 +28,7 @@ class _FriendsPageState extends State<FriendsPage> {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             log.info("waiting");
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
           case ConnectionState.done:
             log.info("load done");
             return pageContent(context);

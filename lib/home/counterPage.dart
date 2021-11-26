@@ -2,18 +2,21 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/home/barChartSection.dart';
-import 'package:homg_long/home/bloc/counterCubit.dart';
+import 'package:homg_long/home/bloc/chartController.dart';
+import 'package:homg_long/home/bloc/counterController.dart';
+import 'package:homg_long/home/bloc/timeHistoryController.dart';
 import 'package:homg_long/home/model/counterPageState.dart';
 import 'package:homg_long/home/pieChartSection.dart';
 import 'package:homg_long/home/timeHistorySection.dart';
+import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/utils/titleText.dart';
 import 'package:logging/logging.dart';
 
 class CounterPage extends StatefulWidget {
-  CounterCubit cubit;
-  CounterPage({Key? key, required this.cubit}) : super(key: key);
+  CounterPage({Key? key}) : super(key: key);
 
   @override
   _CounterPageState createState() => _CounterPageState();
@@ -24,11 +27,19 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
   int touchedIndex = -1;
   Color backgroundColor = Colors.grey.shade200;
   Color subTitleColor = Colors.brown.shade300;
+  final chartController = Get.put(ChartController());
+  final counterController = Get.put(CounterController());
+  final timeHistoryController = Get.put(TimeHistoryController());
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      counterController.loadCounter();
+      chartController.loadTimeData();
+      timeHistoryController.loadTimeHistoryData();
+      log.info("done to init controller");
+    });
     //widget.cubit.loadPage();
     log.info('initState');
   }
@@ -37,7 +48,7 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
   void dispose() {
     log.info('dispose');
     WidgetsBinding.instance?.removeObserver(this);
-    widget.cubit.unloadPage();
+    counterController.unLoadCounter();
     super.dispose();
   }
 
@@ -46,10 +57,7 @@ class _CounterPageState extends State<CounterPage> with WidgetsBindingObserver {
     log.info('didChangeAppLifecycleState = $state');
     if (state == AppLifecycleState.resumed) {
       log.info("resumed");
-      widget.cubit.loadPage();
-    } else if (state == AppLifecycleState.paused) {
-      widget.cubit.unloadPage();
-    }
+    } else if (state == AppLifecycleState.paused) {}
   }
 
   @override

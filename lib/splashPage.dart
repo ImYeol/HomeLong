@@ -5,12 +5,11 @@ import 'package:homg_long/utils/ui.dart';
 class SplashPage extends StatelessWidget {
   const SplashPage({Key? key}) : super(key: key);
 
-  static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => SplashPage());
-  }
-
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    print("main : $width : $height");
     return Container(
         child: Scaffold(
             backgroundColor: AppTheme.backgroundColor,

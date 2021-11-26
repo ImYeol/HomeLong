@@ -130,14 +130,14 @@ class AuthenticationProxy implements Authentication {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
+      log.info("user info1:$credential");
       auth.UserCredential userCredential =
           await auth.FirebaseAuth.instance.signInWithCredential(credential);
-
+      log.info("user info2:$userCredential");
       if (userCredential.user == null) {
         return model.InvalidUserInfo();
       }
-
+      log.info("user info3:$userCredential");
       return model.UserInfo(
         id: userCredential.user!.uid,
         name: userCredential.user!.displayName ?? '',

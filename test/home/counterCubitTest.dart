@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:homg_long/home/bloc/counterCubit.dart';
+import 'package:homg_long/home/bloc/counterController.dart';
 import 'package:homg_long/repository/db/timeDB.dart';
 import 'package:homg_long/repository/timeRepository.dart';
 import 'package:homg_long/screen/bloc/userActionEventObserver.dart';
@@ -10,12 +10,9 @@ import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-class MockUserActionManager extends Mock with UserActionManager {}
-
 void main() {
   final repo = TimeRepository();
-  final mockUserActionManager = MockUserActionManager();
-  CounterCubit cubit = CounterCubit(mockUserActionManager);
+  CounterController cubit = CounterController();
 
   // called only once
   setUpAll(() {
@@ -31,7 +28,7 @@ void main() {
     final isOpened = await repo.openDatabase();
     expect(isOpened, true);
 
-    cubit = CounterCubit(mockUserActionManager);
+    cubit = CounterController();
   });
 
   tearDown(() async {

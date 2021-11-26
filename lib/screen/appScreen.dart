@@ -4,10 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/feed/feedPage.dart';
 import 'package:homg_long/friends/friendsPage.dart';
-import 'package:homg_long/home/bloc/counterCubit.dart';
+import 'package:homg_long/home/bloc/counterController.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/screen/bloc/appScreenCubit.dart';
+import 'package:homg_long/repository/userRepository.dart';
+import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:logging/logging.dart';
 
@@ -21,25 +22,19 @@ class AppScreen extends StatefulWidget {
 class _AppScreenState extends State<AppScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   LogUtil logUtil = LogUtil();
-  int _selectedIndex = 2;
+  int _selectedIndex = 0;
   final log = Logger("AppScreen");
-
-  final AppScreenCubit cubit = AppScreenCubit();
 
   @override
   void initState() {
     super.initState();
-    //WidgetsBinding.instance?.addObserver(this);
-    //cubit.init();
     log.info("initialize app");
   }
 
   @override
   void dispose() {
     super.dispose();
-    //cubit.dispose();
     log.info("dispose app");
-    //WidgetsBinding.instance?.removeObserver(this);
   }
 
   @override
@@ -69,7 +64,7 @@ class _AppScreenState extends State<AppScreen>
         onWillStart: () {
           // You can add a foreground task start condition.
           //return cubit.geofenceService.isRunningService;
-          return cubit.needForegroundTask();
+          return UserActionManager().needForegroundTask();
         },
         androidNotificationOptions: AndroidNotificationOptions(
             channelId: 'geofence_service_notification_channel',
@@ -90,7 +85,7 @@ class _AppScreenState extends State<AppScreen>
   Widget tabPages(int index) {
     switch (index) {
       case 0:
-        return CounterPage(cubit: CounterCubit(cubit));
+        return CounterPage();
       case 1:
         return FriendsPage();
       case 2:

@@ -1,46 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/log/logger.dart';
+import 'package:homg_long/login/cubit/loginController.dart';
 import 'package:homg_long/repository/ConnectivityServiceWrapper.dart';
 import 'package:homg_long/repository/model/wifiState.dart';
 import 'package:homg_long/repository/userRepository.dart';
 import 'package:logging/logging.dart';
 
-import 'bloc/wifi_setting_cubit.dart';
+import 'bloc/wifiSettingController.dart';
 
 class WifiSettingPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
   final log = Logger("WifiSettingPage");
+  final controller = Get.put(WifiSettingController());
 
   WifiSettingPage() : super();
 
   @override
   Widget build(BuildContext context) {
     log.info("build wifi page");
+    controller.subscribeWifiEvent();
+    controller.checkCurrentWifiInfo();
     return Scaffold(
         backgroundColor: Colors.brown[900],
-        body: BlocProvider(
-          create: (_) =>
-              WifiSettingCubit(context.read<ConnectivityServiceWrapper>()),
-          child: WifiSettingForm(),
-        ));
-  }
-}
-
-class WifiSettingForm extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // context.read<WifiSettingCubit>().subscribeWifiEvent();
-    return BlocBuilder<WifiSettingCubit, WifiState>(
-      builder: (context, state) {
-        if (state is WifiConnected) {
-          return HomeWifiSelector(state);
-        } else {
-          return WarningNoWifiConnection();
-        }
-      },
-    );
+        body: Obx(() {
+          if (controller.wifiState.value is WifiConnected) {
+            return HomeWifiSelector(controller.wifiState.value);
+          } else {
+            return WarningNoWifiConnection();
+          }
+        }));
   }
 }
 
@@ -118,33 +109,28 @@ class HomeWifiSelector extends StatelessWidget {
   final double subTitleSize = 20;
   final Color titleColor = Colors.white;
   final Color subTitleColor = Colors.white54;
+  final controller = Get.find<WifiSettingController>();
 
   HomeWifiSelector(this.connInfo);
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<WifiSettingCubit, WifiState>(
-        listener: (context, state) {
-          if (state is WifiInfoSaved) {
-            Navigator.pushReplacementNamed(context, '/Main');
-          }
-        },
-        child: Center(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-              MessageTextView(
-                  message: "SAVE IT AS HOME WIFI",
-                  fontSize: titleSize,
-                  fontColor: titleColor),
-              SizedBox(height: 30),
-              buildWifiInfoCardWidget(
-                  connInfo.ssid == null ? "unknonw" : connInfo.ssid,
-                  connInfo.bssid == null ? "unknonw" : connInfo.bssid),
-              SizedBox(height: 20),
-              buildSaveWifiButton(context),
-            ])));
+    return Center(
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+          MessageTextView(
+              message: "SAVE IT AS HOME WIFI",
+              fontSize: titleSize,
+              fontColor: titleColor),
+          SizedBox(height: 30),
+          buildWifiInfoCardWidget(
+              connInfo.ssid == null ? "unknonw" : connInfo.ssid,
+              connInfo.bssid == null ? "unknonw" : connInfo.bssid),
+          SizedBox(height: 20),
+          buildSaveWifiButton(context),
+        ]));
   }
 
   Widget buildWifiInfoCardWidget(String ssid, String bssid) {
@@ -193,15 +179,10 @@ class HomeWifiSelector extends StatelessWidget {
   Widget buildSaveWifiButton(BuildContext context) {
     return TextButton(
         onPressed: () {
-          Future<bool> success =
-              UserRepository().updateWifiInfo(connInfo.ssid, connInfo.bssid);
-          success.then((value) {
-            if (value != true) {
-              // TODO: Failed to save wifi
-            }
-          }).catchError((onError) {
-            Navigator.pushNamed(context, "/Main");
-          });
+          controller.updateWifiInfo(connInfo.ssid, connInfo.bssid);
+          controller.unSubscribeWifiEvent();
+          Get.find<LoginController>().needSetup = false;
+          Get.offAllNamed("/Main");
         },
         child: Container(
             padding: EdgeInsets.symmetric(horizontal: 30),

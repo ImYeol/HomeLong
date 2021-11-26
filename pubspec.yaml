@@ -85,6 +85,12 @@ dependencies:
   # unit test
   mockito: ^5.0.16
 
+  # getX
+  get: ^4.3.8
+
+  # util
+  intl: ^0.17.0
+
 dev_dependencies:
   # hive
   hive_generator: ^1.1.1

@@ -1,7 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:homg_long/home/bloc/counterController.dart';
+import 'package:homg_long/repository/model/homeTime.dart';
+import 'package:intl/intl.dart';
 
 class PieChartSection extends StatefulWidget {
   PieChartSection({Key? key}) : super(key: key);
@@ -16,6 +20,8 @@ class _PieChartSectionState extends State<PieChartSection> {
   int _touchedIndex = -1;
   late double _width;
   late double _height;
+  NumberFormat formatter = NumberFormat("00");
+  var controller = Get.find<CounterController>();
 
   @override
   Widget build(BuildContext context) {
@@ -25,17 +31,22 @@ class _PieChartSectionState extends State<PieChartSection> {
     return Container(
         width: _width,
         height: _height,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [countTimeText(), pieChart(), indicators()],
-        ));
+        child: Obx(() {
+          return Stack(
+            alignment: Alignment.center,
+            children: [countTimeText(), pieChart(), indicators()],
+          );
+        }));
   }
 
   Widget countTimeText() {
+    final hour = controller.accumulatedHomeTime.value / 3600;
+    final minute = controller.accumulatedHomeTime / 60;
+    final second = controller.accumulatedHomeTime % 60;
     return Text(
-      "15:30",
+      "${formatter.format(hour.toInt())}:${formatter.format(minute.toInt())}:${formatter.format(second.toInt())}",
       style: GoogleFonts.quicksand(
-          color: Color(0xff707070), fontSize: 40, fontWeight: FontWeight.bold),
+          color: Color(0xff707070), fontSize: 25, fontWeight: FontWeight.bold),
     );
   }
 
@@ -92,6 +103,10 @@ class _PieChartSectionState extends State<PieChartSection> {
   }
 
   List<PieChartSectionData> showingSections() {
+    final in_time_percent =
+        controller.accumulatedHomeTime.value / HomeTime.TOTAL_SECOND_A_DAY;
+    final out_time_percent = 1 - in_time_percent;
+
     return List.generate(2, (i) {
       final isTouched = i == _touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
@@ -102,7 +117,8 @@ class _PieChartSectionState extends State<PieChartSection> {
             showTitle: false,
             color: Color(0xFFF68D5F),
             //const Color(0xff0293ee),
-            value: 0.2, //tick.atHomeTime / CounterCubit.TOTAL_MINUTE_A_DAY,
+            value:
+                in_time_percent, //tick.atHomeTime / CounterCubit.TOTAL_MINUTE_A_DAY,
             title: null,
             radius: radius,
             titleStyle: TextStyle(
@@ -115,7 +131,8 @@ class _PieChartSectionState extends State<PieChartSection> {
             showTitle: false,
             color: Colors.cyan[500],
             //const Color(0xfff8b250),
-            value: 0.8, //tick.outHomeTime / CounterCubit.TOTAL_MINUTE_A_DAY,
+            value:
+                out_time_percent, //tick.outHomeTime / CounterCubit.TOTAL_MINUTE_A_DAY,
             title: null,
             radius: radius,
             titleStyle: TextStyle(

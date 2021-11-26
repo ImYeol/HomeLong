@@ -1,4 +1,4 @@
-abstract class WifiState {
+class WifiState {
   final String ssid;
   final String bssid;
 

@@ -1,4 +1,5 @@
 import 'package:homg_long/repository/db/timeDB.dart';
+import 'package:homg_long/repository/model/homeTime.dart';
 import 'package:homg_long/repository/proxy/timeProxy.dart';
 import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
@@ -93,5 +94,10 @@ class TimeRepository {
   int getTotalMinuteADay(DateTime targetDay) {
     targetDay = getDateTimeAsSameDay(targetDay);
     return _db.getTotalMinuteADay(targetDay);
+  }
+
+  List<HomeTime> getTodayHomeTimeHistory(DateTime date) {
+    DateTime today = getDateTimeAsSameDay(date);
+    return _db.getTodayHomeTimeHistory(today);
   }
 }
