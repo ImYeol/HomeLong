@@ -76,15 +76,7 @@ class TimeHistoryListItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color(0xFFF7F7F7),
       ),
-      //   boxShadow: [
-      //   BoxShadow(
-      //       color: Colors.black54, blurRadius: 0.5, offset: Offset(0.0, 0.5))
-      // ], borderRadius: BorderRadius.circular(10), color: Color(0xFFF7F7F7)),
       child: ListTile(
-        // leading: Icon(
-        //   Icons.home,
-        //   size: 30,
-        // ),
         title: Row(
           children: [
             Icon(Icons.home, size: 25),

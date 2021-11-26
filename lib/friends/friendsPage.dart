@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/friends/bloc/friendsPageController.dart';
-import 'package:homg_long/friends/friendsList.dart';
-import 'package:homg_long/friends/homeFriendsList.dart';
+import 'package:homg_long/friends/friendsListSection.dart';
+import 'package:homg_long/friends/homeFriendsListSection.dart';
+import 'package:homg_long/friends/topHomebodySection.dart';
+import 'package:homg_long/utils/titleText.dart';
 import 'package:logging/logging.dart';
 
 class FriendsPage extends StatefulWidget {
@@ -14,7 +17,6 @@ class FriendsPage extends StatefulWidget {
 class _FriendsPageState extends State<FriendsPage> {
   final log = Logger("_FriendsPageState");
   final FriendsPageController controller = FriendsPageController();
-  GlobalKey key = GlobalKey();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -43,16 +45,47 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 
   Widget pageContent(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      child: Column(
-        children: [
-          HomeFriendsList(homeFriends: controller.homeFriends),
-          Expanded(child: FriendsList(friends: controller.frineds)),
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.only(left: 20, right: 20, top: 10),
+        color: Colors.white,
+        child: Column(
+          children: [
+            titleSection(),
+            Container(
+              height: 20,
+            ),
+            TopHomebodySection(),
+            HomeFriendsListSection(),
+            Container(
+              height: 10,
+            ),
+            FriendsListSection()
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget titleSection() {
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: TitleText(
+            title: "HomeBody",
+            withDivider: false,
+            fontSize: 25,
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Icon(
+            Icons.person_add,
+            size: 30,
+          ),
+        )
+      ],
     );
   }
 }
