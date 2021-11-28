@@ -465,11 +465,18 @@ class _AddressInputState extends State<AddressInput> {
                           this.permitted = await _permissionCheck();
                           if (this.permitted == true) {
                             await _getLatLngFromAddress(addressController.text);
-                            await UserRepository().updateLocationInfo(
-                                this.currentLocation.latitude,
-                                this.currentLocation.longitude,
-                                addressController.text);
-                            Navigator.pushReplacementNamed(context, '/Wifi');
+                            Future<bool> success = UserRepository()
+                                .updateLocationInfo(
+                                    this.currentLocation.latitude,
+                                    this.currentLocation.longitude,
+                                    addressController.text);
+                            success.then((value) {
+                              if (value != true) {
+                                // TODO: Failed to save location
+                              }
+                            }).catchError((onError) {
+                              Navigator.pushReplacementNamed(context, '/Wifi');
+                            });
                           }
                         },
                         child: Text('save'),

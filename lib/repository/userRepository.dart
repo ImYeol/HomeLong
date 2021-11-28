@@ -42,16 +42,17 @@ class UserRepository implements UserAPI {
   @override
   Future<UserInfo> getUserInfo() async {
     UserInfo userInfo = await _db.getUserInfo();
-    // userInfo is always true
-    if (userInfo != null) {
+    if (userInfo.id != "") {
       return userInfo;
     }
+    // when get user info from databases is failed
+    // request from server
     return await _proxy.getUserInfo();
   }
 
   @override
   Future<bool> setUserInfo(UserInfo userInfo) async {
-    return await _db.setUserInfo(userInfo) ||
+    return await _db.setUserInfo(userInfo) &&
         await _proxy.setUserInfo(userInfo);
   }
 
@@ -63,13 +64,13 @@ class UserRepository implements UserAPI {
   @override
   Future<bool> updateLocationInfo(
       double latitude, double longitude, String street) async {
-    return await _db.updateLocationInfo(latitude, longitude, street) ||
+    return await _db.updateLocationInfo(latitude, longitude, street) &&
         await _proxy.updateLocationInfo(latitude, longitude, street);
   }
 
   @override
   Future<bool> updateWifiInfo(String ssid, String bssid) async {
-    return await _db.updateWifiInfo(ssid, bssid) ||
+    return await _db.updateWifiInfo(ssid, bssid) &&
         await _proxy.updateWifiInfo(ssid, bssid);
   }
 }

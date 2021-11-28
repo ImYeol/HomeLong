@@ -11,6 +11,11 @@ class URL {
   static Uri getUserInfoURL =
       Uri.parse(serverHost + serverPort + "/account/get");
 
+  // info
+  static Uri setLocationURL =
+      Uri.parse(serverHost + serverPort + "/location/set");
+  static Uri setWifiURL = Uri.parse(serverHost + serverPort + "/wifi/set");
+
   // time
   static Uri getDayTimeURL =
       Uri.parse(serverHost + serverPort + "/time/day/get");

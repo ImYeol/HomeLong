@@ -9,8 +9,6 @@ class SettingCubit extends Cubit<UserInfo> {
 
   getUserInfo() async {
     UserInfo _user = await UserRepository().getUserInfo();
-    if (_user != null) {
-      emit(_user);
-    }
+    emit(_user);
   }
 }
