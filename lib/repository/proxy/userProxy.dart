@@ -37,6 +37,10 @@ class UserProxy implements UserAPI {
   Future<bool> setUserInfo(UserInfo userInfo) async {
     log.info("setUserInfo");
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('id', userInfo.id);
+    await prefs.setString('user', json.encode(userInfo));
+
     var response = await http.post(
       URL.setUserInfoURL,
       body: json.encode(userInfo),
@@ -54,14 +58,45 @@ class UserProxy implements UserAPI {
   @override
   Future<bool> updateLocationInfo(
       double latitude, double longitude, String street) async {
-    // TODO: implement updateLocationInfo
-    return true;
+    final prefs = await SharedPreferences.getInstance();
+    var userInfo =
+        UserInfo.fromJson(json.decode(prefs.getString('user') ?? 'invalid'));
+    userInfo.latitude = latitude;
+    userInfo.longitude = longitude;
+    userInfo.street = street;
+
+    var response = await http.post(URL.setLocationURL,
+        headers: {'id': prefs.getString('id') ?? 'invalid'},
+        body: json.encode(userInfo));
+
+    if (response.statusCode == StatusCode.statusOK) {
+      log.info("set location success");
+      return true;
+    } else {
+      log.info("set location fail(${response.statusCode}, ${response.body})");
+      return false;
+    }
   }
 
   @override
   Future<bool> updateWifiInfo(String ssid, String bssid) async {
-    // TODO: implement updateWifiInfo
-    return true;
+    final prefs = await SharedPreferences.getInstance();
+    var userInfo =
+        UserInfo.fromJson(json.decode(prefs.getString('user') ?? 'invalid'));
+    userInfo.ssid = ssid;
+    userInfo.bssid = bssid;
+
+    var response = await http.post(URL.setWifiURL,
+        headers: {'id': prefs.getString('id') ?? 'invalid'},
+        body: json.encode(userInfo));
+
+    if (response.statusCode == StatusCode.statusOK) {
+      log.info("set wifi success");
+      return true;
+    } else {
+      log.info("set wifi fail(${response.statusCode}, ${response.body})");
+      return false;
+    }
   }
 
   @override

@@ -13,7 +13,12 @@ class AuthenticationDB implements Authentication {
   }
 
   @override
-  Future<UserInfo> kakaoLogin() async {
+  Future<UserInfo> googleLogin() async {
     return UserInfo();
   }
+
+  // @override
+  // Future<UserInfo> kakaoLogin() async {
+  //   return UserInfo();
+  // }
 }

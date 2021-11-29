@@ -12,22 +12,22 @@ class LoginCubit extends Cubit<LoginState> {
 
   LoginCubit() : super(null);
 
-  void kakaoLogin() async {
-    log.info("kakaoLogin");
-    Future<UserInfo> _userInfo = AuthenticationRepository().kakaoLogin();
-    _userInfo.then((value) {
-      if (value.isValid() != true) {
-        log.info("authentication repository kakao login fail");
-        emit(LoginState.UNLOGIN);
-      } else {
-        setUserInfo(value);
-        emit(LoginState.LOGIN);
-      }
-    }).catchError((onError) {
-      log.info("authentication repository kakao login return error:$onError");
-      emit(LoginState.UNLOGIN);
-    });
-  }
+  // void kakaoLogin() async {
+  //   log.info("kakaoLogin");
+  //   Future<UserInfo> _userInfo = AuthenticationRepository().kakaoLogin();
+  //   _userInfo.then((value) {
+  //     if (value.isValid() != true) {
+  //       log.info("authentication repository kakao login fail");
+  //       emit(LoginState.UNLOGIN);
+  //     } else {
+  //       setUserInfo(value);
+  //       emit(LoginState.LOGIN);
+  //     }
+  //   }).catchError((onError) {
+  //     log.info("authentication repository kakao login return error:$onError");
+  //     emit(LoginState.UNLOGIN);
+  //   });
+  // }
 
   void facebookLogin() {
     log.info("facebookLogin");

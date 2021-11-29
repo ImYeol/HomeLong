@@ -7,7 +7,8 @@ import 'proxy/authenticationProxy.dart';
 
 abstract class Authentication {
   Future<UserInfo> facebookLogin();
-  Future<UserInfo> kakaoLogin();
+  Future<UserInfo> googleLogin();
+  // Future<UserInfo> kakaoLogin();
 }
 
 class AuthenticationRepository implements Authentication {
@@ -31,10 +32,10 @@ class AuthenticationRepository implements Authentication {
     return _proxy.facebookLogin();
   }
 
-  @override
-  Future<UserInfo> kakaoLogin() async {
-    return _proxy.kakaoLogin();
-  }
+  // @override
+  // Future<UserInfo> kakaoLogin() async {
+  //   return _proxy.kakaoLogin();
+  // }
 
   @override
   Future<UserInfo> googleLogin() async {

@@ -109,28 +109,28 @@ class _MainIcon extends StatelessWidget {
   }
 }
 
-class _kakaoLogin extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: 270.0,
-      height: 60.0,
-      child: FlatButton(
-          // key: const Key('loginForm_createAccount_flatButton'),
-          // // color: Theme.of(context).accentColor,
-          disabledColor: Theme.of(context).accentColor,
-          splashColor: Colors.grey,
-          onPressed: () => context.read<LoginCubit>().kakaoLogin(),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 0),
-            child: Image.asset(
-              'images/kakao_account_login_btn_medium_wide.png',
-            ),
-          )),
-    );
-  }
-}
+// class _kakaoLogin extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
+//     return Container(
+//       width: 270.0,
+//       height: 60.0,
+//       child: FlatButton(
+//           // key: const Key('loginForm_createAccount_flatButton'),
+//           // // color: Theme.of(context).accentColor,
+//           disabledColor: Theme.of(context).accentColor,
+//           splashColor: Colors.grey,
+//           onPressed: () => context.read<LoginCubit>().kakaoLogin(),
+//           child: Padding(
+//             padding: const EdgeInsets.only(left: 0),
+//             child: Image.asset(
+//               'images/kakao_account_login_btn_medium_wide.png',
+//             ),
+//           )),
+//     );
+//   }
+// }
 
 class _facebookLogin extends StatelessWidget {
   @override

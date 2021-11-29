@@ -193,10 +193,15 @@ class HomeWifiSelector extends StatelessWidget {
   Widget buildSaveWifiButton(BuildContext context) {
     return TextButton(
         onPressed: () {
-          UserRepository().updateWifiInfo(connInfo.ssid, connInfo.bssid);
-          // context.read<WifiSettingCubit>().postWifiAPInfo(
-          //     userInfo.id, connInfo.ssid, connInfo.bssid);
-          Navigator.pushNamed(context, "/Main");
+          Future<bool> success =
+              UserRepository().updateWifiInfo(connInfo.ssid, connInfo.bssid);
+          success.then((value) {
+            if (value != true) {
+              // TODO: Failed to save wifi
+            }
+          }).catchError((onError) {
+            Navigator.pushNamed(context, "/Main");
+          });
         },
         child: Container(
             padding: EdgeInsets.symmetric(horizontal: 30),
