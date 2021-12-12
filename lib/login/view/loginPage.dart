@@ -1,13 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/login/cubit/loginCubit.dart';
+import 'package:homg_long/login/cubit/loginController.dart';
 import 'package:homg_long/utils/ui.dart';
 import 'package:logging/logging.dart' as logging;
-
-enum LoginState { LOGIN, UNLOGIN }
 
 class LoginPage extends StatelessWidget {
   LogUtil logUtil = LogUtil();
@@ -21,31 +20,11 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log.info("build login page");
-    // log.logger.d("build login page");
-    Firebase.initializeApp();
-    return FutureBuilder(
-        future: Firebase.initializeApp(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              //TODO: handle firebase init failed.
-              child: Text("firebase load fail"),
-            );
-          }
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Scaffold(
-              backgroundColor: AppTheme.LoginBackgroundColor,
-              body: Center(
-                child: BlocProvider(
-                  create: (_) => LoginCubit(),
-                  child: LoginForm(),
-                ),
-              ),
-            );
-          }
-          return CircularProgressIndicator();
-        });
+    log.info("build login page : ${Get.size.width} : ${Get.size.height}");
+    return Container(
+        color: AppTheme.LoginBackgroundColor,
+        padding: EdgeInsets.all(10),
+        child: LoginForm());
   }
 }
 
@@ -57,37 +36,20 @@ class LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _log.info("build login form");
-    return BlocListener<LoginCubit, LoginState>(
-      listener: (context, state) {
-        if (state == LoginState.LOGIN) {
-          _log.info("LoginState=$state");
-          Navigator.pushReplacementNamed(context, "/GPS");
-        } else if (state == LoginState.UNLOGIN) {
-          _log.info("LoginState=$state");
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  // _MainIcon(),
-                  headerTextBox("Welcome"),
-                  headerTextBox("HomeBody"),
-                  SizedBox(
-                    height: 50.0,
-                  ),
-                  _facebookLogin(),
-                  _googleLogin()
-                ]),
-          ],
+    _log.info("build login form : ${Get.size.width} : ${Get.size.height}");
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // _MainIcon(),
+        headerTextBox("Welcome"),
+        headerTextBox("HomeBody"),
+        SizedBox(
+          height: 50.0,
         ),
-      ),
+        _facebookLogin(),
+        _googleLogin()
+      ],
     );
   }
 }
@@ -139,7 +101,7 @@ class _facebookLogin extends StatelessWidget {
       width: 270.0,
       height: 60.0,
       child: TextButton(
-          onPressed: () => context.read<LoginCubit>().facebookLogin(),
+          onPressed: () => Get.find<LoginController>().facebookLogin(),
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(
@@ -157,7 +119,7 @@ class _googleLogin extends StatelessWidget {
       width: 270.0,
       height: 60.0,
       child: TextButton(
-          onPressed: () => context.read<LoginCubit>().googleLogin(),
+          onPressed: () => Get.find<LoginController>().googleLogin(),
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(

@@ -1,7 +1,9 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:homg_long/log/logger.dart';
+import 'package:homg_long/login/cubit/loginController.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/setting/bloc/settingCubit.dart';
@@ -139,9 +141,8 @@ class _SettingPageState extends StatelessWidget {
         ),
         Container(
           child: TextButton(
-            onPressed: () async {
-              await UserRepository().deleteUserInfo();
-              Navigator.pushNamed(context, '/Login');
+            onPressed: () {
+              Get.find<LoginController>().logOut();
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,

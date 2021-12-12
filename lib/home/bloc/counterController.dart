@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:homg_long/home/model/chartInfo.dart';
 import 'package:homg_long/home/model/counterPageState.dart';
 import 'package:homg_long/repository/timeRepository.dart';
@@ -14,41 +15,34 @@ import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/utils/utils.dart';
 import 'package:logging/logging.dart';
 
-class CounterCubit extends Cubit<CouterPageState>
-    with AbstractPageCubit, UserActionEventObserver {
-  final log = Logger("CounterCubit");
+class CounterController extends GetxController with UserActionEventObserver {
+  final log = Logger("CounterController");
   static final int period = 1; // 1 second;
-  static final int TOTAL_MINUTE_A_DAY = 60 * 60 * 24;
 
-  UserActionManager userActionManager;
   Timer? timer;
   DateTime _lastEnterTime = DateTime.parse(TimeRepository.INVALID_DATE_TIME);
-  int accumulatedHomeTime = 0;
+  var accumulatedHomeTime = 0.obs;
 
-  CounterCubit(this.userActionManager) : super(CounterPageLoading());
+  CounterController();
 
-  @override
-  void loadPage() {
-    log.info("loadPage");
-    userActionManager.registerUserActionEventObserver(this);
-
-    final lastEnterTime = TimeRepository().getEnterTime();
+  void loadCounter() async {
+    UserActionManager().registerUserActionEventObserver(this);
+    UserActionManager().checkNowConnectionState();
     DateTime now = DateTime.now();
-    accumulatedHomeTime = TimeRepository().getTotalMinuteADay(now);
-    if (lastEnterTime.toString() != TimeRepository.INVALID_DATE_TIME &&
-        userActionManager.isUserAtHome()) {
+    DateTime lastEnterTime = TimeRepository().getEnterTime();
+    accumulatedHomeTime.value = TimeRepository().getTotalMinuteADay(now);
+    log.info(
+        "loadCounter lastEnterTime=${lastEnterTime}, userAtHome=${UserActionManager().isUserAtHome()}");
+    if (UserActionManager().isUserAtHome()) {
       _lastEnterTime = lastEnterTime;
-      updateUiWithDurationSinceLastEnterTime(now);
+      updateDurationSinceLastEnterTime(now);
       startCounter();
-    } else {
-      emit(new CounterTickInvoked(
-          accumulatedHomeTime, TOTAL_MINUTE_A_DAY - accumulatedHomeTime));
     }
+    //update();
   }
 
-  @override
-  void unloadPage() {
-    log.info("unLoadPage");
+  void unLoadCounter() async {
+    log.info("unLoadCounter");
     stopCounter();
   }
 
@@ -58,10 +52,10 @@ class CounterCubit extends Cubit<CouterPageState>
     log.info("starTimer222");
     timer = Timer.periodic(Duration(seconds: period), (timer) {
       if (_lastEnterTime.toString() != TimeRepository.INVALID_DATE_TIME &&
-          userActionManager.isUserAtHome()) {
+          UserActionManager().isUserAtHome()) {
         DateTime now = DateTime.now();
         updateLastEnterTimesIfdayChanged(now);
-        updateUiWithDurationSinceLastEnterTime(now);
+        accumulatedHomeTime.value += 1;
       }
     });
   }
@@ -77,21 +71,18 @@ class CounterCubit extends Cubit<CouterPageState>
       TimeRepository().saveExitTime(todayMidnight);
       TimeRepository().saveEnterTime(todayMidnight);
       _lastEnterTime = todayMidnight;
-      accumulatedHomeTime = 0;
+      accumulatedHomeTime.value = 0;
       log.info(
           "updateLastEnterTimesIfdayChanged - midnight: ${todayMidnight}, lastEnter: ${_lastEnterTime}, now: ${now}");
     }
   }
 
-  void updateUiWithDurationSinceLastEnterTime(DateTime now) {
+  void updateDurationSinceLastEnterTime(DateTime now) {
     if (now.isAfter(_lastEnterTime)) {
       Duration durationSinceLastEnterTime = now.difference(_lastEnterTime);
-      final inHometime =
-          durationSinceLastEnterTime.inSeconds + accumulatedHomeTime;
-      final outHomeTime = TOTAL_MINUTE_A_DAY - inHometime;
-      emit(new CounterTickInvoked(inHometime, outHomeTime));
-      log.info(
-          "update UI : inHomeTime = ${inHometime}, outHomeTime = ${outHomeTime} ");
+      accumulatedHomeTime.value =
+          durationSinceLastEnterTime.inSeconds + accumulatedHomeTime.value;
+      log.info("update UI : accumulatedHomeTime = ${accumulatedHomeTime}");
     }
   }
 
@@ -101,7 +92,7 @@ class CounterCubit extends Cubit<CouterPageState>
     switch (action) {
       case UserActionType.ENTER_HOME:
         _lastEnterTime = time;
-        accumulatedHomeTime =
+        accumulatedHomeTime.value =
             TimeRepository().getTotalMinuteADay(_lastEnterTime);
         startCounter();
         break;
@@ -110,39 +101,5 @@ class CounterCubit extends Cubit<CouterPageState>
         stopCounter();
         break;
     }
-  }
-
-  BarChartGroupData makeGroupData(
-    int x,
-    int y, {
-    bool isTouched = false,
-    Color barColor = Colors.red,
-    double width = 10,
-    List<int> showTooltips = const [],
-  }) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          y: y.toDouble() % 10,
-          colors: isTouched ? [Colors.yellow] : [barColor],
-          width: width,
-        ),
-      ],
-      showingTooltipIndicators: showTooltips,
-    );
-  }
-
-  ChartInfo loadWeekTimeData(DateTime today) {
-    List<BarChartGroupData> weekTimeDataGroup = <BarChartGroupData>[];
-    int month = 5;
-    int day = 21;
-    int totalTime = 20;
-    for (int offset = DateTime.daysPerWeek - 1; offset >= 0; offset--) {
-      day -= offset;
-      totalTime += 10;
-      weekTimeDataGroup.add(makeGroupData(month * 100 + day, totalTime));
-    }
-    return WeekChartInfo(weekTimeDataGroup);
   }
 }

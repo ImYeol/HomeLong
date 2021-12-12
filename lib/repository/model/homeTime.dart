@@ -7,6 +7,7 @@ part 'homeTime.g.dart';
 class HomeTime {
   static const int INIT_TIME_OF_A_DAY = 0;
   static const int LAST_TIME_OF_A_DAY = 240000;
+  static final int TOTAL_SECOND_A_DAY = 60 * 60 * 24;
 
   @HiveField(0)
   final String enterTime; // ex) 2014-02-15 08:57:47.812

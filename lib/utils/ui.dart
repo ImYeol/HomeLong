@@ -6,11 +6,12 @@ headerTextBox(String text) {
   return Text(
     text,
     style: GoogleFonts.ptSans(
-      fontSize: AppTheme.headerSize,
-      color: AppTheme.headerColor,
-      fontWeight: FontWeight.bold,
-      // letterSpacing: 1.0,
-    ),
+        fontSize: AppTheme.headerSize,
+        color: AppTheme.headerColor,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.none
+        // letterSpacing: 1.0,
+        ),
     maxLines: 1,
     overflow: TextOverflow.ellipsis,
   );

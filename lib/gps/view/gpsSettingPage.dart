@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -22,19 +23,10 @@ class GPSSettingPage extends StatelessWidget {
 
   GPSSettingPage() : super();
 
-  static Route route() {
-    return MaterialPageRoute(builder: (_) => GPSSettingPage());
-  }
-
   @override
   Widget build(BuildContext context) {
     log.info("build gps page");
-    return Scaffold(
-      body: BlocProvider(
-        create: (_) => GPSSettingCubit(context.read<GPSService>()),
-        child: GPSSettingForm(),
-      ),
-    );
+    return Scaffold(body: GPSSettingForm());
   }
 }
 
@@ -75,28 +67,18 @@ class GPSSettingForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    return BlocListener<GPSSettingCubit, gpsState>(
-        listener: (context, state) {
-          if (state == gpsState.GPSSET) {
-            log.info("GPS info is loaded");
-          } else {
-            log.info("GPS info is unloaded yet");
-          }
-        },
-        child: Scaffold(
-          body: Stack(
-            children: <Widget>[
-              _buildGoogleMapWidget(context),
-              _buildZoomButton(),
-              AddressInput(
-                width: width,
-                addressController: this._addressController,
-                currentLocation: this._currentLocation,
-              ),
-              _buildCurrentLocationButton(context),
-            ],
-          ),
-        ));
+    return Stack(
+      children: <Widget>[
+        _buildGoogleMapWidget(context),
+        _buildZoomButton(),
+        AddressInput(
+          width: width,
+          addressController: this._addressController,
+          currentLocation: this._currentLocation,
+        ),
+        _buildCurrentLocationButton(context),
+      ],
+    );
   }
 
   Widget _buildGoogleMapWidget(BuildContext context) {
@@ -465,18 +447,12 @@ class _AddressInputState extends State<AddressInput> {
                           this.permitted = await _permissionCheck();
                           if (this.permitted == true) {
                             await _getLatLngFromAddress(addressController.text);
-                            Future<bool> success = UserRepository()
-                                .updateLocationInfo(
-                                    this.currentLocation.latitude,
-                                    this.currentLocation.longitude,
-                                    addressController.text);
-                            success.then((value) {
-                              if (value != true) {
-                                // TODO: Failed to save location
-                              }
-                            }).catchError((onError) {
-                              Navigator.pushReplacementNamed(context, '/Wifi');
-                            });
+                            await UserRepository().updateLocationInfo(
+                                this.currentLocation.latitude,
+                                this.currentLocation.longitude,
+                                addressController.text);
+                            //Navigator.pushReplacementNamed(context, '/Wifi');
+                            Get.offAllNamed("/Wifi");
                           }
                         },
                         child: Text('save'),

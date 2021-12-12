@@ -108,4 +108,11 @@ class TimeDB {
         "getTotalMinuteADay - total= ${totalMinute} key = ${targetDay}, list : ${homeTimeList}");
     return totalMinute;
   }
+
+  List<HomeTime> getTodayHomeTimeHistory(DateTime targetDay) {
+    _checkIfDBOpenedOrOpenDB(TIME_DB_NAME);
+    final homeTimeList = Hive.box(TIME_DB_NAME)
+        .get(targetDay.toString(), defaultValue: <HomeTime>[]);
+    return List<HomeTime>.from(homeTimeList);
+  }
 }

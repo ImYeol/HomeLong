@@ -1,46 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:homg_long/const/AppTheme.dart';
+import 'package:get/get.dart';
 import 'package:homg_long/home/barChartContent.dart';
 import 'package:homg_long/home/barChartToggleButton.dart';
-import 'package:homg_long/home/bloc/counterCubit.dart';
-import 'package:homg_long/screen/bloc/appScreenCubit.dart';
-import 'package:homg_long/screen/bloc/userActionManager.dart';
+import 'package:homg_long/home/bloc/chartController.dart';
 import 'package:homg_long/utils/titleText.dart';
+import 'package:logging/logging.dart';
 
-class BarChartSection extends StatefulWidget {
-  BarChartSection({Key? key}) : super(key: key);
-
-  @override
-  _BarChartSectionState createState() => _BarChartSectionState();
-}
-
-class _BarChartSectionState extends State<BarChartSection> {
-  List<bool> isSelected = [true, false];
+class BarChartSection extends StatelessWidget {
+  final log = Logger("_BarChartSectionState");
   double width = 0;
   double height = 0;
-  final cubit = CounterCubit(AppScreenCubit());
+  final controller = Get.find<ChartController>();
 
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return Container(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        //toggleButtonMenu(),
-        BarChartToggleButton(),
-        Container(height: 10),
-        chartTitle(),
-        barChart()
-      ],
-    ));
+    return Container(child: Obx(() {
+      log.info("BarChartSectionState build");
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          BarChartToggleButton(),
+          Container(height: 10),
+          //chartTitle(),
+          barChart()
+        ],
+      );
+    }));
   }
 
   Widget chartTitle() {
     return TitleText(
-      title: isSelected[0] ? "Weekly" : "Monthly",
+      title: controller.toChartTypeString(controller.selectedChartType),
       fontSize: 20,
       withDivider: false,
     );
@@ -51,10 +44,7 @@ class _BarChartSectionState extends State<BarChartSection> {
         padding: EdgeInsets.only(left: 20, right: 20, top: 10),
         width: width,
         child: AspectRatio(
-          aspectRatio: 2 / 1,
-          child: BarChartContent(
-            chartInfo: cubit.loadWeekTimeData(DateTime.now()),
-          ),
-        ));
+            aspectRatio: 2 / 1,
+            child: BarChartContent(chartInfo: controller.chartInfo)));
   }
 }

@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/home/bloc/chartController.dart';
+import 'package:homg_long/home/model/chartInfo.dart';
 
-class BarChartToggleButton extends StatefulWidget {
-  BarChartToggleButton({Key? key}) : super(key: key);
-
-  @override
-  _BarChartToggleButtonState createState() => _BarChartToggleButtonState();
-}
-
-class _BarChartToggleButtonState extends State<BarChartToggleButton> {
-  List<bool> isSelected = [true, false];
+class BarChartToggleButton extends StatelessWidget {
   final double fontSize = 15;
   final FontWeight fontWeight = FontWeight.w600;
   final Color selectedColor = Colors.white;
   final Color unSelectedColor = Color(0xFFE9E9FF);
   final Color selectedFontColor = AppTheme.font_color;
   final Color unSelectedFontColor = Color(0x070417).withOpacity(0.4);
+  final controller = Get.find<ChartController>();
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +23,16 @@ class _BarChartToggleButtonState extends State<BarChartToggleButton> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10), color: Color(0xFFE9E9FF)),
       child: Row(
-        children: [toggleButtonItem("Weekly"), toggleButtonItem("Monthly")],
+        children: [
+          toggleButtonItem(ChartContentType.WEEK),
+          toggleButtonItem(ChartContentType.MONTH)
+        ],
       ),
     );
   }
 
-  Widget toggleButtonItem(String title) {
-    bool selected = buttonSelected(title);
+  Widget toggleButtonItem(ChartContentType type) {
+    print("BarChartToggleButton - type = ${controller.selectedChartType}");
     return Flexible(
         flex: 1,
         child: InkWell(
@@ -41,39 +40,24 @@ class _BarChartToggleButtonState extends State<BarChartToggleButton> {
             margin: EdgeInsets.all(5),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: selected ? selectedColor : unSelectedColor),
+                color: controller.selectedChartType == type
+                    ? selectedColor
+                    : unSelectedColor),
             child: Center(
               child: Text(
-                title,
+                controller.toChartTypeString(type),
                 style: GoogleFonts.ptSans(
                     fontSize: fontSize,
-                    color: selected ? selectedFontColor : unSelectedFontColor,
+                    color: controller.selectedChartType == type
+                        ? selectedFontColor
+                        : unSelectedFontColor,
                     fontWeight: fontWeight),
               ),
             ),
           ),
-          onTap: () {
-            setState(() {
-              if (buttonSelected(title) == false) {
-                updateButtonSeleted();
-              }
-            });
-          },
+          onTap: () => type == ChartContentType.WEEK
+              ? controller.loadWeekTimeData(DateTime.now())
+              : controller.loadMonthTimeData(DateTime.now()),
         ));
-  }
-
-  bool buttonSelected(String title) {
-    print("tittle: " + title);
-    if (title == "Weekly") {
-      return isSelected[0];
-    } else {
-      return isSelected[1];
-    }
-  }
-
-  void updateButtonSeleted() {
-    for (int i = 0; i < isSelected.length; i++) {
-      isSelected[i] = isSelected[i] ? false : true;
-    }
   }
 }

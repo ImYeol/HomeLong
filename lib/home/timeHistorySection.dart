@@ -1,39 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/const/AppTheme.dart';
+import 'package:homg_long/home/bloc/timeHistoryController.dart';
 import 'package:homg_long/repository/model/homeTime.dart';
 import 'package:homg_long/utils/titleText.dart';
+import 'package:logging/logging.dart';
 
 class TimeHistorySection extends StatelessWidget {
-  List<HomeTime>? timeHistoryList;
-  List<HomeTime> tempHistoryList = [
-    HomeTime(
-        enterTime: "2014-02-15 08:57:47.812",
-        exitTime: "2014-02-15 09:57:47.812",
-        description: "home"),
-    HomeTime(
-        enterTime: "2014-02-15 10:57:47.812",
-        exitTime: "2014-02-15 11:57:47.812",
-        description: "home"),
-    HomeTime(
-        enterTime: "2014-02-15 12:57:47.812",
-        exitTime: "2014-02-15 13:57:47.812",
-        description: "home"),
-    HomeTime(
-        enterTime: "2014-02-15 14:57:47.812",
-        exitTime: "2014-02-15 15:57:47.812",
-        description: "home"),
-    HomeTime(
-        enterTime: "2014-02-15 16:57:47.812",
-        exitTime: "2014-02-15 17:57:47.812",
-        description: "home"),
-  ];
-
-  TimeHistorySection({Key? key, this.timeHistoryList}) : super(key: key);
+  final log = Logger("TimeHistorySection");
+  TimeHistorySection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print("timeHistorySection build");
+    log.info("timeHistorySection build");
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,20 +26,22 @@ class TimeHistorySection extends StatelessWidget {
   }
 
   Widget timeHistoryListView() {
-    timeHistoryList = tempHistoryList;
-    print("timeHistoryList is : $timeHistoryList");
-    if (timeHistoryList == null || timeHistoryList!.length == 0) {
-      print("timeHistoryList is null : $timeHistoryList");
+    final controller = Get.find<TimeHistoryController>();
+    final timeHistoryList = controller.timeHistory;
+    log.info("timeHistoryList is : $timeHistoryList");
+    if (timeHistoryList.length == 0) {
       return Container();
     }
-    return ListView.builder(
-        primary: false,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        scrollDirection: Axis.vertical,
-        itemCount: timeHistoryList!.length,
-        itemBuilder: (context, index) =>
-            TimeHistoryListItem(homeTime: timeHistoryList![index]));
+    return Obx(() {
+      return ListView.builder(
+          primary: false,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          scrollDirection: Axis.vertical,
+          itemCount: timeHistoryList.length,
+          itemBuilder: (context, index) =>
+              TimeHistoryListItem(homeTime: timeHistoryList[index]));
+    });
   }
 }
 
