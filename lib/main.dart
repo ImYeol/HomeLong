@@ -1,9 +1,12 @@
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginController.dart';
@@ -13,9 +16,8 @@ import 'package:homg_long/screen/appScreen.dart';
 import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/utils/router.dart';
 import 'package:logging/logging.dart' as logging;
+
 import 'login/view/loginPage.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 //https://fkkmemi.github.io/ff/
 void main() async {
@@ -121,7 +123,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         defaultTransition: Transition.rightToLeftWithFade,
         getPages: GetXRouter.route,
         navigatorKey: _navigatorKey,
-        home:
-            UserRepository().isLoginSessionValid() ? AppScreen() : LoginPage());
+        home: auth.FirebaseAuth.instance.currentUser == null
+            ? LoginPage()
+            : AppScreen());
   }
 }
