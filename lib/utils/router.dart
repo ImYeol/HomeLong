@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
+import 'package:homg_long/friends/addFriendPage.dart';
 import 'package:homg_long/gps/view/gpsSettingPage.dart';
 import 'package:homg_long/login/view/loginPage.dart';
-import 'package:homg_long/main.dart';
 import 'package:homg_long/screen/appScreen.dart';
 import 'package:homg_long/splashPage.dart';
 import 'package:homg_long/wifi/wifiSettingPage.dart';
@@ -13,5 +13,6 @@ class GetXRouter {
     GetPage(name: '/Main', page: () => AppScreen()),
     GetPage(name: '/Wifi', page: () => WifiSettingPage()),
     GetPage(name: '/GPS', page: () => GPSSettingPage()),
+    GetPage(name: '/AddFriend', page: () => AddFriendPage()),
   ];
 }

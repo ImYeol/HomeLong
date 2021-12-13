@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:homg_long/const/AppTheme.dart';
+import 'package:get/get.dart';
 import 'package:homg_long/friends/bloc/friendsPageController.dart';
 import 'package:homg_long/friends/friendsListSection.dart';
 import 'package:homg_long/friends/homeFriendsListSection.dart';
@@ -80,9 +80,12 @@ class _FriendsPageState extends State<FriendsPage> {
         ),
         Align(
           alignment: Alignment.centerRight,
-          child: Icon(
-            Icons.person_add,
-            size: 30,
+          child: IconButton(
+            icon: Icon(Icons.person_add),
+            iconSize: 30,
+            onPressed: () {
+              Get.toNamed('AddFriend');
+            },
           ),
         )
       ],
