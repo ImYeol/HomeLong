@@ -21,22 +21,9 @@ class BarChartSection extends StatelessWidget {
       log.info("BarChartSectionState build");
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          BarChartToggleButton(),
-          Container(height: 10),
-          //chartTitle(),
-          barChart()
-        ],
+        children: [BarChartToggleButton(), Container(height: 10), barChart()],
       );
     }));
-  }
-
-  Widget chartTitle() {
-    return TitleText(
-      title: controller.toChartTypeString(controller.selectedChartType),
-      fontSize: 20,
-      withDivider: false,
-    );
   }
 
   Widget barChart() {

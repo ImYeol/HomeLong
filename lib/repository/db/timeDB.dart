@@ -101,8 +101,8 @@ class TimeDB {
     homeTimeList.forEach((element) {
       DateTime enterTime = DateTime.parse(element.enterTime);
       DateTime exitTime = DateTime.parse(element.exitTime);
-      // inSeconds for debug
-      totalMinute += exitTime.difference(enterTime).inSeconds;
+      // inMinute for debug
+      totalMinute += exitTime.difference(enterTime).inMinutes;
     });
     log.info(
         "getTotalMinuteADay - total= ${totalMinute} key = ${targetDay}, list : ${homeTimeList}");
