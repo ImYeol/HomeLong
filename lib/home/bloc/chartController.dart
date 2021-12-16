@@ -20,7 +20,7 @@ class ChartController extends GetxController {
 
   BarChartGroupData makeGroupData(
     int x,
-    int y, {
+    double y, {
     bool isTouched = false,
     Color barColor = Colors.red,
     double width = 10,
@@ -30,7 +30,7 @@ class ChartController extends GetxController {
       x: x,
       barRods: [
         BarChartRodData(
-          y: y.toDouble() % 10,
+          y: y,
           colors: isTouched ? [Colors.yellow] : [barColor],
           width: width,
         ),
@@ -57,7 +57,8 @@ class ChartController extends GetxController {
     List<BarChartGroupData> weekTimeDataGroup = <BarChartGroupData>[];
     for (int offset = DateTime.daysPerWeek - 1; offset >= 0; offset--) {
       DateTime date = today.subtract(Duration(days: offset));
-      int totalTime = TimeRepository().getTotalMinuteADay(date);
+      // hour time
+      double totalTime = TimeRepository().getTotalMinuteADay(date) / 60;
       log.info("loadWeekTimeData : " +
           "date=" +
           (date.month * 100 + date.day).toString() +
@@ -75,8 +76,9 @@ class ChartController extends GetxController {
     List<BarChartGroupData> monthTimeDataGroup = <BarChartGroupData>[];
     for (int offset = daysPerMonth - 1; offset >= 0; offset--) {
       DateTime date = today.subtract(Duration(days: offset));
-      int totalTime = TimeRepository().getTotalMinuteADay(date);
-      log.info("loadWeekTimeData : " +
+      // hour time
+      double totalTime = TimeRepository().getTotalMinuteADay(date) / 60;
+      log.info("loadMonthTimeData : " +
           "date=" +
           (date.month * 100 + date.day).toString() +
           " totalTime=" +

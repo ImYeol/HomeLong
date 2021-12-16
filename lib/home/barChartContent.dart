@@ -15,7 +15,7 @@ class BarChartContent extends StatelessWidget {
     log.info("min Y: ${chartInfo.minY}, max Y: ${chartInfo.maxY}");
     return BarChart(BarChartData(
       minY: 0,
-      maxY: 100,
+      maxY: 24,
       // bottom data titles
       titlesData: getTitlesData(),
       barGroups: chartInfo.chartGroupData,
@@ -45,7 +45,7 @@ class BarChartContent extends StatelessWidget {
       getTextStyles: (context, value) => GoogleFonts.quicksand(
           fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
       getTitles: (double value) {
-        int month = (value / 100).toInt();
+        int month = value ~/ 100;
         int day = (value % 100).toInt();
         return month.toString() + "." + day.toString();
       },
