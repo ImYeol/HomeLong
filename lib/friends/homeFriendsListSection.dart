@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/const/AppTheme.dart';
-import 'package:homg_long/repository/model/userInfo.dart';
+import 'package:homg_long/friends/bloc/friendsPageController.dart';
+import 'package:homg_long/friends/roundedProfileImage.dart';
+import 'package:homg_long/repository/model/friendInfo.dart';
 import 'package:homg_long/utils/titleText.dart';
 import 'package:logging/logging.dart';
 
 class HomeFriendsListSection extends StatelessWidget {
   final log = Logger("HomeFriendsList");
-  List<UserInfo> homeFriends = [
-    UserInfo(id: "asdf dd1", name: "asdfdd1", image: ""),
-    UserInfo(id: "asdf dd12", name: "asdfdd1212341234", image: ""),
-    UserInfo(id: "asdf dd123", name: "asdfdd12333", image: ""),
-    UserInfo(id: "asdf dd1234", name: "asdfdd12341234", image: ""),
-    UserInfo(id: "asdf dd12345", name: "asdfdd12345", image: "")
-  ];
+  final controller = Get.find<FriendsPageController>();
+  // List<UserInfo> homeFriends = [
+  //   UserInfo(id: "asdf dd1", name: "asdfdd1", image: ""),
+  //   UserInfo(id: "asdf dd12", name: "asdfdd1212341234", image: ""),
+  //   UserInfo(id: "asdf dd123", name: "asdfdd12333", image: ""),
+  //   UserInfo(id: "asdf dd1234", name: "asdfdd12341234", image: ""),
+  //   UserInfo(id: "asdf dd12345", name: "asdfdd12345", image: "")
+  // ];
 
   HomeFriendsListSection({Key? key});
 
@@ -23,37 +27,40 @@ class HomeFriendsListSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [TitleText(title: "At Home"), topHomeBodyListView()],
+        children: [TitleText(title: "At Home"), homeBodyListView()],
       ),
     );
   }
 
-  Widget topHomeBodyListView() {
+  Widget homeBodyListView() {
     // parent is single child view that has infinite height
     // It needs to set hegiht
-    return SizedBox(
-      height: AppTheme.icon_size * 2,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: homeFriends.length,
-        itemBuilder: (context, index) =>
-            HomeFriendsListItem(friend: homeFriends[index]),
-      ),
-    );
+    return Obx(() {
+      return SizedBox(
+        height: AppTheme.icon_size * 2,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: controller.homeFriends.length,
+          itemBuilder: (context, index) =>
+              HomeFriendsListItem(friend: controller.homeFriends[index]),
+        ),
+      );
+    });
   }
 }
 
 class HomeFriendsListItem extends StatelessWidget {
+  final log = Logger("HomeFriendsListItem");
   final double height = AppTheme.icon_size * 2;
   final double width = AppTheme.icon_size * 3;
 
-  final UserInfo friend;
+  final FriendInfo friend;
 
   HomeFriendsListItem({Key? key, required this.friend}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print("HomeFriendsListItem size : ${width} : ${height}");
+    log.info("HomeFriendsListItem size : ${width} : ${height}");
     return Container(
         width: width,
         height: height,
@@ -73,12 +80,7 @@ class HomeFriendsListItem extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        CircleAvatar(
-          radius: AppTheme.icon_size / 2,
-          backgroundImage: friend.image == "invalid"
-              ? AssetImage(AppTheme.emptyUserImage)
-              : AssetImage(AppTheme.emptyUserImage),
-        ),
+        RoundedProfileImage(imageUrl: friend.image),
         Container(
           width: AppTheme.icon_size * 1.5,
           child: Text(

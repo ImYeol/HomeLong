@@ -4,6 +4,7 @@ import 'package:homg_long/const/StatusCode.dart';
 import 'package:homg_long/const/URL.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
+import 'package:homg_long/repository/proxy/friendApiHeader.dart';
 import 'package:homg_long/repository/userRepository.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
@@ -103,5 +104,56 @@ class UserProxy implements UserAPI {
   Future<bool> deleteUserInfo() async {
     // TODO: implement deleteUserInfo
     return true;
+  }
+
+  Future<bool> setFriendInfo(UserInfo user, UserInfo friend) async {
+    log.info("setFriendInfo");
+
+    var response = await http.post(
+      URL.setFriendURL,
+      headers: FriendApiHeader.builder(user.id, friend.id),
+    );
+
+    if (response.statusCode == StatusCode.statusOK) {
+      log.info("setFriendInfo success");
+      return true;
+    } else {
+      log.info("setFriendInfo fail(${response.statusCode}, ${response.body})");
+      return false;
+    }
+  }
+
+  Future<UserInfo> getFriendInfo(UserInfo user, UserInfo friend) async {
+    log.info("getFriendInfo");
+    var response = await http.get(
+      URL.getFriendURL,
+      headers: FriendApiHeader.builder(user.id, friend.id),
+    );
+
+    if (response.statusCode == StatusCode.statusOK) {
+      log.info("getFriendInfo success(${response.body}");
+      return UserInfo.fromJson(json.decode(response.body));
+    } else {
+      log.info("getFriendInfo fail(${response.statusCode}, ${response.body})");
+      return InvalidUserInfo();
+    }
+  }
+
+  Future<bool> deleteFriendInfo(UserInfo user, UserInfo friend) async {
+    log.info("setFriendInfo");
+
+    var response = await http.post(
+      URL.deleteFriendURL,
+      headers: FriendApiHeader.builder(user.id, friend.id),
+    );
+
+    if (response.statusCode == StatusCode.statusOK) {
+      log.info("deleteFriendInfo success");
+      return true;
+    } else {
+      log.info(
+          "deleteFriendInfo fail(${response.statusCode}, ${response.body})");
+      return false;
+    }
   }
 }

@@ -87,7 +87,7 @@ class _AppScreenState extends State<AppScreen>
       case 0:
         return CounterPage();
       case 1:
-        return FriendsPage();
+        return FriendPage();
       case 2:
         return FeedPage();
       case 3:

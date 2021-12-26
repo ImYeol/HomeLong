@@ -1,38 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:homg_long/friends/friendsPage.dart';
+import 'package:homg_long/repository/friendRepository.dart';
+import 'package:homg_long/repository/model/friendInfo.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
+import 'package:homg_long/repository/userRepository.dart';
 
 class FriendsPageController extends ChangeNotifier {
-  List<UserInfo> _homeFriends = <UserInfo>[];
-  List<UserInfo> _friends = <UserInfo>[];
+  var _homeFriends = <FriendInfo>[].obs;
+  var _friends = <FriendInfo>[].obs;
 
-  List<UserInfo> get homeFriends => _homeFriends;
-  List<UserInfo> get frineds => _friends;
+  List<FriendInfo> get homeFriends => _homeFriends.value;
+  List<FriendInfo> get frineds => _friends.value;
 
-  Future<void> loadFreinds() async {
-    _friends = await Future.delayed(
-        Duration(milliseconds: 300),
-        () => [
-              UserInfo(id: "id11111", name: "11111", image: "empty"),
-              UserInfo(id: "id22222", name: "22222", image: "empty"),
-              UserInfo(id: "id33333", name: "33333", image: "empty"),
-              UserInfo(id: "id44444", name: "44444", image: "empty"),
-              UserInfo(id: "id55555", name: "55555", image: "empty"),
-              UserInfo(id: "id66666", name: "66666", image: "empty")
-            ]);
+  final UserRepository userRepository;
+  final FriendRepository friendRepository;
 
-    _homeFriends = await Future.delayed(
-        Duration(milliseconds: 300),
-        () => [
-              UserInfo(id: "id11111", name: "11111", image: "empty"),
-              UserInfo(id: "id44444", name: "44444", image: "empty"),
-              UserInfo(id: "id55555", name: "55555", image: "empty"),
-              UserInfo(id: "id66666", name: "66666", image: "empty")
-            ]);
+  FriendsPageController(
+      {required this.userRepository, required this.friendRepository});
+
+  void loadFreinds() async {
+    final user = await userRepository.getUserInfo();
+    _friends.value = await friendRepository.getAllFriends(user.id);
+    _homeFriends.value =
+        _friends.value.where((friend) => friend.atHome).toList();
   }
 
-  void searchFriend(String id) async {}
+  Future<FriendInfo> searchFriend(String fid) async {
+    final user = await userRepository.getUserInfo();
+    return friendRepository.getFriendInfo(user.id, fid);
+  }
 
-  void addFriend(String id) async {}
+  void addFriend(FriendInfo friend) async {
+    final user = await userRepository.getUserInfo();
+    bool added = await friendRepository.setFriendInfo(user.id, friend);
+    if (added) {
+      _friends.value.add(friend);
+      if (friend.atHome) {
+        _homeFriends.value.add(friend);
+      }
+    }
+  }
 
-  void deleteFriend(String id) async {}
+  void deleteFriend(FriendInfo friend) async {
+    final user = await userRepository.getUserInfo();
+    bool deleted = await friendRepository.deleteFriendInfo(user.id, friend.id);
+    if (deleted) {
+      _friends.value.remove(friend);
+      if (friend.atHome) {
+        _homeFriends.value.remove(friend);
+      }
+    }
+  }
 }

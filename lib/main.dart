@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:homg_long/const/appTheme.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginController.dart';
+import 'package:homg_long/repository/friendRepository.dart';
 import 'package:homg_long/repository/timeRepository.dart';
 import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/screen/appScreen.dart';
@@ -32,8 +33,10 @@ void main() async {
   await Firebase.initializeApp();
   UserRepository().init();
   TimeRepository().init();
+  FriendRepository().init();
   await UserRepository().openDatabase();
   await TimeRepository().openDatabase();
+  await FriendRepository().openDatabase();
   UserActionManager().init();
   // run myapp with auth repository.
   runApp(MyApp());
