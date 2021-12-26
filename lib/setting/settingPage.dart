@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:homg_long/log/logger.dart';
 import 'package:homg_long/login/cubit/loginController.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/setting/bloc/settingCubit.dart';
 import 'package:homg_long/utils/ui.dart';
 import 'package:logging/logging.dart';

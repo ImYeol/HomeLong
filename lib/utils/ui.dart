@@ -31,6 +31,20 @@ normalTextBox(String text) {
   );
 }
 
+normalInvalidTextBox(String text) {
+  return Text(
+    text,
+    style: GoogleFonts.ptSans(
+      fontSize: AppTheme.textSize,
+      color: Colors.black12,
+      fontWeight: FontWeight.bold,
+      // letterSpacing: 1.0,
+    ),
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+  );
+}
+
 smallTextBox(String text) {
   return Text(
     text,
