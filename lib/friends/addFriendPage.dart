@@ -5,6 +5,7 @@ import 'package:homg_long/friends/bloc/addFriendPageController.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/utils/titleText.dart';
 import 'package:homg_long/utils/ui.dart';
+import 'package:homg_long/utils/utils.dart';
 
 class AddFriendPage extends StatelessWidget {
   AddFriendPage({Key? key}) : super(key: key);
@@ -22,6 +23,7 @@ class AddFriendPage extends StatelessWidget {
 class AddFriendForm extends StatelessWidget {
   final AddFriendPageController controller = AddFriendPageController();
   late UserInfo userInfo;
+  late String fid;
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -88,6 +90,7 @@ class AddFriendForm extends StatelessWidget {
           if (input.isEmpty) {
             controller.off();
           } else {
+            fid = input;
             controller.on();
           }
         },
@@ -112,8 +115,14 @@ class AddFriendForm extends StatelessWidget {
                 init: controller,
                 builder: (_) => controller.getHasInput()
                     ? TextButton(
-                        onPressed: () {
-                          Get.back();
+                        onPressed: () async {
+                          var res =
+                              await controller.addFriend(userInfo.id, fid);
+                          if (res == true) {
+                            Get.back();
+                          } else {
+                            showToast("add friend failed");
+                          }
                         },
                         child: normalTextBox("SAVE"))
                     : TextButton(

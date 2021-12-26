@@ -23,6 +23,10 @@ class UserInfo {
   double latitude = double.infinity; // as initial value
   @HiveField(8)
   double longitude = double.infinity; // as initial value
+  @HiveField(9)
+  List<String> friend = [];
+  @HiveField(10)
+  bool atHome = false;
 
   UserInfo(
       {String id = "",
@@ -33,7 +37,9 @@ class UserInfo {
       String street = "",
       String initDate = "9999-99-99 99:99:99.999",
       double latitude = 0.0,
-      double longitude = 0.0}) {
+      double longitude = 0.0,
+      List<String> friend = const [""],
+      bool atHome = false}) {
     this.id = id;
     this.name = name;
     this.image = image;
@@ -43,6 +49,8 @@ class UserInfo {
     this.initDate = initDate;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.friend = friend;
+    this.atHome = false;
   }
 
   UserInfo.fromJson(Map<String, dynamic> json) {
@@ -55,6 +63,9 @@ class UserInfo {
     initDate = json['initDate'];
     latitude = json['latitude'];
     longitude = json['longitude'];
+    var friendFromJson = json['friend'];
+    friend = new List<String>.from(friendFromJson);
+    atHome = json['atHome'];
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +79,8 @@ class UserInfo {
       "initDate": this.initDate,
       "latitude": this.latitude,
       "longitude": this.longitude,
+      "friend": this.friend,
+      "atHome": this.atHome,
     };
   }
 

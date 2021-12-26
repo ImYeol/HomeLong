@@ -26,4 +26,7 @@ class URL {
 
   static Uri setDayTimeURL =
       Uri.parse(serverHost + serverPort + "/time/day/set");
+
+  // frined
+  static Uri addFriendURL = Uri.parse(serverHost + serverPort + "/friend/set");
 }

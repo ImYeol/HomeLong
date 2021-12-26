@@ -23,4 +23,8 @@ class AddFriendPageController extends GetxController {
   bool getHasInput() {
     return hasInput;
   }
+
+  Future<bool> addFriend(String id, String fid) async {
+    return UserRepository().addFriend(id, fid);
+  }
 }

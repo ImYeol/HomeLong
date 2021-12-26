@@ -104,4 +104,19 @@ class UserProxy implements UserAPI {
     // TODO: implement deleteUserInfo
     return true;
   }
+
+  Future<bool> addFriend(String id, String fid) async {
+    var response =
+        await http.post(URL.addFriendURL, headers: {'id': id, 'fid': fid});
+
+    if (response.statusCode != StatusCode.statusOK) {
+      log.warning("add friend failed");
+      log.warning("id:", id);
+      log.warning("fid:", fid);
+      return false;
+    }
+
+    log.info("add friend success (${response.statusCode}, ${response.body})");
+    return true;
+  }
 }

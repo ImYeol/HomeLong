@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/friends/verticalUserInfoListItem.dart';
 import 'package:homg_long/repository/model/userInfo.dart';

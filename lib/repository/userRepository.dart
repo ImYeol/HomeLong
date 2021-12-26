@@ -73,4 +73,8 @@ class UserRepository implements UserAPI {
     return await _db.updateWifiInfo(ssid, bssid) &&
         await _proxy.updateWifiInfo(ssid, bssid);
   }
+
+  Future<bool> addFriend(String id, String fid) async {
+    return await _db.addFriend(id, fid) && await _proxy.addFriend(id, fid);
+  }
 }

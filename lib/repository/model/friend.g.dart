@@ -1,40 +1,33 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'userInfo.dart';
+part of 'friend.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class UserInfoAdapter extends TypeAdapter<UserInfo> {
+class FriendAdapter extends TypeAdapter<Friend> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
-  UserInfo read(BinaryReader reader) {
+  Friend read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return UserInfo(
+    return Friend(
       id: fields[0] as String,
       name: fields[1] as String,
       image: fields[2] as String,
-      ssid: fields[3] as String,
-      bssid: fields[4] as String,
-      street: fields[5] as String,
-      initDate: fields[6] as String,
-      latitude: fields[7] as double,
-      longitude: fields[8] as double,
-      friend: fields[9] as List<String>,
-      atHome: fields[10] as bool,
+      atHome: fields[3] as bool,
     );
   }
 
   @override
-  void write(BinaryWriter writer, UserInfo obj) {
+  void write(BinaryWriter writer, Friend obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -42,20 +35,6 @@ class UserInfoAdapter extends TypeAdapter<UserInfo> {
       ..writeByte(2)
       ..write(obj.image)
       ..writeByte(3)
-      ..write(obj.ssid)
-      ..writeByte(4)
-      ..write(obj.bssid)
-      ..writeByte(5)
-      ..write(obj.street)
-      ..writeByte(6)
-      ..write(obj.initDate)
-      ..writeByte(7)
-      ..write(obj.latitude)
-      ..writeByte(8)
-      ..write(obj.longitude)
-      ..writeByte(9)
-      ..write(obj.friend)
-      ..writeByte(10)
       ..write(obj.atHome);
   }
 
@@ -65,7 +44,7 @@ class UserInfoAdapter extends TypeAdapter<UserInfo> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserInfoAdapter &&
+      other is FriendAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
