@@ -27,11 +27,17 @@ class AuthenticationProxy implements Authentication {
           await auth.FirebaseAuth.instance.signInWithCredential(credential);
 
       if (userCredential.user == null) {
+        log.warning("userCredential.user is null");
+        return model.InvalidUserInfo();
+      }
+
+      if (userCredential.user!.email == "") {
+        log.warning("userCredential.user.email is empty");
         return model.InvalidUserInfo();
       }
 
       return model.UserInfo(
-          id: userCredential.user!.uid,
+          id: userCredential.user!.email ?? 'invalid',
           name: userCredential.user!.displayName ?? '',
           image: userCredential.user!.photoURL ?? '',
           initDate: DateTime.now().toString());
@@ -130,16 +136,22 @@ class AuthenticationProxy implements Authentication {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      log.info("user info1:$credential");
+
       auth.UserCredential userCredential =
           await auth.FirebaseAuth.instance.signInWithCredential(credential);
-      log.info("user info2:$userCredential");
+
       if (userCredential.user == null) {
+        log.warning("userCredential.user is null");
         return model.InvalidUserInfo();
       }
-      log.info("user info3:$userCredential");
+
+      if (userCredential.user!.email == "") {
+        log.warning("userCredential.user.email is empty");
+        return model.InvalidUserInfo();
+      }
+
       return model.UserInfo(
-        id: userCredential.user!.uid,
+        id: userCredential.user!.email ?? 'invalid',
         name: userCredential.user!.displayName ?? '',
         image: userCredential.user!.photoURL ?? '',
         initDate: DateTime.now().toString(),
