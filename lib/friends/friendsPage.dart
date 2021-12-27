@@ -59,9 +59,7 @@ class FriendPage extends StatelessWidget {
           child: IconButton(
             icon: Icon(Icons.person_add),
             iconSize: 30,
-            onPressed: () {
-              Get.toNamed('AddFriend');
-            },
+            onPressed: () => controller.goToSearchPage(),
           ),
         )
       ],

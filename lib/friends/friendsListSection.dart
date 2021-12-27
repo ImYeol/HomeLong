@@ -42,8 +42,19 @@ class FriendsListSection extends StatelessWidget {
           childAspectRatio: 1,
         ),
         itemCount: controller.frineds.length,
-        itemBuilder: (context, index) =>
-            VerticalUserInfoListItem(friend: controller.frineds[index]),
+        itemBuilder: (context, index) => GestureDetector(
+          onLongPress: () => Get.defaultDialog(
+              title: "Delete",
+              middleText: "${controller.frineds[index].id}",
+              onConfirm: () {
+                controller.deleteFriend(controller.frineds[index]);
+                Get.back();
+              },
+              onCancel: () {
+                Get.back();
+              }),
+          child: VerticalUserInfoListItem(friend: controller.frineds[index]),
+        ),
       );
     });
   }

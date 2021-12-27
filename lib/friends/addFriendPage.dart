@@ -1,55 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/friends/bloc/addFriendPageController.dart';
+import 'package:homg_long/friends/roundedProfileImage.dart';
+import 'package:homg_long/repository/friendRepository.dart';
+import 'package:homg_long/repository/model/friendInfo.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:homg_long/utils/titleText.dart';
 import 'package:homg_long/utils/ui.dart';
 
 class AddFriendPage extends StatelessWidget {
-  AddFriendPage({Key? key}) : super(key: key);
+  late final AddFriendPageController controller;
+
+  AddFriendPage({Key? key}) : super(key: key) {
+    controller = AddFriendPageController(
+        user: Get.arguments, friendRepository: FriendRepository());
+    Get.put(controller);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppTheme.backgroundColor,
+          elevation: 0,
+          title: TitleText(title: "Add Friend", withDivider: false),
+          leading: IconButton(
+            icon: Icon(Icons.chevron_left),
+            color: AppTheme.textColor,
+            onPressed: () => Get.back(),
+          ),
+          actions: [Center(child: searchButton())],
+        ),
         body: Container(
             color: AppTheme.backgroundColor,
-            padding: EdgeInsets.only(left: 20, top: 50, right: 20),
+            padding: EdgeInsets.only(left: 20, top: 20, right: 20),
             child: AddFriendForm()));
+  }
+
+  Widget searchButton() {
+    return Obx(() {
+      if (controller.inputText.isEmpty) {
+        print("controller has no input");
+        return TextButton(
+            onPressed: () {}, child: normalInvalidTextBox("Search"));
+      } else {
+        print("controller has input");
+        return TextButton(
+            onPressed: () => controller.searchFriend(),
+            child: normalTextBox("Search"));
+      }
+    });
   }
 }
 
 class AddFriendForm extends StatelessWidget {
-  final AddFriendPageController controller = AddFriendPageController();
-  late UserInfo userInfo;
+  final AddFriendPageController controller =
+      Get.find<AddFriendPageController>();
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: controller.loadUserInfo(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return Center(child: CircularProgressIndicator());
-            case ConnectionState.done:
-              userInfo = snapshot.data as UserInfo;
-              return addFriend(userInfo);
-            default:
-              return Center(child: CircularProgressIndicator());
-          }
-        });
-  }
-
-  Widget addFriend(UserInfo userInfo) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Container(
-          child: TitleText(title: "Add Friend"),
-        ),
         addFriendText(),
         idView(),
-        saveBackButton(),
+        Obx(() {
+          return Center(
+              child: searchResultView(friend: controller.searchedFriend));
+        })
       ],
     );
   }
@@ -85,11 +106,7 @@ class AddFriendForm extends StatelessWidget {
             hintText: 'Input Friend ID',
             hintStyle: TextStyle(color: AppTheme.smallTextColor)),
         onChanged: (String input) {
-          if (input.isEmpty) {
-            controller.off();
-          } else {
-            controller.on();
-          }
+          controller.inputText = input;
         },
       ),
     );
@@ -98,35 +115,56 @@ class AddFriendForm extends StatelessWidget {
   Widget idView() {
     return Container(
         alignment: Alignment.centerRight,
-        child: smallTextBox("ID : " + userInfo.id));
+        child: smallTextBox("ID : " + controller.user.id));
   }
+}
 
-  Widget saveBackButton() {
+class searchResultView extends StatelessWidget {
+  static const _viewWidth = 250.0;
+  static const _viewHeight = 150.0;
+  final FriendInfo friend;
+  final controller = Get.find<AddFriendPageController>();
+  searchResultView({Key? key, required this.friend}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (friend.id.isEmpty) {
+      return Container();
+    }
     return Container(
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(top: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        width: _viewWidth,
+        height: _viewHeight,
+        margin: EdgeInsets.only(top: 20),
+        decoration: BoxDecoration(
+          color: Color(0xFFF7F7F7),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            GetBuilder<AddFriendPageController>(
-                init: controller,
-                builder: (_) => controller.getHasInput()
-                    ? TextButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        child: normalTextBox("SAVE"))
-                    : TextButton(
-                        onPressed: () {}, child: normalInvalidTextBox("SAVE"))),
-            Container(
-                // padding: EdgeInsets.only(left: 5),
-                child: TextButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: normalTextBox("BACK"),
-            ))
+            RoundedProfileImage(imageUrl: friend.image),
+            knockGuideText(),
+            addButton()
           ],
         ));
+  }
+
+  Widget knockGuideText() {
+    return Text(
+      friend.id,
+      style: GoogleFonts.lato(
+          color: Color(0xFF4F5E7B),
+          fontSize: 12,
+          fontWeight: FontWeight.normal),
+      softWrap: true,
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget addButton() {
+    return ElevatedButton(
+        onPressed: () => controller.addFriend(friend),
+        child: normalTextBox("SAVE"));
   }
 }

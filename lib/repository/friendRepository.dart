@@ -5,7 +5,7 @@ import 'package:homg_long/repository/proxy/friendProxy.dart' as proxy;
 import 'package:logging/logging.dart';
 
 class FriendRepository {
-  final log = Logger("UserProxy");
+  final log = Logger("FriendRepository");
   late FriendDB _db;
   //late FriendProxy _proxy;
 
@@ -45,14 +45,15 @@ class FriendRepository {
 
   Future<FriendInfo> getFriendInfo(String uid, String fid) async {
     //return proxy.getFriendInfo(uid, fid);
+    log.info("getFriendInfo called");
     FriendInfo friendInfo = await _db.getFriendInfo(fid);
-    if (friendInfo.id != InvalidUserInfo.INVALID_ID) {
+    if (friendInfo.id == InvalidUserInfo.INVALID_ID) {
       log.info("getFriendInfo : friendInfo.id invalid");
       return await proxy.getFriendInfo(uid, fid);
     }
     // when get user info from databases is failed
     // request from server
-    return FriendInfo.invalidFriend();
+    return friendInfo;
   }
 
   Future<bool> setFriendInfo(String uid, FriendInfo friend) async {
