@@ -31,7 +31,7 @@ class AuthenticationProxy implements Authentication {
       }
 
       return model.UserInfo(
-          id: userCredential.user!.uid,
+          id: userCredential.user?.email ?? model.InvalidUserInfo().id,
           name: userCredential.user!.displayName ?? '',
           image: userCredential.user!.photoURL ?? '',
           initDate: DateTime.now().toString());
@@ -139,7 +139,7 @@ class AuthenticationProxy implements Authentication {
       }
       log.info("user info3:$userCredential");
       return model.UserInfo(
-        id: userCredential.user!.uid,
+        id: userCredential.user?.email ?? model.InvalidUserInfo().id,
         name: userCredential.user!.displayName ?? '',
         image: userCredential.user!.photoURL ?? '',
         initDate: DateTime.now().toString(),
