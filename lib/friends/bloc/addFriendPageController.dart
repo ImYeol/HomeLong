@@ -1,26 +1,37 @@
 import 'package:get/get.dart';
+import 'package:homg_long/repository/friendRepository.dart';
+import 'package:homg_long/repository/model/friendInfo.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
-import 'package:homg_long/repository/userRepository.dart';
 
 class AddFriendPageController extends GetxController {
-  late UserInfo user;
-  var hasInput = false;
+  var _searchedFriend = FriendInfo().obs;
+  var _inputText = "".obs;
+  final UserInfo user;
+  final FriendRepository friendRepository;
 
-  Future<UserInfo> loadUserInfo() async {
-    return UserRepository().getUserInfo();
+  AddFriendPageController({required this.user, required this.friendRepository});
+
+  FriendInfo get searchedFriend => _searchedFriend.value;
+  String get inputText => _inputText.value;
+
+  set inputText(String text) {
+    _inputText.value = text;
   }
 
-  void on() {
-    hasInput = true;
-    update();
+  void searchFriend() async {
+    final input = _inputText.value;
+    _searchedFriend.value =
+        await friendRepository.getFriendInfo(user.id, input);
   }
 
-  void off() {
-    hasInput = false;
-    update();
-  }
-
-  bool getHasInput() {
-    return hasInput;
+  void addFriend(FriendInfo friend) async {
+    final added = await friendRepository.setFriendInfo(user.id, friend);
+    if (added) {
+      print("addFriend added");
+      Get.back(result: friend);
+    } else {
+      print("addFriend not added");
+      Get.back();
+    }
   }
 }

@@ -9,7 +9,7 @@ import 'package:homg_long/repository/proxy/friendApiHeader.dart';
 import 'package:logging/logging.dart';
 import 'package:http/http.dart' as http;
 
-final log = Logger("UserProxy");
+final log = Logger("FriendProxy");
 
 Future<List<FriendInfo>> getAllFriendInfo(String uid) async {
   log.info("getFriendInfo");
@@ -67,9 +67,9 @@ Future<FriendInfo> getFriendInfo(String uid, String fid) async {
 }
 
 Future<bool> deleteFriendInfo(String uid, String fid) async {
-  log.info("setFriendInfo");
+  log.info("deleteFriendInfo");
 
-  var response = await http.post(
+  var response = await http.get(
     URL.deleteFriendURL,
     headers: FriendApiHeader.builder(uid, fid),
   );

@@ -28,6 +28,9 @@ class FriendInfo {
 
   FriendInfo.invalidFriend() {
     id = InvalidUserInfo.INVALID_ID;
+    name = "";
+    image = "";
+    atHome = false;
   }
 
   FriendInfo.fromJson(Map<String, dynamic> json) {

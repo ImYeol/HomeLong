@@ -28,7 +28,7 @@ class FriendDB {
   }
 
   Future<FriendInfo> getFriendInfo(String fid) async {
-    log.info("getUserInfo");
+    log.info("getFriendInfo");
     FriendInfo friendInfo = Hive.box(FRIEND_DB_NAME)
         .get(fid, defaultValue: FriendInfo.invalidFriend());
     return friendInfo;
