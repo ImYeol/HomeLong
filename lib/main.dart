@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,10 +18,10 @@ import 'package:homg_long/screen/appScreen.dart';
 import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/utils/router.dart';
 import 'package:logging/logging.dart' as logging;
+import 'package:homg_long/screen/bloc/fcmHelper.dart';
 
 import 'login/view/loginPage.dart';
 
-//https://fkkmemi.github.io/ff/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   EquatableConfig.stringify = kDebugMode;
@@ -31,6 +32,7 @@ void main() async {
   // initialize hive
   await Hive.initFlutter();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   UserRepository().init();
   TimeRepository().init();
   FriendRepository().init();
