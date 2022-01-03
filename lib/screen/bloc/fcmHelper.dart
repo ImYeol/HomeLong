@@ -2,7 +2,11 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:homg_long/repository/friendRepository.dart';
+import 'package:homg_long/repository/model/knockFeed.dart';
+import 'package:homg_long/repository/userRepository.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 // https://velog.io/@ezuunuu/Flutter-Firebasemessaging-%EB%B0%B1%EA%B7%B8%EB%9D%BC%EC%9A%B4%EB%93%9C-%EB%A9%94%EC%84%B8%EC%A7%80
 // https://doitduri.me/45
@@ -16,7 +20,29 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   //await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
-  print('Handling a background message ${message.data}');
+  print(
+      'Handling a background message $message : id ${message.category} : ${message.sentTime}');
+  //KnockFeed knock = KnockFeed.fromJson(message.data);
+  final pref = await SharedPreferences.getInstance();
+  var messageList = pref.getStringList("messages") ?? <String>[];
+  print("background message list : $messageList");
+  messageList.add(jsonEncode(message.data));
+  var success = await pref.setStringList("messages", messageList);
+  if (success) print("success to save feed");
+}
+
+Future<void> loadFirebaseBackgroundMessages() async {
+  final pref = await SharedPreferences.getInstance();
+  var messageList = pref.getStringList("messages");
+  print("loadFirebaseBackgroundMessages : $messageList");
+  if (messageList != null) {
+    messageList.forEach((message) {
+      var map = jsonDecode(message);
+      KnockFeed feed = KnockFeed.fromJson(map);
+      FriendRepository().saveKnockFeed(feed);
+    });
+    pref.remove("messages");
+  }
 }
 
 /// Create a [AndroidNotificationChannel] for heads up notifications
@@ -62,6 +88,7 @@ void handleFcmMessages() async {
   // 1) When user Uninstall/Reinstall the app or Clears App Data
   // 2) You manually delete FCM Instance using FirebaseMessaging().deleteInstanceID()
   token = await FirebaseMessaging.instance.getToken();
+  print("fcm token : $token");
 
   // If the application is opened from a terminated state
   // a Future containing a RemoteMessage will be returned.
@@ -79,25 +106,29 @@ void handleFcmMessages() async {
 
   // handle remote messages from FCM
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-    if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: channel.description,
-            // TODO add a proper drawable resource to android, for now using
-            //      one that already exists in example app.
-            icon: 'launch_background',
-          ),
-        ),
-      );
-    }
+    print("onMessage message : ${message.data}");
+    KnockFeed knock = KnockFeed.fromJson(message.data);
+    FriendRepository().saveKnockFeed(knock);
+
+    // RemoteNotification? notification = message.notification;
+    // AndroidNotification? android = message.notification?.android;
+    // if (notification != null && android != null) {
+    //   flutterLocalNotificationsPlugin.show(
+    //     notification.hashCode,
+    //     notification.title,
+    //     notification.body,
+    //     NotificationDetails(
+    //       android: AndroidNotificationDetails(
+    //         channel.id,
+    //         channel.name,
+    //         channelDescription: channel.description,
+    //         // TODO add a proper drawable resource to android, for now using
+    //         //      one that already exists in example app.
+    //         icon: 'launch_background',
+    //       ),
+    //     ),
+    //   );
+    // }
   });
 
   // A Stream which posts a RemoteMessage when the application is opened from a background state.
@@ -109,38 +140,4 @@ void handleFcmMessages() async {
     //   arguments: MessageArguments(message, true),
     // );
   });
-}
-
-/// The API endpoint here accepts a raw FCM payload for demonstration purposes.
-String constructFCMPayload(String? token) {
-  return jsonEncode({
-    'token': token,
-    'data': {
-      'via': 'FlutterFire Cloud Messaging!!!',
-    },
-    'notification': {
-      'title': 'Hello FlutterFire!',
-      'body': 'This notification was created via FCM!',
-    },
-  });
-}
-
-Future<void> sendPushMessage(String? token) async {
-  if (token == null) {
-    print('Unable to send FCM message, no token exists.');
-    return;
-  }
-
-  try {
-    await http.post(
-      Uri.parse('https://api.rnfirebase.io/messaging/send'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: constructFCMPayload(token),
-    );
-    print('FCM request for device sent!');
-  } catch (e) {
-    print(e);
-  }
 }

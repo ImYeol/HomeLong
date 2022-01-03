@@ -96,6 +96,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     log.info("didchangeApplifeCycleState : $state");
 
+    if (state == AppLifecycleState.resumed) {
+      // came to foreground
+      log.info("resume app");
+      loadFirebaseBackgroundMessages();
+    }
+
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) return;
 

@@ -1,5 +1,7 @@
 import 'package:homg_long/repository/db/friendDB.dart';
+import 'package:homg_long/repository/db/knockDB.dart';
 import 'package:homg_long/repository/model/friendInfo.dart';
+import 'package:homg_long/repository/model/knockFeed.dart';
 import 'package:homg_long/repository/model/userInfo.dart';
 import 'package:homg_long/repository/proxy/friendProxy.dart' as proxy;
 import 'package:logging/logging.dart';
@@ -7,6 +9,7 @@ import 'package:logging/logging.dart';
 class FriendRepository {
   final log = Logger("FriendRepository");
   late FriendDB _db;
+  late KnockDB _knockDb;
   //late FriendProxy _proxy;
 
   static final FriendRepository _instance = FriendRepository._internal();
@@ -17,21 +20,24 @@ class FriendRepository {
 
   FriendRepository._internal() {
     this._db = FriendDB();
+    this._knockDb = KnockDB();
     //this._proxy = FriendProxy();
   }
 
   void init() {
     _db.init();
+    _knockDb.init();
   }
 
   Future<bool> openDatabase() async {
-    return _db.openDatabase();
+    return await _db.openDatabase() && await _knockDb.openDatabase();
   }
 
   Future<List<FriendInfo>> getAllFriends(String uid) async {
     //return proxy.getAllFriendInfo(uid);
     log.info("getAllFriends called");
     var friendList = await _db.getAllFriendInfo();
+    //if (friendList.isEmpty) {
     if (friendList.isEmpty) {
       log.info("getAllFriends : friendList is empty");
       friendList = await proxy.getAllFriendInfo(uid);
@@ -66,5 +72,25 @@ class FriendRepository {
     //return proxy.deleteFriendInfo(uid, fid);
     return await _db.deleteFriendInfo(fid) &&
         await proxy.deleteFriendInfo(uid, fid);
+  }
+
+  Future<bool> sendKnockMessage(String uid, String fid) async {
+    bool sent = await proxy.sendKnockMessage(uid, fid);
+    print("sendKnockMessage : $sent");
+    if (sent) {
+      KnockFeed feed = KnockFeed(
+          senderId: uid, receiverId: fid, sentTime: DateTime.now().toString());
+      saveKnockFeed(feed);
+    }
+    return sent;
+  }
+
+  Future<int> saveKnockFeed(KnockFeed feed) {
+    print("saveKnockFeed : $feed");
+    return _knockDb.saveKnockFeed(feed);
+  }
+
+  Future<List<KnockFeed>> loadAllKnockFeed() async {
+    return _knockDb.loadAllKnockFeed();
   }
 }

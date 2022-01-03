@@ -9,6 +9,7 @@ import 'package:homg_long/screen/bloc/fcmHelper.dart';
 import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppScreen extends StatefulWidget {
   AppScreen({Key? key}) : super(key: key);

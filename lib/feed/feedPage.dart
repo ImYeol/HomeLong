@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:homg_long/feed/KnockFeedListItem.dart';
 import 'package:homg_long/feed/bloc/feedPageController.dart';
-import 'package:homg_long/feed/model/knockFeed.dart';
+import 'package:homg_long/repository/friendRepository.dart';
+import 'package:homg_long/repository/model/knockFeed.dart';
 import 'package:homg_long/utils/titleText.dart';
 
 class FeedPage extends StatefulWidget {
@@ -12,7 +13,7 @@ class FeedPage extends StatefulWidget {
 }
 
 class _FeedPageState extends State<FeedPage> {
-  final controller = FeedPageController();
+  final controller = FeedPageController(repository: FriendRepository());
 
   @override
   Widget build(BuildContext context) {

@@ -37,4 +37,5 @@ class URL {
   static Uri getFriendURL = Uri.parse(serverHost + serverPort + "/friend/get");
   static Uri deleteFriendURL =
       Uri.parse(serverHost + serverPort + "/friend/delete");
+  static Uri sendKnockURL = Uri.parse(serverHost + serverPort + "/knock/set");
 }

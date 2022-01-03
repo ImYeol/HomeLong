@@ -82,3 +82,19 @@ Future<bool> deleteFriendInfo(String uid, String fid) async {
     return false;
   }
 }
+
+Future<bool> sendKnockMessage(String uid, String fid) async {
+  log.info("sendKnockMessage to $fid");
+  var response = await http.get(
+    URL.sendKnockURL,
+    headers: {'id': uid, 'fid': fid, 'time': DateTime.now().toString()},
+  );
+
+  if (response.statusCode == StatusCode.statusOK) {
+    log.info("sendKnockMessage success(${response.body}");
+    return true;
+  } else {
+    log.info("sendKnockMessage fail(${response.statusCode}, ${response.body})");
+    return false;
+  }
+}

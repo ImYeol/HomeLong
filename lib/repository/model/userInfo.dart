@@ -23,6 +23,8 @@ class UserInfo {
   double latitude = double.infinity; // as initial value
   @HiveField(8)
   double longitude = double.infinity; // as initial value
+  @HiveField(9)
+  late String token;
 
   UserInfo(
       {String id = "",
@@ -33,7 +35,8 @@ class UserInfo {
       String street = "",
       String initDate = "9999-99-99 99:99:99.999",
       double latitude = 0.0,
-      double longitude = 0.0}) {
+      double longitude = 0.0,
+      String token = ""}) {
     this.id = id;
     this.name = name;
     this.image = image;
@@ -43,6 +46,7 @@ class UserInfo {
     this.initDate = initDate;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.token = token;
   }
 
   UserInfo.fromJson(Map<String, dynamic> json) {
@@ -55,6 +59,7 @@ class UserInfo {
     initDate = json['initDate'];
     latitude = json['latitude'];
     longitude = json['longitude'];
+    token = json['token'];
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +73,7 @@ class UserInfo {
       "initDate": this.initDate,
       "latitude": this.latitude,
       "longitude": this.longitude,
+      "token": this.token
     };
   }
 
