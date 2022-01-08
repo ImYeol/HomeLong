@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:geofence_service/geofence_service.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:homg_long/const/AppTheme.dart';
 import 'package:homg_long/feed/feedPage.dart';
 import 'package:homg_long/friends/friendsPage.dart';
-import 'package:homg_long/home/bloc/counterController.dart';
 import 'package:homg_long/home/counterPage.dart';
 import 'package:homg_long/log/logger.dart';
-import 'package:homg_long/repository/userRepository.dart';
+import 'package:homg_long/screen/bloc/fcmHelper.dart';
 import 'package:homg_long/screen/bloc/userActionManager.dart';
 import 'package:homg_long/setting/setting.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppScreen extends StatefulWidget {
   AppScreen({Key? key}) : super(key: key);
@@ -29,6 +28,7 @@ class _AppScreenState extends State<AppScreen>
   void initState() {
     super.initState();
     log.info("initialize app");
+    handleFcmMessages();
   }
 
   @override

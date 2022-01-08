@@ -45,4 +45,11 @@ class FriendsPageController extends ChangeNotifier {
       loadFreinds();
     }
   }
+
+  void knockToFriend(FriendInfo friend) async {
+    final user = await userRepository.getUserInfo();
+    await friendRepository.sendKnockMessage(user.id, friend.id);
+    log.info("knockToFriend : uid=${user.id}, fid=${friend.id}");
+    Get.snackbar("Knock Knock", friend.id, snackPosition: SnackPosition.BOTTOM);
+  }
 }

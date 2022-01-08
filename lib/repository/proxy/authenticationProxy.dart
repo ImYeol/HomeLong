@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:homg_long/const/AppKey.dart';
@@ -29,12 +30,15 @@ class AuthenticationProxy implements Authentication {
       if (userCredential.user == null) {
         return model.InvalidUserInfo();
       }
+      String? token = await FirebaseMessaging.instance.getToken();
+      log.info("firebase token: $token");
 
       return model.UserInfo(
           id: userCredential.user?.email ?? model.InvalidUserInfo().id,
           name: userCredential.user!.displayName ?? '',
           image: userCredential.user!.photoURL ?? '',
-          initDate: DateTime.now().toString());
+          initDate: DateTime.now().toString(),
+          token: token ?? '');
     } catch (e) {
       logUtil.logger.e(e);
       return model.InvalidUserInfo();
@@ -138,11 +142,15 @@ class AuthenticationProxy implements Authentication {
         return model.InvalidUserInfo();
       }
       log.info("user info3:$userCredential");
+      String? token = await FirebaseMessaging.instance.getToken();
+
+      log.info("firebase token: $token");
       return model.UserInfo(
         id: userCredential.user?.email ?? model.InvalidUserInfo().id,
         name: userCredential.user!.displayName ?? '',
         image: userCredential.user!.photoURL ?? '',
         initDate: DateTime.now().toString(),
+        token: token ?? '',
       );
     } catch (e) {
       logUtil.logger.e(e);

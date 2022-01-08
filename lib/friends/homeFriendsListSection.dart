@@ -39,11 +39,14 @@ class HomeFriendsListSection extends StatelessWidget {
       return SizedBox(
         height: AppTheme.icon_size * 2,
         child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: controller.homeFriends.length,
-          itemBuilder: (context, index) =>
-              HomeFriendsListItem(friend: controller.homeFriends[index]),
-        ),
+            scrollDirection: Axis.horizontal,
+            itemCount: controller.homeFriends.length,
+            itemBuilder: (context, index) => GestureDetector(
+                  onDoubleTap: () =>
+                      controller.knockToFriend(controller.homeFriends[index]),
+                  child: HomeFriendsListItem(
+                      friend: controller.homeFriends[index]),
+                )),
       );
     });
   }
